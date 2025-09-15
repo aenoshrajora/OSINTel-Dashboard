@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Setup Script V1.2
+# Setup Script v1.0
 
 # CAUTION WHEN MODIFYING THIS SCRIPT, it is fully automated, and if using sudo can do system-wide changes, if changed anything without properly caution or study, could harm your PC
 skipped_system_tools=""
@@ -55,7 +55,7 @@ handle_clonable_tool_installation() {
     fi
 }
 
-echo "--- OSINT Dashboard Setup V1.2 ---"
+echo "--- OSINTel-Dashboard Setup v1.0 ---"
 echo "This script will guide you through installing necessary system packages and OSINT tools."
 echo ""
 
@@ -250,7 +250,7 @@ echo ""
 
     echo "" && \
     echo "------------------------------------------------------------------------------------" && \
-    echo "SETUP SCRIPT V1.2 - FINISHED." && \
+    echo "SETUP SCRIPT v1.0 - FINISHED." && \
     echo "" && \
     echo "SUMMARY & ATTENTION REQUIRED:" && \
     echo "" && \
