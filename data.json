@@ -357,36 +357,5 @@
     "run_in_directory": null,
     "output_filename_pattern": "ipdns_{{INPUT__target}}_{{TIMESTAMP}}.info",
     "custom_handling": false
-  },
-  {
-    "id": "a120c4f5-5ba4-42d1-905c-12d2cd6da93c",
-    "name": "Domain Directory Finder (Gobuster)",
-    "description": "Searches for directories on a domain using Gobuster. Requires 'gobuster' to be globally installed.",
-    "notes": "",
-    "command_template": "gobuster dir -u {{protocol}}://{{domain}} -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 50",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Target Domain (e.g., example.com):",
-        "type": "text",
-        "placeholder": "example.com",
-        "default_value": ""
-      },
-      {
-        "id": "protocol",
-        "label": "Protocol:",
-        "type": "select",
-        "placeholder": "Protocol",
-        "default_value": "",
-        "options": []
-      }
-    ],
-    "requires_clone": false,
-    "clone_url": "",
-    "clone_dir": "",
-    "requirements_file": "",
-    "run_in_directory": null,
-    "output_filename_pattern": "gobuster_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false
   }
 ]
