@@ -1,0 +1,392 @@
+[
+  {
+    "id": "holehe-builtin",
+    "name": "Holehe Email Check",
+    "description": "Check if an email is used on different sites. Assumes 'holehe' is globally installed via pip.",
+    "notes": "No cloning required by this application.",
+    "command_template": "holehe {{email}} --no-color",
+    "input_fields": [
+      {
+        "id": "email",
+        "label": "Email Address:",
+        "type": "email",
+        "placeholder": "Enter email to check"
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "holehe_{{INPUT__email}}_{{TIMESTAMP}}.txt"
+  },
+  {
+    "id": "nmap-builtin",
+    "name": "Nmap Network Scan",
+    "description": "Network scanner. Assumes 'nmap' is globally installed.",
+    "notes": "Select scan type carefully. Some scans can be intrusive or require sudo for full effectiveness (not handled here).",
+    "command_template": "nmap {{scan_type}} {{target}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target (IP/Hostname):",
+        "type": "text",
+        "placeholder": "e.g., 192.168.1.1 or example.com"
+      },
+      {
+        "id": "scan_type",
+        "label": "Scan Type:",
+        "type": "select",
+        "options": [
+          {
+            "value": "-F",
+            "text": "Fast Scan (-F)"
+          },
+          {
+            "value": "-sV -T4",
+            "text": "Service Version (-sV -T4)"
+          },
+          {
+            "value": "-A -T4",
+            "text": "Aggressive (-A -T4)"
+          },
+          {
+            "value": "-p- -T4",
+            "text": "All Ports (Very Slow, -p-)"
+          }
+        ],
+        "default_value": "-F"
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "nmap_{{INPUT__target}}_{{INPUT__scan_type}}_{{TIMESTAMP}}.log"
+  },
+  {
+    "id": "ipdomain-builtin",
+    "name": "IP/Domain Info (Whois)",
+    "description": "Performs WHOIS lookup. Assumes 'whois' are globally installed.",
+    "notes": "",
+    "command_template": "whois {{target}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP or Domain:",
+        "type": "text",
+        "placeholder": "e.g., example.com or 8.8.8.8",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "ipdomain_{{INPUT__target}}_{{TIMESTAMP}}.info",
+    "custom_handling": false
+  },
+  {
+    "id": "theharvester-builtin",
+    "name": "TheHarvester",
+    "description": "Gathers emails, subdomains, hosts from public sources. Assumes 'theHarvester' is globally installed.",
+    "notes": "Can be slow, especially with 'all' sources. Results depend on API keys for some modules (not configured here).",
+    "command_template": "theHarvester -d {{domain}} -b {{source}} -l 200 --virtual-host",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain to Harvest:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "source",
+        "label": "Data Sources:",
+        "type": "select",
+        "placeholder": "",
+        "default_value": "DuckDuckGo, Bing, Brave",
+        "options": [
+          {
+            "text": "DuckDuckGo, Bing,Brave",
+            "value": "duckduckgo,bing,brave"
+          },
+          {
+            "text": "LinkedIn",
+            "value": "linkedin"
+          },
+          {
+            "text": "Twitter",
+            "value": "twitter"
+          },
+          {
+            "text": "All (Very Slow)",
+            "value": "all"
+          }
+        ]
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "theharvester_{{INPUT__domain}}_{{INPUT__source}}_{{TIMESTAMP}}.txt",
+    "custom_handling": false
+  },
+  {
+    "id": "dnsrecon-builtin",
+    "name": "Dnsrecon DNS Enumeration",
+    "description": "DNS Enumeration Script. Assumes 'dnsrecon' is globally installed.",
+    "notes": "Brute-force requires a wordlist; this uses dnsrecon's default.",
+    "command_template": "dnsrecon -d {{domain}}  -t {{type}}",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "type",
+        "label": "Enumeration Type:",
+        "type": "select",
+        "placeholder": "",
+        "default_value": "std",
+        "options": [
+          {
+            "text": "Standard (std)",
+            "value": "std"
+          },
+          {
+            "text": "Brute-force (brt)",
+            "value": "brt"
+          },
+          {
+            "text": "Zone Transfer (axfr)",
+            "value": "axfr"
+          }
+        ]
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "dnsrecon_{{INPUT__domain}}_{{INPUT__type}}_{{TIMESTAMP}}.txt",
+    "custom_handling": false
+  },
+  {
+    "id": "whatweb-builtin",
+    "name": "WhatWeb - Website Technologies",
+    "description": "Identify technologies used on websites. Assumes 'whatweb' is globally installed.",
+    "notes": "Provide full URL including http/https.",
+    "command_template": "whatweb --colour never {{url}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com"
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "whatweb_{{INPUT__url}}_{{TIMESTAMP}}.txt"
+  },
+  {
+    "id": "sherlock-cloned",
+    "name": "Sherlock Username Search",
+    "description": "Hunt for social media accounts by username. This configuration expects Sherlock to be cloned.",
+    "notes": "Ensure the clone URL is correct and the server can access it. Clone and pip install will be attempted if added via UI.",
+    "command_template": "python3 sherlock/sherlock.py {{username}} --no-color --timeout 10 --print-found",
+    "input_fields": [
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "Enter username",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/sherlock-project/sherlock.git",
+    "clone_dir": "tools/sherlock_username_search_cloned",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/sherlock_username_search",
+    "output_filename_pattern": "sherlock_{{INPUT__username}}_{{TIMESTAMP}}.txt",
+    "custom_handling": false
+  },
+  {
+    "id": "sublist3r-cloned",
+    "name": "Sublist3r Subdomain Enum",
+    "description": "Fast subdomains enumeration tool. This expects Sublist3r to be cloned.",
+    "notes": "Cloning and pip install will be attempted if added via UI.",
+    "command_template": "python3 sublist3r.py -d {{domain}} -n",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/aboul3la/Sublist3r.git",
+    "clone_dir": "tools/sublist3r_subdomain_enum_cloned",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/sublist3r_subdomain_enum",
+    "output_filename_pattern": "sublist3r_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
+    "custom_handling": false
+  },
+  {
+    "id": "metagoofil-cloned",
+    "name": "Metagoofil Metadata Extraction",
+    "description": "Extracts metadata from public documents. Expects Metagoofil to be cloned.",
+    "notes": "Output directory will be created inside the cloned tool's directory. Relies on system's exiftool.",
+    "command_template": "python2 metagoofil/metagoofil.py -d {{domain}} -t {{filetypes}} -l {{search_limit}} -n {{download_limit}} -o results_output -f metagoofil_report.html",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Target Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "filetypes",
+        "label": "File Types (comma-sep):",
+        "type": "text",
+        "placeholder": "pdf,doc,xls",
+        "default_value": "pdf,doc,xls"
+      },
+      {
+        "id": "search_limit",
+        "label": "Search Results Limit:",
+        "type": "text",
+        "placeholder": "100",
+        "default_value": "100"
+      },
+      {
+        "id": "download_limit",
+        "label": "Files to Download Limit:",
+        "type": "text",
+        "placeholder": "50",
+        "default_value": "50"
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/laramies/metagoofil.git",
+    "clone_dir": "tools/metagoofil_metadata_extr_cloned",
+    "requirements_file": "",
+    "run_in_directory": "tools/metagoofil_metadata_extraction",
+    "output_filename_pattern": "metagoofil_{{INPUT__domain}}_{{TIMESTAMP}}.info",
+    "custom_handling": false
+  },
+  {
+    "id": "ffuf-file-finder",
+    "name": "Domain File Finder (ffuf)",
+    "description": "Searches for specific files on a domain using ffuf. Provide one filename per line.",
+    "notes": "Requires 'ffuf' to be globally installed on the server. This tool creates temporary files (wordlist, ffuf JSON output) during execution, which are then deleted.",
+    "command_template": "ffuf -w {{wordlist_path}} -u {{protocol}}://{{domain}}/FUZZ -mc 200 -H \"User-Agent: OSINTDashboard/1.0\" -t 50 -timeout 10 -o {{ffuf_json_output_path}} -of json",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Target Domain (e.g., example.com):",
+        "type": "text",
+        "placeholder": "example.com"
+      },
+      {
+        "id": "filenames",
+        "label": "Filenames to search (one per line):",
+        "type": "textarea",
+        "placeholder": "robots.txt\nadmin.php\nbackup.zip\n.env"
+      },
+      {
+        "id": "protocol",
+        "label": "Protocol:",
+        "type": "select",
+        "options": [
+          {
+            "value": "https",
+            "text": "HTTPS"
+          },
+          {
+            "value": "http",
+            "text": "HTTP"
+          }
+        ],
+        "default_value": "https"
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "ffuf_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
+    "custom_handling": true
+  },
+  {
+    "id": "4d60633d-1634-426f-87d9-628e068e4a80",
+    "name": "IP/Domain Info (Dig)",
+    "description": "Retrieves DNS records and IP details to map domain infrastructure and network configuration.",
+    "notes": "",
+    "command_template": "dig {{target}} ANY +noall +answer +additional",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP or Domain:",
+        "type": "text",
+        "placeholder": "e.g., example.com or 8.8.8.8",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "ipdns_{{INPUT__target}}_{{TIMESTAMP}}.info",
+    "custom_handling": false
+  },
+  {
+    "id": "a120c4f5-5ba4-42d1-905c-12d2cd6da93c",
+    "name": "Domain Directory Finder (Gobuster)",
+    "description": "Searches for directories on a domain using Gobuster. Requires 'gobuster' to be globally installed.",
+    "notes": "",
+    "command_template": "gobuster dir -u {{protocol}}://{{domain}} -w /usr/share/wordlists/dirbuster/directory-list-2.3-small.txt -t 50",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Target Domain (e.g., example.com):",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "protocol",
+        "label": "Protocol:",
+        "type": "select",
+        "placeholder": "Protocol",
+        "default_value": "",
+        "options": []
+      }
+    ],
+    "requires_clone": false,
+    "clone_url": "",
+    "clone_dir": "",
+    "requirements_file": "",
+    "run_in_directory": null,
+    "output_filename_pattern": "gobuster_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
+    "custom_handling": false
+  }
+]

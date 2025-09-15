@@ -1,0 +1,569 @@
+[
+  {
+    "history_id": "89116a8b-ea09-478f-abc2-a1cace635e40",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search",
+    "timestamp": "2025-09-15T12:27:32.744764",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250915_122642.txt",
+    "status": "success",
+    "preview": "[*] Checking username aenoshrajora on:"
+  },
+  {
+    "history_id": "b3601488-66ca-4670-8071-e2715cc9b5a1",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois)",
+    "timestamp": "2025-09-15T12:26:38.160745",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250915_122636.info",
+    "status": "success",
+    "preview": "   Domain Name: GOOGLE.COM"
+  },
+  {
+    "history_id": "3e64a044-8c1d-4c1d-a024-dd814512d7d2",
+    "tool_id": "holehe-builtin",
+    "tool_name": "Holehe Email Check",
+    "timestamp": "2025-09-15T12:26:24.783837",
+    "inputs": {
+      "email": "hakaenosh101@gmail.com"
+    },
+    "output_file": "data/holehe_hakaenosh101_gmail_com_20250915_122556.txt",
+    "status": "success",
+    "preview": "Twitter : @palenath"
+  },
+  {
+    "history_id": "3b9823bc-c448-4098-8742-df5d2eff78e3",
+    "tool_id": "holehe-builtin",
+    "tool_name": "Holehe Email Check",
+    "timestamp": "2025-09-14T12:00:25.888436",
+    "inputs": {
+      "email": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/holehe_aenoshrajora79_gmail_com_20250914_120008.txt",
+    "status": "success",
+    "preview": "Twitter : @palenath"
+  },
+  {
+    "history_id": "257a96fd-5708-48ac-8ee2-6b20b8294db6",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search",
+    "timestamp": "2025-09-14T11:59:18.100772",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250914_115823.txt",
+    "status": "success",
+    "preview": "[*] Checking username aenoshrajora on:"
+  },
+  {
+    "history_id": "dd9a3fb5-f7b4-4900-948a-83f4d44a7c92",
+    "tool_id": "4d60633d-1634-426f-87d9-628e068e4a80",
+    "tool_name": "IP/Domain Info (Dig)",
+    "timestamp": "2025-09-12T21:06:30.538728",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdns_google_com_20250912_210600.info",
+    "status": "error",
+    "preview": "Error (Code 9)"
+  },
+  {
+    "history_id": "e0d02e42-e04e-46c7-aa00-fefa68e5ca67",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search",
+    "timestamp": "2025-09-12T21:05:09.414418",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250912_210418.txt",
+    "status": "success",
+    "preview": "[*] Checking username aenoshrajora on:"
+  },
+  {
+    "history_id": "29156937-9688-4d47-98f7-bc128db6de6b",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois)",
+    "timestamp": "2025-09-12T21:03:43.284764",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250912_210342.info",
+    "status": "success",
+    "preview": "   Domain Name: GOOGLE.COM"
+  },
+  {
+    "history_id": "d0200979-ce7d-4919-a769-def030d37984",
+    "tool_id": "holehe-builtin",
+    "tool_name": "Holehe Email Check",
+    "timestamp": "2025-09-12T21:02:38.827627",
+    "inputs": {
+      "email": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/holehe_aenoshrajora79_gmail_com_20250912_210226.txt",
+    "status": "success",
+    "preview": "Twitter : @palenath"
+  },
+  {
+    "history_id": "65ca941c-661c-406a-b6f8-a11e7d41a456",
+    "tool_id": "ffuf-file-finder",
+    "tool_name": "Domain File Finder (ffuf)",
+    "timestamp": "2025-09-12T19:54:01.053200",
+    "inputs": {
+      "domain": "http://testphp.vulnweb.com/",
+      "filenames": "login.php",
+      "protocol": "https"
+    },
+    "output_file": "data/ffuf_http_testphp_vulnweb_com__20250912_195351.txt",
+    "status": "success",
+    "preview": "FFUF Console Output:"
+  },
+  {
+    "history_id": "dae41656-4b83-4195-8b78-639f8d11ce90",
+    "tool_id": "ffuf-file-finder",
+    "tool_name": "Domain File Finder (ffuf)",
+    "timestamp": "2025-09-12T19:46:03.427665",
+    "inputs": {
+      "domain": "google.com",
+      "filenames": "robots.txt",
+      "protocol": "https"
+    },
+    "output_file": "data/ffuf_google_com_20250912_194602.txt",
+    "status": "success",
+    "preview": "FFUF Console Output:"
+  },
+  {
+    "history_id": "4ed6bfcc-eddf-4525-9363-db90319c2259",
+    "tool_id": "metagoofil-cloned",
+    "tool_name": "Metagoofil Metadata Extraction",
+    "timestamp": "2025-09-12T19:44:45.766510",
+    "inputs": {
+      "domain": "https://umd.edu/",
+      "filetypes": "pdf,doc,xls",
+      "search_limit": "100",
+      "download_limit": "50"
+    },
+    "output_file": "data/metagoofil_https_umd_edu__20250912_194439.info",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "a99143cd-d80f-41c9-bc06-1dcb9cbfca83",
+    "tool_id": "metagoofil-cloned",
+    "tool_name": "Metagoofil Metadata Extraction",
+    "timestamp": "2025-09-12T19:30:41.957086",
+    "inputs": {
+      "domain": "google.com",
+      "filetypes": "pdf,doc,xls",
+      "search_limit": "100",
+      "download_limit": "50"
+    },
+    "output_file": "data/metagoofil_google_com_20250912_193037.info",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "1e092812-3d38-44cf-90e2-bfa3c0876b94",
+    "tool_id": "metagoofil-cloned",
+    "tool_name": "Metagoofil Metadata Extraction",
+    "timestamp": "2025-09-12T19:29:43.621977",
+    "inputs": {
+      "domain": "google.com",
+      "filetypes": "pdf,doc,xls",
+      "search_limit": "100",
+      "download_limit": "50"
+    },
+    "output_file": "data/metagoofil_google_com_20250912_192942.info",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  },
+  {
+    "history_id": "3d2aa10f-ecbb-45f6-b1b2-556908cb0a28",
+    "tool_id": "metagoofil-cloned",
+    "tool_name": "Metagoofil Metadata Extraction",
+    "timestamp": "2025-09-12T19:29:13.469533",
+    "inputs": {
+      "domain": "google.com",
+      "filetypes": "pdf,doc,xls",
+      "search_limit": "100",
+      "download_limit": "50"
+    },
+    "output_file": "data/metagoofil_google_com_20250912_192913.info",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  },
+  {
+    "history_id": "8f02d0fc-24cb-4d6d-924f-de5e2918f0ff",
+    "tool_id": "metagoofil-cloned",
+    "tool_name": "Metagoofil Metadata Extraction",
+    "timestamp": "2025-09-12T19:28:50.979690",
+    "inputs": {
+      "domain": "google.com",
+      "filetypes": "pdf,doc,xls",
+      "search_limit": "100",
+      "download_limit": "50"
+    },
+    "output_file": "data/metagoofil_google_com_20250912_192850.info",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "10b39d55-157c-40fd-b433-0e83d857643a",
+    "tool_id": "ghunt-cloned",
+    "tool_name": "GHunt Google Acct Investigation",
+    "timestamp": "2025-09-12T19:22:53.104293",
+    "inputs": {
+      "email_or_gaiaid": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/ghunt_aenoshrajora79_gmail_com_20250912_192252.txt",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "32c16d8a-0176-41e2-809a-f83696ffc0dc",
+    "tool_id": "ghunt-cloned",
+    "tool_name": "GHunt Google Acct Investigation",
+    "timestamp": "2025-09-12T19:22:20.995939",
+    "inputs": {
+      "email_or_gaiaid": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/ghunt_aenoshrajora79_gmail_com_20250912_192220.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "6e92d63b-418c-40b7-b890-401516bd11b7",
+    "tool_id": "ghunt-cloned",
+    "tool_name": "GHunt Google Acct Investigation",
+    "timestamp": "2025-09-12T19:22:18.118452",
+    "inputs": {
+      "email_or_gaiaid": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/ghunt_aenoshrajora79_gmail_com_20250912_192217.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "c8cb1c82-e0bd-4e1c-b439-ac67f6cc71fa",
+    "tool_id": "ghunt-cloned",
+    "tool_name": "GHunt Google Acct Investigation",
+    "timestamp": "2025-09-12T19:21:42.244663",
+    "inputs": {
+      "email_or_gaiaid": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/ghunt_aenoshrajora79_gmail_com_20250912_192142.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "3e602a08-5955-46dc-b17c-a00dd4df94ee",
+    "tool_id": "sublist3r-cloned",
+    "tool_name": "Sublist3r Subdomain Enum",
+    "timestamp": "2025-09-12T19:16:52.237008",
+    "inputs": {
+      "domain": "google.com"
+    },
+    "output_file": "data/sublist3r_google_com_20250912_191538.txt",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "bf250698-2eda-4dc6-bbd9-452699d1f83e",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search (Cloned)",
+    "timestamp": "2025-09-12T19:11:04.696397",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250912_191011.txt",
+    "status": "success",
+    "preview": "[*] Checking username aenoshrajora on:"
+  },
+  {
+    "history_id": "1cab1874-0b0a-4b1b-b0e7-944e0a1b572b",
+    "tool_id": "whatweb-builtin",
+    "tool_name": "WhatWeb - Website Technologies",
+    "timestamp": "2025-09-12T19:09:26.371596",
+    "inputs": {
+      "url": "google.com"
+    },
+    "output_file": "data/whatweb_google_com_20250912_190906.txt",
+    "status": "success",
+    "preview": "http://google.com [301 Moved Permanently] Country[UNITED STATES][US], HTTPServer[gws], IP[216.58.200..."
+  },
+  {
+    "history_id": "f47a6ed5-0659-49ed-a0a8-032cf2a71f06",
+    "tool_id": "dnsrecon-builtin",
+    "tool_name": "Dnsrecon DNS Enumeration",
+    "timestamp": "2025-09-12T19:08:37.246163",
+    "inputs": {
+      "domain": "google.com",
+      "type": "std"
+    },
+    "output_file": "data/dnsrecon_google_com_std_20250912_190829.txt",
+    "status": "success",
+    "preview": "[*] std: Performing General Enumeration against: google.com..."
+  },
+  {
+    "history_id": "213b83f7-def3-4bd5-9290-fb674ba3d1ba",
+    "tool_id": "dnsrecon-builtin",
+    "tool_name": "Dnsrecon DNS Enumeration",
+    "timestamp": "2025-09-12T19:07:24.549148",
+    "inputs": {
+      "domain": "google.com",
+      "type": "std"
+    },
+    "output_file": "data/dnsrecon_google_com_std_20250912_190722.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "a1ad9cd3-df4e-4fcd-aff0-a2284d6a2465",
+    "tool_id": "theharvester-builtin",
+    "tool_name": "TheHarvester",
+    "timestamp": "2025-09-12T19:04:56.927819",
+    "inputs": {
+      "domain": "google.com",
+      "source": "duckduckgo,bing,brave"
+    },
+    "output_file": "data/theharvester_google_com_duckduckgo_bing_brave_20250912_190443.txt",
+    "status": "success",
+    "preview": "Read proxies.yaml from /etc/theHarvester/proxies.yaml"
+  },
+  {
+    "history_id": "63b719b8-dd1a-4bf7-98b5-8d5274c5ae32",
+    "tool_id": "theharvester-builtin",
+    "tool_name": "TheHarvester",
+    "timestamp": "2025-09-12T19:02:02.780538",
+    "inputs": {
+      "domain": "google.com",
+      "source": "google,bing"
+    },
+    "output_file": "data/theharvester_google_com_google_bing_20250912_190201.txt",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  },
+  {
+    "history_id": "f3acec7f-0108-43c1-abd3-701c67fd0932",
+    "tool_id": "theharvester-builtin",
+    "tool_name": "TheHarvester",
+    "timestamp": "2025-09-12T18:55:59.087036",
+    "inputs": {
+      "domain": "google.com",
+      "source": "all"
+    },
+    "output_file": "data/theharvester_google_com_all_20250912_185059.txt",
+    "status": "error",
+    "preview": "Error: Command 'theHarvester' timed out after 300 seconds."
+  },
+  {
+    "history_id": "f6e7d5a2-58f7-4f18-9401-4bb578d249fe",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois)",
+    "timestamp": "2025-09-12T18:50:02.909295",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250912_185001.info",
+    "status": "success",
+    "preview": "   Domain Name: GOOGLE.COM"
+  },
+  {
+    "history_id": "1e3de1d9-f9f5-49b6-9a75-950841104ecb",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois)",
+    "timestamp": "2025-09-12T18:44:25.977209",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250912_184424.info",
+    "status": "success",
+    "preview": "   Domain Name: GOOGLE.COM"
+  },
+  {
+    "history_id": "ee0cf266-35d9-4152-af4d-6b32b1f22509",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois, Dig)",
+    "timestamp": "2025-09-12T17:07:33.931055",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250912_170733.info",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  },
+  {
+    "history_id": "55a4acda-a6a3-4b56-84fc-1978d3024411",
+    "tool_id": "ipdomain-builtin",
+    "tool_name": "IP/Domain Info (Whois, Dig)",
+    "timestamp": "2025-09-12T17:01:17.223848",
+    "inputs": {
+      "target": "google.com"
+    },
+    "output_file": "data/ipdomain_google_com_20250912_170117.info",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  },
+  {
+    "history_id": "33382add-7b46-4730-a01d-8019e1df70e0",
+    "tool_id": "nmap-builtin",
+    "tool_name": "Nmap Network Scan",
+    "timestamp": "2025-09-12T16:53:56.561266",
+    "inputs": {
+      "target": "google.com",
+      "scan_type": "-F"
+    },
+    "output_file": "data/nmap_google_com__F_20250912_165353.log",
+    "status": "success",
+    "preview": "Starting Nmap 7.95 ( https://nmap.org ) at 2025-09-12 16:53 IST"
+  },
+  {
+    "history_id": "a8e7e6fa-6fa8-4906-b58e-1b4b953a1edd",
+    "tool_id": "holehe-builtin",
+    "tool_name": "Holehe Email Check",
+    "timestamp": "2025-09-12T16:50:20.212806",
+    "inputs": {
+      "email": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/holehe_aenoshrajora79_gmail_com_20250912_165007.txt",
+    "status": "success",
+    "preview": "Twitter : @palenath"
+  },
+  {
+    "history_id": "1c16a035-90a6-4dd9-b144-c0e281808da3",
+    "tool_id": "holehe-builtin",
+    "tool_name": "Holehe Email Check",
+    "timestamp": "2025-09-12T15:04:29.631572",
+    "inputs": {
+      "email": "aenoshrajora79@gmail.com"
+    },
+    "output_file": "data/holehe_aenoshrajora79_gmail_com_20250912_150429.txt",
+    "status": "error",
+    "preview": "Error: The command 'holehe' was not found. Is it installed and in PATH?"
+  },
+  {
+    "history_id": "22d5ec5f-427b-491c-8598-94688b69850e",
+    "tool_id": "sublist3r-cloned",
+    "tool_name": "Sublist3r Subdomain Enum (Cloned)",
+    "timestamp": "2025-09-12T12:30:02.048252",
+    "inputs": {
+      "domain": "google.com"
+    },
+    "output_file": "data/sublist3r_google_com_20250912_122841.txt",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "24a53aca-5c84-454d-b9d6-05459c95f3ac",
+    "tool_id": "sublist3r-cloned",
+    "tool_name": "Sublist3r Subdomain Enum (Cloned)",
+    "timestamp": "2025-09-12T12:28:05.556624",
+    "inputs": {
+      "domain": "google.com"
+    },
+    "output_file": "data/sublist3r_google_com_20250912_122805.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "5ef046db-37f6-46c1-8f99-171a5ef50aea",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search (Cloned)",
+    "timestamp": "2025-09-12T12:27:16.117524",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250912_122621.txt",
+    "status": "success",
+    "preview": "[*] Checking username aenoshrajora on:"
+  },
+  {
+    "history_id": "5980df41-635a-482b-84ea-38a4e61b4851",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search (Cloned)",
+    "timestamp": "2025-09-12T12:25:26.934130",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250912_122526.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "a77e8d7e-31b4-4236-82a5-f9a1a25f6176",
+    "tool_id": "sherlock-cloned",
+    "tool_name": "Sherlock Username Search (Cloned)",
+    "timestamp": "2025-09-12T12:24:24.092382",
+    "inputs": {
+      "username": "aenoshrajora"
+    },
+    "output_file": "data/sherlock_aenoshrajora_20250912_122423.txt",
+    "status": "error",
+    "preview": "Error (Code 2)"
+  },
+  {
+    "history_id": "8f88ce95-480b-42a5-9866-e492c0cb0485",
+    "tool_id": "whatweb-builtin",
+    "tool_name": "WhatWeb - Website Technologies",
+    "timestamp": "2025-09-12T12:23:47.545305",
+    "inputs": {
+      "url": "https://www.google.com/"
+    },
+    "output_file": "data/whatweb_https_www_google_com__20250912_122335.txt",
+    "status": "success",
+    "preview": "https://www.google.com/ [200 OK] Cookies[AEC,NID], Country[UNITED STATES][US], HTML5, HTTPServer[gws..."
+  },
+  {
+    "history_id": "18d01ee2-2929-4fb3-8cf6-3f2845f38aa4",
+    "tool_id": "whatweb-builtin",
+    "tool_name": "WhatWeb - Website Technologies",
+    "timestamp": "2025-09-12T12:19:30.740097",
+    "inputs": {
+      "url": "https://www.google.com/"
+    },
+    "output_file": "data/whatweb_https_www_google_com__20250912_121917.txt",
+    "status": "success",
+    "preview": "\u001b[1m\u001b[34mhttps://www.google.com/\u001b[0m [200 OK] \u001b[1mCookies\u001b[0m[\u001b[0m\u001b[22mAEC,NID\u001b[0m], \u001b[1mCountry\u001b[0m..."
+  },
+  {
+    "history_id": "ce363c91-81c0-4f8a-9963-25cfaa371520",
+    "tool_id": "whatweb-builtin",
+    "tool_name": "WhatWeb - Website Technologies",
+    "timestamp": "2025-09-12T11:00:52.661602",
+    "inputs": {
+      "url": "https://www.google.com/"
+    },
+    "output_file": "data/whatweb_https_www_google_com__20250912_110047.txt",
+    "status": "success",
+    "preview": ""
+  },
+  {
+    "history_id": "7837a8a4-7de3-49fc-845f-b7532511c4dc",
+    "tool_id": "theharvester-builtin",
+    "tool_name": "TheHarvester",
+    "timestamp": "2025-09-12T10:57:48.221259",
+    "inputs": {
+      "domain": "google.com",
+      "source": "all"
+    },
+    "output_file": "data/theharvester_google_com_all_20250912_105248.txt",
+    "status": "error",
+    "preview": "Error: Command 'theHarvester' timed out after 300 seconds."
+  },
+  {
+    "history_id": "e2c3b7c4-117a-488f-a77b-ae61444b0696",
+    "tool_id": "theharvester-builtin",
+    "tool_name": "TheHarvester",
+    "timestamp": "2025-09-12T10:52:34.080460",
+    "inputs": {
+      "domain": "google.com",
+      "source": "google,bing"
+    },
+    "output_file": "data/theharvester_google_com_google_bing_20250912_105229.txt",
+    "status": "error",
+    "preview": "Error (Code 1)"
+  }
+]
