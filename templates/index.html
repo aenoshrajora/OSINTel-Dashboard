@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OSINTle</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #e6f3f0; display: flex; height: 100vh; color: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #000303; display: flex; height: 100vh; color: #333; }
         .sidebar { width: 280px; background-color: #f8f9fa; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; border-right: 1px solid #dee2e6; display: flex; flex-direction: column; }
-        .sidebar h2 { font-size: 1.3em; color: #00695c; margin-bottom: 10px; text-align: center; }
+        .sidebar h2 { font-size: 1.3em; color: #00e4c9; margin-bottom: 10px; text-align: center; }
         .sidebar ul#toolList { list-style: none; padding: 0; flex-grow: 1; }
         .sidebar li.tool-item { padding: 8px 10px; margin-bottom: 8px; background-color: #e9ecef; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s; font-size: 0.88em; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar li.tool-item:hover, .sidebar li.tool-item.active { background-color: #00796b; color: white; }
+        .sidebar li.tool-item:hover, .sidebar li.tool-item.active { background-color: #6900f3; color: rgb(255, 255, 255); }
         .sidebar .tool-item-name { flex-grow: 1; margin-right: 5px; }
         .sidebar .tool-actions button { font-size: 0.65em; padding: 3px 5px; margin-left: 3px; background-color: #004d40; color:white; border:none; border-radius:3px; cursor:pointer;}
         .sidebar .tool-actions button.history-btn {background-color: #5a6268;}
@@ -20,9 +20,9 @@
         .sidebar .manage-tools-btn:hover { background-color: #0056b3; }
 
         .main-content { flex-grow: 1; padding: 25px; overflow-y: auto; }
-        .panel { background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 20px; display: none; }
+        .panel { background-color: #d1d1d1; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 20px; display: none; }
         .panel.active { display: block; }
-        .panel h3 { margin-top: 0; color: #004d40; border-bottom: 2px solid #a7d8de; padding-bottom: 12px; font-size: 1.2em; }
+        .panel h3 { margin-top: 0; color: #47008a; border-bottom: 2px solid #260581; padding-bottom: 12px; font-size: 1.2em; }
         
         #toolOutputDisplay { 
             width: calc(100% - 22px); 
@@ -45,7 +45,7 @@
         .panel .input-group { margin-bottom: 15px; }
         .panel .input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size:0.9em; }
         .panel .input-group input[type="text"], .panel .input-group input[type="email"], .panel .input-group input[type="url"], .panel .input-group select { width: calc(100% - 22px); padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; }
-        .panel button.run-tool-btn { padding: 10px 18px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; font-size: 0.9em; margin-top:10px; }
+        .panel button.run-tool-btn { padding: 10px 18px; background-color: #005a15; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; font-size: 0.9em; margin-top:10px; }
         .panel button.run-tool-btn:hover { background-color: #1e7e34; }
         .panel p.tool-description, .panel p.tool-notes { font-size: 0.9em; margin-bottom: 10px; background-color: #f0f7f8; padding: 8px; border-left: 3px solid #00796b; border-radius:3px; }
         #currentToolStatus { font-size: 0.8em; margin-top: 5px; padding: 5px; border-radius: 3px; text-align: right;}
@@ -82,7 +82,7 @@
 
     <div class="main-content">
         <div id="welcomePanel" class="panel active">
-            <h3>Welcome to the Enhanced OSINT Dashboard</h3>
+            <h3>Welcome to the OSINTel Dashboard</h3>
             <p>Select a tool from the sidebar, view its history, or add a new tool configuration.</p>
             <p>Tool outputs are saved to files in the 'data/' directory on the server and can be reviewed via the history feature.</p>
         </div>
