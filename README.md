@@ -130,8 +130,8 @@ If you prefer to install everything manually or the setup script encounters issu
 1.  **Project Directory:**
     Create your project directory and navigate into it:
     ```bash
-    mkdir osint_dashboard_project
-    cd osint_dashboard_project
+    mkdir osintelOSINTel-Dashboard
+    cd osintelOSINTel-Dashboard
     ```
     Place `app.py`, `data.json`, `history.json` (empty `[]`), and the `templates/index.html` file here.
 
