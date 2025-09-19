@@ -1,386 +1,1469 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OSINTle</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #6d6d6d; display: flex; height: 100vh; color: #333; }
-        .sidebar { width: 280px; background-color: #f8f9fa; padding: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); overflow-y: auto; border-right: 1px solid #dee2e6; display: flex; flex-direction: column; }
-        .sidebar h2 { font-size: 1.3em; color: #00e4c9; margin-bottom: 10px; text-align: center; }
-        .sidebar ul#toolList { list-style: none; padding: 0; flex-grow: 1; }
-        .sidebar li.tool-item { padding: 8px 10px; margin-bottom: 8px; background-color: #e9ecef; border-radius: 5px; cursor: pointer; transition: background-color 0.3s, color 0.3s; font-size: 0.88em; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar li.tool-item:hover, .sidebar li.tool-item.active { background-color: #6900f3; color: rgb(255, 255, 255); }
-        .sidebar .tool-item-name { flex-grow: 1; margin-right: 5px; }
-        .sidebar .tool-actions button { font-size: 0.65em; padding: 3px 5px; margin-left: 3px; background-color: #004d40; color:white; border:none; border-radius:3px; cursor:pointer;}
-        .sidebar .tool-actions button.history-btn {background-color: #5a6268;}
-        .sidebar .tool-actions button:hover { background-color: #00251a;}
-        .sidebar .tool-actions button.history-btn:hover {background-color: #33383c;}
-        .sidebar .manage-tools-btn { display: block; width: calc(100% - 10px) ; padding: 10px 15px; margin-top:15px; background-color: #007bff; color: white; border: none; border-radius: 5px; text-align: center; cursor: pointer; font-size: 0.95em; }
-        .sidebar .manage-tools-btn:hover { background-color: #0056b3; }
-
-        .main-content { flex-grow: 1; padding: 25px; overflow-y: auto; }
-        .panel { background-color: #d1d1d1; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.08); padding: 20px; display: none; }
-        .panel.active { display: block; }
-        .panel h3 { margin-top: 0; color: #47008a; border-bottom: 2px solid #260581; padding-bottom: 12px; font-size: 1.2em; }
-        
-        #toolOutputDisplay { 
-            width: calc(100% - 22px); 
-            min-height: 250px; 
-            margin-top: 15px; 
-            border: 1px solid #ced4da; 
-            border-radius: 4px; 
-            padding: 10px; 
-            font-family: 'Courier New', Courier, monospace; 
-            font-size: 0.9em; 
-            background-color: #fdfdfd; 
-            white-space: pre-wrap; 
-            word-wrap: break-word; 
-            overflow-y: auto;
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <style>
+        /* Global */
+        body {
+          margin: 0;
+          font-family: 'Segoe UI', Roboto, sans-serif;
+          background: linear-gradient(135deg, #1a1a1a, #0d0d0d); /* Dark background gradient */
+          color: #ccc;
+          display: flex;
+          height: 100vh;
         }
-        #toolOutputDisplay.error-output { border-left: 5px solid #dc3545; }
-        #toolOutputDisplay.success-output { border-left: 5px solid #28a745; }
+        
+        body.light-theme {
+          background: linear-gradient(135deg, #f6f8fb, #eef1f7); /* light mode background */
+          color: #333;
+        }
+        
+        body.light-theme .sidebar {
+          background: #fff;
+        }
+        
+        body.light-theme .panel {
+          background: #fff;
+          color: #333;
+        }
+        
+        body.light-theme .modal-content {
+          background: #fff;
+          color: #333;
+        }
+        
+        body.light-theme .input-group input,
+        body.light-theme .input-group select,
+        body.light-theme .modal-content input,
+        body.light-theme .modal-content textarea,
+        body.light-theme .modal-content select {
+          background: #fff;
+          color: #333;
+          border: 1px solid #ccc;
+        }
+        
+        body.light-theme .input-group input::placeholder,
+        body.light-theme .input-group select::placeholder,
+        body.light-theme .modal-content input::placeholder,
+        body.light-theme .modal-content textarea::placeholder,
+        body.light-theme .modal-content select::placeholder {
+          color: #999;
+        }
+        
+        body.light-theme #toolOutputDisplay {
+          background: #f9f9f9;
+          color: #333;
+          border-color: #ccc;
+        }
+        
+        body.light-theme #glassOverlay {
+          background: rgba(255, 255, 255, 0.3);
+        }
+        
+        body.light-theme .sidebar li.tool-item {
+          background: #f5f5f5;
+          color: #333;
+        }
+        
+        body.light-theme .sidebar li.tool-item:hover,
+        body.light-theme .sidebar li.tool-item.active {
+          background: linear-gradient(90deg, #dfdfdf, #f302e7);
+          color: #fff;
+        }
+        
+        body.light-theme .sidebar .tool-actions button {
+          background: rgba(0, 0, 0, 0.1);
+          color: #333;
+        }
+        
+        body.light-theme .sidebar .tool-actions button:hover {
+          background: rgba(0, 0, 0, 0.2);
+        }
+        
+        body.light-theme .modal-content .input-field-config {
+          background: #f5f5f5;
+          border-color: #ccc;
+        }
+        
+        body.light-theme .modal-content .input-field-config label {
+          color: #333;
+        }
+        
+        body.light-theme .modal-content input[type="text"],
+        body.light-theme .modal-content input[type="url"],
+        body.light-theme .modal-content textarea,
+        body.light-theme .modal-content select {
+          background: #fff;
+          color: #333;
+          border: 1px solid #ccc;
+        }
+        
+        body.light-theme .modal-content input[type="text"]::placeholder,
+        body.light-theme .modal-content input[type="url"]::placeholder,
+        body.light-theme .modal-content textarea::placeholder,
+        body.light-theme .modal-content select::placeholder {
+          color: #999;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+          width: 280px;
+          background: #111;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          border-radius: 0 20px 20px 0;
+          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+          height: 100vh;
+          overflow: hidden;
+        }
+        
+        .sidebar ul#toolList {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          flex-grow: 1;
+          overflow-y: auto;
+          scrollbar-width: thin;
+        }
+        
+        .sidebar ul#toolList::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .sidebar ul#toolList::-webkit-scrollbar-thumb {
+          background: rgba(139, 0, 0, 0.4);
+          border-radius: 10px;
+        }
+        
+        .sidebar h2 {
+          font-size: 1.4em;
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 20px;
+          background: linear-gradient(90deg, #6003ca, #0033cc);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar li.tool-item {
+          background: #222;
+          padding: 12px 15px;
+          margin-bottom: 10px;
+          border-radius: 12px;
+          cursor: pointer;
+          font-size: 0.95em;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          transition: all 0.25s ease;
+        }
+        
+        .sidebar li.tool-item:hover,
+        .sidebar li.tool-item.active {
+          background: linear-gradient(90deg, #8b0000, #000000);
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+        
+        .sidebar .tool-actions button {
+          background: rgba(255,255,255,0.1);
+          border: none;
+          color: #fff;
+          padding: 5px 8px;
+          margin-left: 5px;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 0.7em;
+          transition: all 0.2s;
+        }
+        
+        .sidebar li.tool-item:hover .tool-actions button {
+          background: rgba(255,255,255,0.2);
+        }
+        
+        .sidebar .manage-tools-btn {
+          padding: 12px;
+          margin-top: 20px;
+          border: none;
+          border-radius: 14px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          color: #fff;
+          background: linear-gradient(90deg, #00008b, #2e004f);
+          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+          transition: all 0.25s ease;
+        }
+        
+        .sidebar .manage-tools-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+        
+        /* Main Content */
+        .main-content {
+          flex-grow: 1;
+          padding: 30px;
+          overflow-y: auto;
+        }
+        
+        .panel {
+          background: #1a1a1a;
+          border-radius: 20px;
+          padding: 25px;
+          margin-bottom: 20px;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+          display: none;
+          animation: fadeIn 0.3s ease;
+        }
+        
+        .panel.active {
+          display: block;
+        }
+        
+        .panel h3 {
+          margin-top: 0;
+          font-size: 1.3em;
+          font-weight: 700;
+          color: #8b0000;
+          border-bottom: 2px solid #333;
+          padding-bottom: 12px;
+        }
+        
+        .panel .input-group {
+          margin-bottom: 15px;
+        }
+        
+        .panel .input-group label {
+          font-weight: 500;
+          margin-bottom: 6px;
+          display: block;
+        }
+        
+        .panel .input-group input,
+        .panel .input-group select {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #333;
+          border-radius: 12px;
+          font-size: 0.95em;
+          transition: border 0.2s;
+        }
+        
+        .panel .input-group input:focus,
+        .panel .input-group select:focus {
+          outline: none;
+          border: 1px solid #00008b;
+          box-shadow: 0 0 0 3px rgba(0,0,139,0.3);
+        }
+        
+        .panel button.run-tool-btn {
+          background: linear-gradient(90deg, #004d00, #333333);
+          border: none;
+          color: #fff;
+          padding: 12px 20px;
+          border-radius: 14px;
+          font-size: 1em;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.25s ease;
+          margin-top: 10px;
+        }
+        
+        .panel button.run-tool-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        }
+        
+        /* Tool Output */
+        #toolOutputDisplay {
+          background: rgba(0, 0, 0, 0.7);
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.1);
+          backdrop-filter: blur(8px);
+          padding: 18px;
+          margin-top: 20px;
+          min-height: 200px;
+          font-family: "Courier New", monospace;
+          font-size: 0.95em;
+          color: #ccc;
+          white-space: pre-wrap;
+          overflow-y: auto;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+          animation: fadeIn 0.3s ease;
+        }
+        
+        #toolOutputDisplay.success-output {
+          border-left: 5px solid #004d00;
+        }
+        
+        #toolOutputDisplay.error-output {
+          border-left: 5px solid #8b0000;
+        }
+        
+        /* Modal Overlay */
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1000;
+          left: 0; top: 0;
+          width: 100%; height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(8px);
+          animation: fadeIn 0.3s ease;
+        }
+        
+        /* Modal Content */
+        .modal-content {
+          background: #272727;
+          border-radius: 20px;
+          width: 85%;
+          max-width: 750px;
+          padding: 25px 30px;
+          box-shadow: 0 12px 28px rgba(0,0,0,0.15);
+          animation: scaleIn 0.25s ease;
+          position: absolute;
+          top: 45%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+        
+        .modal-content h4 {
+          margin-top: 0;
+          font-size: 1.3em;
+          font-weight: 700;
+          color: #8b0000;
+          border-bottom: 2px solid #333;
+          padding-bottom: 12px;
+        }
+        
+        .modal-content .close-btn {
+          position: absolute;
+          top: 15px;
+          right: 20px;
+          font-size: 26px;
+          font-weight: bold;
+          color: #888;
+          cursor: pointer;
+          transition: color 0.2s;
+        }
+        
+        .modal-content .close-btn:hover {
+          color: #8b0000;
+        }
+        
+        .modal-content label {
+          display: block;
+          margin-top: 12px;
+          margin-bottom: 5px;
+          font-weight: 600;
+          font-size: 0.9em;
+          color: #ccc;
+        }
+        
+        .modal-content input[type="text"],
+        .modal-content input[type="url"],
+        .modal-content textarea,
+        .modal-content select {
+          width: 100%;
+          padding: 12px;
+          border: 1px solid #333;
+          border-radius: 12px;
+          font-size: 0.95em;
+          margin-bottom: 10px;
+          transition: all 0.2s ease;
+        }
+        
+        .modal-content input:focus,
+        .modal-content textarea:focus,
+        .modal-content select:focus {
+          outline: none;
+          border: 1px solid #00008b;
+          box-shadow: 0 0 0 3px rgba(0,0,139,0.3);
+        }
+        
+        .modal-content textarea {
+          min-height: 70px;
+          resize: vertical;
+        }
+        
+        .modal-content button {
+          background: linear-gradient(90deg, #00008b, #2e004f);
+          color: #fff;
+          border: none;
+          padding: 12px 18px;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 0.95em;
+          transition: all 0.25s ease;
+        }
+        
+        .modal-content button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
+        }
+        
+        .modal-content .input-field-config {
+          background: #222;
+          border: 1px dashed #444;
+          padding: 12px;
+          margin-bottom: 12px;
+          border-radius: 12px;
+        }
+        
+        .modal-content .input-field-config label {
+          font-weight: normal;
+          font-size: 0.85em;
+        }
+        
+        /* History Modal */
+        #historyModalContent ul {
+          list-style: none;
+          padding: 0;
+          max-height: 400px;
+          overflow-y: auto;
+        }
+        
+        #historyModalContent li {
+          padding: 12px;
+          border-bottom: 1px solid #333;
+          cursor: pointer;
+          font-size: 0.95em;
+          border-radius: 10px;
+          transition: background 0.2s;
+        }
+        
+        #historyModalContent li:hover {
+          background: #333;
+        }
+        
+        #historyModalContent li small {
+          display: block;
+          color: #999;
+          font-size: 0.8em;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.9); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+          0% { opacity: 0.8; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.05); }
+          100% { opacity: 0.8; transform: scale(1); }
+        }
+        
+        /* Glass Overlay */
+        #glassOverlay {
+          display: none;
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          z-index: 2000;
+        }
+        
+        #glassOverlay.active {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: fadeIn 0.3s ease;
+        }
+        
+        #glassOverlay span {
+          padding: 15px 25px;
+          border-radius: 16px;
+          font-size: 1.1em;
+          font-weight: 600;
+          color: #fff;
+          background: linear-gradient(90deg, #8b0000, #333333);
+          box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+          animation: pulse 1.5s infinite;
+        }
+        /* Input Fields Configuration - Base Styling */
+.modal-content .input-field-config {
+  background: #222; /* Dark mode default background */
+  border: 1px dashed #444;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
 
+/* Adjust label color for better contrast */
+.modal-content .input-field-config label {
+  color: #ccc;
+  font-weight: 500;
+}
 
-        .panel .input-group { margin-bottom: 15px; }
-        .panel .input-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size:0.9em; }
-        .panel .input-group input[type="text"], .panel .input-group input[type="email"], .panel .input-group input[type="url"], .panel .input-group select { width: calc(100% - 22px); padding: 10px; border: 1px solid #ced4da; border-radius: 4px; font-size: 0.9em; }
-        .panel button.run-tool-btn { padding: 10px 18px; background-color: #005a15; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; font-size: 0.9em; margin-top:10px; }
-        .panel button.run-tool-btn:hover { background-color: #1e7e34; }
-        .panel p.tool-description, .panel p.tool-notes { font-size: 0.9em; margin-bottom: 10px; background-color: #f0f7f8; padding: 8px; border-left: 3px solid #00796b; border-radius:3px; }
-        #currentToolStatus { font-size: 0.8em; margin-top: 5px; padding: 5px; border-radius: 3px; text-align: right;}
-        #currentToolStatus.status-success { color: green; }
-        #currentToolStatus.status-error { color: red; }
+/* Make sure text inputs inside don't overflow and are nicely contained */
+.modal-content .input-field-config input,
+.modal-content .input-field-config select,
+.modal-content .input-field-config textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 0.95em;
+  box-sizing: border-box;
+}
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: #fefefe; margin: 5% auto; padding: 25px; border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 8px; position: relative; }
-        .modal-content h4 { margin-top: 0; color: #00695c; }
-        .modal-content .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; position: absolute; top: 10px; right: 20px; }
-        .modal-content .close-btn:hover, .modal-content .close-btn:focus { color: black; text-decoration: none; }
-        .modal-content label { display: block; margin-top: 10px; margin-bottom: 3px; font-weight: bold; font-size: 0.9em; }
-        .modal-content input[type="text"], .modal-content input[type="url"], .modal-content textarea, .modal-content select { width: calc(100% - 20px); padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9em; }
-        .modal-content textarea { min-height: 60px; }
-        .modal-content button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top:10px; }
-        .modal-content button:hover { background-color: #0056b3; }
-        .modal-content .input-field-config { border: 1px dashed #ccc; padding: 10px; margin-bottom: 10px; border-radius: 4px; }
-        .modal-content .input-field-config label {font-weight:normal; font-size:0.85em;}
-        .modal-content #installationLog {margin-top:15px; padding:10px; background-color:#f0f0f0; border:1px solid #ddd; max-height:150px; overflow-y:auto; font-size:0.8em; white-space:pre-wrap;}
+/* Focus state */
+.modal-content .input-field-config input:focus,
+.modal-content .input-field-config select:focus,
+.modal-content .input-field-config textarea:focus {
+  border: 1px solid #00008b;
+  box-shadow: 0 0 0 3px rgba(0, 0, 139, 0.3);
+  outline: none;
+}
 
-        #historyModalContent ul { list-style: none; padding: 0; max-height: 400px; overflow-y:auto; }
-        #historyModalContent li { padding: 8px; border-bottom: 1px solid #eee; cursor: pointer; font-size: 0.9em; }
-        #historyModalContent li:hover { background-color: #f0f0f0; }
-        #historyModalContent li small { display: block; color: #555; font-size: 0.8em; }
-        #historyModal .modal-content {max-width: 800px;}
-    </style>
-</head>
-<body>
+/* ✅ Light Theme Adjustments */
+body.light-theme .modal-content .input-field-config {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+body.light-theme .modal-content .input-field-config label {
+  color: #333;
+}
+
+body.light-theme .modal-content .input-field-config input,
+body.light-theme .modal-content .input-field-config select,
+body.light-theme .modal-content .input-field-config textarea {
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+}
+
+body.light-theme .modal-content .input-field-config input::placeholder,
+body.light-theme .modal-content .input-field-config select::placeholder,
+body.light-theme .modal-content .input-field-config textarea::placeholder {
+  color: #999;
+}
+/* ✅ Dark mode adjustments for Input Fields Configuration */
+body:not(.light-theme) .modal-content .input-field-config {
+  background: #1a1a1a; /* match modal background */
+  border: 1px dashed #333; /* subtle border to distinguish section */
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+body:not(.light-theme) .modal-content .input-field-config label {
+  color: #ccc; /* match modal text color */
+}
+
+body:not(.light-theme) .modal-content .input-field-config input,
+body:not(.light-theme) .modal-content .input-field-config select,
+body:not(.light-theme) .modal-content .input-field-config textarea {
+  background: #222; /* darker but within modal theme */
+  color: #ccc;
+  border: 1px solid #333;
+  border-radius: 8px;
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+body:not(.light-theme) .modal-content .input-field-config input::placeholder,
+body:not(.light-theme) .modal-content .input-field-config select::placeholder,
+body:not(.light-theme) .modal-content .input-field-config textarea::placeholder {
+  color: #999;
+}
+
+body:not(.light-theme) .modal-content .input-field-config input:focus,
+body:not(.light-theme) .modal-content .input-field-config select:focus,
+body:not(.light-theme) .modal-content .input-field-config textarea:focus {
+  border: 1px solid #00008b;
+  box-shadow: 0 0 0 3px rgba(0, 0, 139, 0.3);
+  outline: none;
+}
+/* Floating bottom-right sun/moon toggle */
+.switch {
+  --total_transition_duration: .3s;
+  --slider_width: 2.875em;
+  --slider_height: 1.5em;
+  --slider_light_bg: linear-gradient(90deg, #f32a85 0%, #f19d36 100%);
+  --slider_night_bg: linear-gradient(90deg, #1701a1 0%, #af0693 75%);
+  --circle_diameter: 1.125em;
+  --circle_rotation: 360deg;
+  --slider_offset: calc((var(--slider_height) - var(--circle_diameter)) / 2);
+  --slider_radius: calc(var(--slider_height) / 2);
+  --sun-color: #fff;
+  --moon-color: #fff;
+
+  position: fixed;     
+  bottom: 20px;          
+  right: 20px;           
+  z-index: 3000;         
+  transform: scale(1);   
+  transform-origin: bottom right;
+}
+
+.switch input { display: none; }
+
+.slider {
+  display: inline-block;
+  width: var(--slider_width);
+  height: var(--slider_height);
+  border-radius: var(--slider_radius);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: var(--total_transition_duration) ease;
+}
+
+.slider::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:0;
+  background:var(--slider_night_bg);
+  transition: var(--total_transition_duration) ease;
+}
+
+.slider::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  opacity:1;
+  background:var(--slider_light_bg);
+  transition: var(--total_transition_duration) ease;
+}
+
+.circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--circle_diameter);
+  height: var(--circle_diameter);
+  position: absolute;
+  top: var(--slider_offset);
+  left: var(--slider_offset);
+  transition: var(--total_transition_duration) ease;
+  z-index: 10;
+}
+
+.circle svg.sun { transform: scale(1); color: var(--sun-color); }
+.circle svg.moon { transform: scale(0); color: var(--moon-color); width: calc(100% - 2px); }
+
+.switch input:checked + .slider::before { opacity: 1; }
+.switch input:checked + .slider::after { opacity: 0; }
+
+.switch input:active + .slider .circle { transform: scale(0.9); }
+.switch input:checked + .slider .circle {
+  left: calc(100% - var(--circle_diameter) - var(--slider_offset));
+}
+
+.switch input:checked + .slider .sun { transform: scale(0) rotate(var(--circle_rotation)); }
+.switch input:checked + .slider .moon { transform: scale(1) rotate(var(--circle_rotation)); }
+
+        </style>
+         
+  </head>
+  <body class="light-theme">
     <div class="sidebar">
-        <h2>OSINT Tools</h2>
-        <ul id="toolList"></ul>
-        <button class="manage-tools-btn" onclick="openToolModal()">Add New Tool</button>
+      <h2>OSINT Tools</h2>
+      <ul id="toolList"></ul>
+      <button class="manage-tools-btn" onclick="openToolModal()">
+        Add New Tool
+      </button>
     </div>
-
+<label class="switch">
+    <input id="themeToggle" type="checkbox">
+    <span class="slider">
+      <span class="circle">
+        <!-- Sun SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="sun">
+          <g>
+            <circle cx="16" cy="16" r="8.312" fill="currentColor"></circle>
+            <path d="M31.72 16.706a1.03 1.03 0 0 0 0-1.413l-2.816-3.023a1.037 1.037 0 0 1-.28-.831l.509-4.104c.072-.54-.291-1.05-.832-1.153l-4.062-.78a1.035 1.035 0 0 1-.707-.519l-1.994-3.616a1.037 1.037 0 0 0-1.35-.436l-3.751 1.756c-.27.125-.603.125-.873-.01L11.814.83a1.037 1.037 0 0 0-1.351.436L8.468 4.883c-.146.27-.406.457-.707.52L3.7 6.182c-.54.104-.904.613-.831 1.153l.509 4.104c.03.301-.063.602-.28.831L.28 15.293a1.03 1.03 0 0 0 0 1.413l2.815 3.024c.218.228.312.53.28.831l-.508 4.104c-.073.54.29 1.05.83 1.153l4.063.78c.301.062.561.249.707.519l1.994 3.615c.27.478.863.676 1.351.437l3.75-1.756c.27-.125.603-.125.873.01l3.751 1.746c.488.239 1.08.041 1.35-.437l1.995-3.615c.146-.27.406-.457.707-.52l4.062-.779c.54-.104.904-.613.832-1.153l-.51-4.104a1.037 1.037 0 0 1 .28-.831l2.816-3.023zM16 26.39c-5.725 0-10.39-4.665-10.39-10.39S10.275 5.61 16 5.61 26.39 10.275 26.39 16 21.725 26.39 16 26.39z" fill="currentColor"></path>
+          </g>
+        </svg>
+        <!-- Moon SVG -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="moon">
+          <g clip-path="url(#clip0_68_17)">
+            <path fill="currentColor" d="M355.2 142.08C355.2 162.133 338.773 178.56 318.72 178.56C298.667 178.56 282.453 162.133 282.453 142.08C282.453 122.027 298.667 105.813 318.72 105.813C338.773 105.813 355.2 122.027 355.2 142.08Z"></path>
+            <path fill="currentColor" d="M151.253 283.52C142.72 283.52 135.893 290.347 135.893 298.88C135.893 307.413 142.72 314.453 151.253 314.453C159.787 314.453 166.613 307.413 166.613 298.88C166.613 290.347 159.787 283.52 151.253 283.52Z"></path>
+          </g>
+          <defs>
+            <clipPath id="clip0_68_17">
+              <rect fill="currentColor" width="512" height="512"></rect>
+            </clipPath>
+          </defs>
+        </svg>
+      </span>
+    </span>
+  </label>
+  
+  
     <div class="main-content">
-        <div id="welcomePanel" class="panel active">
-            <h3>Welcome to the OSINTel Dashboard</h3>
-            <p>Select a tool from the sidebar, view its history, or add a new tool configuration.</p>
-            <p>Tool outputs are saved to files in the 'data/' directory on the server and can be reviewed via the history feature.</p>
-        </div>
-        <div id="toolRunPanel" class="panel">
-            <h3 id="currentToolName"></h3>
-            <p id="currentToolDescription" class="tool-description" style="display:none;"></p>
-            <p id="currentToolNotes" class="tool-notes" style="display:none;"></p>
-            <div id="toolInputsContainer"></div>
-            <button class="run-tool-btn" onclick="executeCurrentTool()">Run Tool</button>
-            <div id="currentToolStatus"></div>
-            <div id="toolOutputDisplay" placeholder="Tool output will appear here..."></div>
-        </div>
+      <div id="welcomePanel" class="panel active">
+        <h3>Welcome to the OSINTel Dashboard</h3>
+        <p>
+          Select a tool from the sidebar, view its history, or add a new tool
+          configuration.
+        </p>
+        <p>
+          Tool outputs are saved to files in the 'data/' directory on the server
+          and can be reviewed via the history feature.
+        </p>
+      </div>
+      <div id="toolRunPanel" class="panel">
+        <h3 id="currentToolName"></h3>
+        <p
+          id="currentToolDescription"
+          class="tool-description"
+          style="display: none"
+        ></p>
+        <p id="currentToolNotes" class="tool-notes" style="display: none"></p>
+        <div id="toolInputsContainer"></div>
+        <button class="run-tool-btn" onclick="executeCurrentTool()">
+          Run Tool
+        </button>
+        <div id="currentToolStatus"></div>
+        <div
+          id="toolOutputDisplay"
+          placeholder="Tool output will appear here..."
+        ></div>
+      </div>
     </div>
 
     <div id="toolModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeToolModal()">×</span>
-            <h4 id="modalTitle">Add New Tool</h4>
-            <input type="hidden" id="toolId">
-            <label for="toolName">Tool Name:</label>
-            <input type="text" id="toolName" placeholder="e.g., Sherlock Username Search">
-            <label for="toolDescription">Description (optional):</label>
-            <textarea id="toolDescription" placeholder="Brief description of the tool"></textarea>
-            <label for="toolNotes">Notes/Instructions (optional):</label>
-            <textarea id="toolNotes" placeholder="Any specific notes for using this tool"></textarea>
-            <label for="toolCommandTemplate">Command Template:</label>
-            <input type="text" id="toolCommandTemplate" placeholder="e.g., python3 tools/myscript.py {{input1}} -o {{input2}}">
-            <small>Use `{{input_id}}` for placeholders that match Input Field IDs.</small>
+      <div class="modal-content">
+        <span class="close-btn" onclick="closeToolModal()">×</span>
+        <h4 id="modalTitle">Add New Tool</h4>
+        <input type="hidden" id="toolId" />
+        <label for="toolName">Tool Name:</label>
+        <input
+          type="text"
+          id="toolName"
+          placeholder="e.g., Sherlock Username Search"
+        />
+        <label for="toolDescription">Description (optional):</label>
+        <textarea
+          id="toolDescription"
+          placeholder="Brief description of the tool"
+        ></textarea>
+        <label for="toolNotes">Notes/Instructions (optional):</label>
+        <textarea
+          id="toolNotes"
+          placeholder="Any specific notes for using this tool"
+        ></textarea>
+        <label for="toolCommandTemplate">Command Template:</label>
+        <input
+          type="text"
+          id="toolCommandTemplate"
+          placeholder="e.g., python3 tools/myscript.py {{input1}} -o {{input2}}"
+        />
+        <small
+          >Use `{{input_id}}` for placeholders that match Input Field
+          IDs.</small
+        >
 
-            <label for="toolOutputFilenamePattern">Output Filename Pattern (optional):</label>
-            <input type="text" id="toolOutputFilenamePattern" placeholder="Example: tool_name_input_value_timestamp.txt">
-            <small>Use placeholders like: `{{TOOL_ID}}`, `{{TOOL_NAME_SANITIZED}}`, `{{INPUT__field_id}}`, `{{TIMESTAMP}}`, `{{UUID}}`</small>
+        <label for="toolOutputFilenamePattern"
+          >Output Filename Pattern (optional):</label
+        >
+        <input
+          type="text"
+          id="toolOutputFilenamePattern"
+          placeholder="Example: tool_name_input_value_timestamp.txt"
+        />
+        <small
+          >Use placeholders like: `{{TOOL_ID}}`, `{{TOOL_NAME_SANITIZED}}`,
+          `{{INPUT__field_id}}`, `{{TIMESTAMP}}`, `{{UUID}}`</small
+        >
 
+        <h4>Input Fields Configuration:</h4>
+        <div id="inputFieldsList"></div>
+        <button type="button" onclick="addInputFieldConfig()">
+          + Add Input Field
+        </button>
 
-            <h4>Input Fields Configuration:</h4>
-            <div id="inputFieldsList"></div>
-            <button type="button" onclick="addInputFieldConfig()">+ Add Input Field</button>
-
-            <h4>Cloning & Execution (Optional):</h4>
-            <input type="checkbox" id="toolRequiresClone" onchange="toggleCloneOptions()"> <label for="toolRequiresClone" style="display:inline; font-weight:normal;">Requires Git Clone?</label>
-            <div id="cloneOptions" style="display:none; margin-left:20px; padding-top:10px; border-left:2px solid #eee;">
-                <label for="toolCloneUrl">Git Clone URL:</label>
-                <input type="url" id="toolCloneUrl" placeholder="https://github.com/user/repo.git">
-                <label for="toolRequirementsFile">Requirements File Path (relative to cloned dir, optional):</label>
-                <input type="text" id="toolRequirementsFile" placeholder="e.g., requirements.txt">
-                <input type="checkbox" id="toolRunInClonedDirectory"> <label for="toolRunInClonedDirectory" style="display:inline; font-weight:normal;">Run command from inside the cloned directory?</label>
-            </div>
-            <button id="saveToolButton" onclick="saveTool()">Save Tool</button>
-            <div id="installationLog" style="display:none;"></div>
+        <h4>Cloning & Execution (Optional):</h4>
+        <input
+          type="checkbox"
+          id="toolRequiresClone"
+          onchange="toggleCloneOptions()"
+        />
+        <label
+          for="toolRequiresClone"
+          style="display: inline; font-weight: normal"
+          >Requires Git Clone?</label
+        >
+        <div
+          id="cloneOptions"
+          style="
+            display: none;
+            margin-left: 20px;
+            padding-top: 10px;
+            border-left: 2px solid #eee;
+          "
+        >
+          <label for="toolCloneUrl">Git Clone URL:</label>
+          <input
+            type="url"
+            id="toolCloneUrl"
+            placeholder="https://github.com/user/repo.git"
+          />
+          <label for="toolRequirementsFile"
+            >Requirements File Path (relative to cloned dir, optional):</label
+          >
+          <input
+            type="text"
+            id="toolRequirementsFile"
+            placeholder="e.g., requirements.txt"
+          />
+          <input type="checkbox" id="toolRunInClonedDirectory" />
+          <label
+            for="toolRunInClonedDirectory"
+            style="display: inline; font-weight: normal"
+            >Run command from inside the cloned directory?</label
+          >
         </div>
+        <button id="saveToolButton" onclick="saveTool()">Save Tool</button>
+        <div id="installationLog" style="display: none"></div>
+      </div>
     </div>
 
     <div id="historyModal" class="modal">
-        <div class="modal-content" id="historyModalContent">
-            <span class="close-btn" onclick="closeHistoryModal()">×</span>
-            <h4 id="historyModalTitle">Execution History for Tool</h4>
-            <ul id="historyList"></ul>
-            <p id="noHistoryMessage" style="display:none; text-align:center; color:#777;">No history found for this tool.</p>
-        </div>
+      <div class="modal-content" id="historyModalContent">
+        <span class="close-btn" onclick="closeHistoryModal()">×</span>
+        <h4 id="historyModalTitle">Execution History for Tool</h4>
+        <ul id="historyList"></ul>
+        <p
+          id="noHistoryMessage"
+          style="display: none; text-align: center; color: #777"
+        >
+          No history found for this tool.
+        </p>
+      </div>
     </div>
 
     <script>
-        const apiUrl = '/api';
-        let currentTools = [];
-        let activeToolId = null;
-        let editingToolId = null;
-        const toolOutputDisplay = document.getElementById('toolOutputDisplay');
+document.addEventListener('DOMContentLoaded', function () {
+  const toggle = document.getElementById('themeToggle');
 
-        function makeLinksClickable(text) {
-            const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-            return text.replace(urlRegex, function(url) {
-                return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+  document.body.classList.add('light-theme');
+  toggle.checked = false;
+
+  // Toggle listener
+  toggle.addEventListener('change', function () {
+    if (this.checked) {
+      // Night mode
+      document.body.classList.add('dark-theme');
+      document.body.classList.remove('light-theme');
+    } else {
+      // Day mode
+      document.body.classList.add('light-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  });
+});
+
+      const apiUrl = "/api";
+      let currentTools = [];
+      let activeToolId = null;
+      let editingToolId = null;
+      const toolOutputDisplay = document.getElementById("toolOutputDisplay");
+    
+              function toggleTheme() {
+    document.body.classList.toggle('light-theme');
+}
+      function makeLinksClickable(text) {
+        const urlRegex =
+          /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+        return text.replace(urlRegex, function (url) {
+          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+        });
+      }
+      function displayToolOutput(text, status = "neutral") {
+        toolOutputDisplay.innerHTML = makeLinksClickable(escapeHtml(text));
+        toolOutputDisplay.className = "";
+        if (status === "success")
+          toolOutputDisplay.classList.add("success-output");
+        else if (status === "error")
+          toolOutputDisplay.classList.add("error-output");
+        const statusEl = document.getElementById("currentToolStatus");
+        statusEl.textContent =
+          status === "success"
+            ? "Status: Success"
+            : status === "error"
+            ? "Status: Error (see output)"
+            : "";
+        statusEl.className =
+          status === "success"
+            ? "status-success"
+            : status === "error"
+            ? "status-error"
+            : "";
+      }
+      function escapeHtml(unsafe) {
+        if (typeof unsafe !== "string") return "";
+        return unsafe
+          .replace(/&/g, "&")
+          .replace(/</g, "<")
+          .replace(/>/g, ">")
+          .replace(/"/g, "")
+          .replace(/'/g, "'");
+      }
+      async function fetchTools() {
+        try {
+          const response = await fetch(`${apiUrl}/tools`);
+          if (!response.ok)
+            throw new Error(`HTTP error! status: ${response.status}`);
+          currentTools = await response.json();
+          renderToolList();
+        } catch (error) {
+          console.error("Failed to fetch tools:", error);
+          alert("Error fetching tools. Check console.");
+        }
+      }
+      function renderToolList() {
+        const toolListUl = document.getElementById("toolList");
+        toolListUl.innerHTML = "";
+        if (currentTools.length === 0) {
+          toolListUl.innerHTML =
+            '<p style="padding:10px; text-align:center; color:#777;">No tools. Click "Add New Tool".</p>';
+        }
+        currentTools.forEach((tool) => {
+          const li = document.createElement("li");
+          li.classList.add("tool-item");
+          li.dataset.toolId = tool.id;
+          const nameSpan = document.createElement("span");
+          nameSpan.classList.add("tool-item-name");
+          nameSpan.textContent = tool.name;
+          nameSpan.onclick = () => selectTool(tool.id);
+          li.appendChild(nameSpan);
+          const actionsDiv = document.createElement("div");
+          actionsDiv.classList.add("tool-actions");
+          const historyBtn = document.createElement("button");
+          historyBtn.textContent = "Hist";
+          historyBtn.classList.add("history-btn");
+          historyBtn.title = "View History";
+          historyBtn.onclick = (e) => {
+            e.stopPropagation();
+            openHistoryModal(tool.id, tool.name);
+          };
+          const editBtn = document.createElement("button");
+          editBtn.textContent = "Edit";
+          editBtn.title = "Edit Tool";
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            openToolModal(tool.id);
+          };
+          const deleteBtn = document.createElement("button");
+          deleteBtn.textContent = "Del";
+          deleteBtn.title = "Delete Tool";
+          deleteBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteTool(tool.id, tool.name);
+          };
+          actionsDiv.appendChild(historyBtn);
+          actionsDiv.appendChild(editBtn);
+          actionsDiv.appendChild(deleteBtn);
+          li.appendChild(actionsDiv);
+          toolListUl.appendChild(li);
+        });
+      }
+      function selectTool(toolId, fromHistoryOutput = null) {
+        // Close modals to ensure stale data is not shown
+        closeToolModal();
+        closeHistoryModal();
+
+        activeToolId = toolId;
+        const tool = currentTools.find((t) => t.id === toolId);
+        if (!tool) return;
+
+        document
+          .querySelectorAll(".sidebar li.tool-item")
+          .forEach((li) => li.classList.remove("active"));
+        const activeLi = document.querySelector(
+          `.sidebar li.tool-item[data-tool-id="${toolId}"]`
+        );
+        if (activeLi) activeLi.classList.add("active");
+
+        document.getElementById("welcomePanel").classList.remove("active");
+        const toolRunPanel = document.getElementById("toolRunPanel");
+        toolRunPanel.classList.add("active");
+
+        document.getElementById("currentToolName").textContent = tool.name;
+
+        const descriptionEl = document.getElementById("currentToolDescription");
+        descriptionEl.style.display = tool.description
+          ? ((descriptionEl.textContent = tool.description), "block")
+          : "none";
+
+        const notesEl = document.getElementById("currentToolNotes");
+        notesEl.style.display = tool.notes
+          ? ((notesEl.textContent = "Notes: " + tool.notes), "block")
+          : "none";
+
+        const inputsContainer = document.getElementById("toolInputsContainer");
+        inputsContainer.innerHTML = "";
+
+        tool.input_fields.forEach((field) => {
+          const group = document.createElement("div");
+          group.classList.add("input-group");
+          const label = document.createElement("label");
+          label.htmlFor = `tool-input-${field.id}`;
+          label.textContent = field.label || field.id;
+          group.appendChild(label);
+
+          if (field.type === "select") {
+            const select = document.createElement("select");
+            select.id = `tool-input-${field.id}`;
+            select.name = field.id;
+            (field.options || []).forEach((opt) => {
+              const option = document.createElement("option");
+              option.value = opt.value;
+              option.textContent = opt.text || opt.value;
+              if (
+                opt.value ===
+                (field.default_value ||
+                  (field.options[0] ? field.options[0].value : ""))
+              ) {
+                option.selected = true;
+              }
+              select.appendChild(option);
             });
+            group.appendChild(select);
+          } else {
+            const input = document.createElement("input");
+            input.type = field.type || "text";
+            input.id = `tool-input-${field.id}`;
+            input.name = field.id;
+            input.placeholder = field.placeholder || "";
+            if (field.default_value) input.value = field.default_value;
+            group.appendChild(input);
+          }
+          inputsContainer.appendChild(group);
+        });
+
+        if (fromHistoryOutput !== null) {
+          displayToolOutput(fromHistoryOutput, "neutral");
+          document.getElementById(
+            "currentToolName"
+          ).textContent = `${tool.name} (Viewing History)`;
+        } else {
+          displayToolOutput("", "neutral");
+          document.getElementById("currentToolStatus").textContent = "";
         }
-        function displayToolOutput(text, status = "neutral") {
-            toolOutputDisplay.innerHTML = makeLinksClickable(escapeHtml(text));
-            toolOutputDisplay.className = ''; 
-            if (status === "success") toolOutputDisplay.classList.add('success-output');
-            else if (status === "error") toolOutputDisplay.classList.add('error-output');
-            const statusEl = document.getElementById('currentToolStatus');
-            statusEl.textContent = status === "success" ? "Status: Success" : (status === "error" ? "Status: Error (see output)" : "");
-            statusEl.className = status === "success" ? "status-success" : (status === "error" ? "status-error" : "");
+      }
+
+      async function executeCurrentTool() {
+        if (!activeToolId) return;
+        const tool = currentTools.find((t) => t.id === activeToolId);
+        if (!tool) return;
+        displayToolOutput(`Running ${tool.name}, please wait...`, "neutral");
+        const payload = {};
+        tool.input_fields.forEach((field) => {
+          const inputElement = document.getElementById(
+            `tool-input-${field.id}`
+          );
+          if (inputElement) payload[field.id] = inputElement.value;
+        });
+        try {
+          const response = await fetch(`${apiUrl}/run_tool/${activeToolId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+          if (!response.ok || data.error) {
+            displayToolOutput(
+              `Error: ${data.error || response.statusText}\n\n${
+                data.output || ""
+              }`,
+              "error"
+            );
+          } else {
+            displayToolOutput(data.output, data.status);
+          }
+        } catch (error) {
+          console.error("Failed to run tool:", error);
+          displayToolOutput(
+            `Client-side error or failed to connect: ${error}`,
+            "error"
+          );
         }
-        function escapeHtml(unsafe) { 
-            if (typeof unsafe !== 'string') return '';
-            return unsafe.replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, "").replace(/'/g, "'");
-        }
-        async function fetchTools() {
-            try {
-                const response = await fetch(`${apiUrl}/tools`);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                currentTools = await response.json();
-                renderToolList();
-            } catch (error) { console.error("Failed to fetch tools:", error); alert("Error fetching tools. Check console."); }
-        }
-        function renderToolList() {
-            const toolListUl = document.getElementById('toolList');
-            toolListUl.innerHTML = '';
-            if (currentTools.length === 0) { toolListUl.innerHTML = '<p style="padding:10px; text-align:center; color:#777;">No tools. Click "Add New Tool".</p>'; }
-            currentTools.forEach(tool => {
-                const li = document.createElement('li'); li.classList.add('tool-item'); li.dataset.toolId = tool.id;
-                const nameSpan = document.createElement('span'); nameSpan.classList.add('tool-item-name'); nameSpan.textContent = tool.name; nameSpan.onclick = () => selectTool(tool.id); li.appendChild(nameSpan);
-                const actionsDiv = document.createElement('div'); actionsDiv.classList.add('tool-actions');
-                const historyBtn = document.createElement('button'); historyBtn.textContent = 'Hist'; historyBtn.classList.add('history-btn'); historyBtn.title = "View History"; historyBtn.onclick = (e) => { e.stopPropagation(); openHistoryModal(tool.id, tool.name); };
-                const editBtn = document.createElement('button'); editBtn.textContent = 'Edit'; editBtn.title = "Edit Tool"; editBtn.onclick = (e) => { e.stopPropagation(); openToolModal(tool.id); };
-                const deleteBtn = document.createElement('button'); deleteBtn.textContent = 'Del'; deleteBtn.title = "Delete Tool"; deleteBtn.onclick = (e) => { e.stopPropagation(); deleteTool(tool.id, tool.name); };
-                actionsDiv.appendChild(historyBtn); actionsDiv.appendChild(editBtn); actionsDiv.appendChild(deleteBtn); li.appendChild(actionsDiv); toolListUl.appendChild(li);
-            });
-        }
-        function selectTool(toolId, fromHistoryOutput = null) {
-            activeToolId = toolId;
-            const tool = currentTools.find(t => t.id === toolId); if (!tool) return;
-            document.querySelectorAll('.sidebar li.tool-item').forEach(li => li.classList.remove('active'));
-            const activeLi = document.querySelector(`.sidebar li.tool-item[data-tool-id="${toolId}"]`); if(activeLi) activeLi.classList.add('active');
-            document.getElementById('welcomePanel').classList.remove('active');
-            const toolRunPanel = document.getElementById('toolRunPanel'); toolRunPanel.classList.add('active');
-            document.getElementById('currentToolName').textContent = tool.name;
-            const descriptionEl = document.getElementById('currentToolDescription'); descriptionEl.style.display = tool.description ? (descriptionEl.textContent = tool.description, 'block') : 'none';
-            const notesEl = document.getElementById('currentToolNotes'); notesEl.style.display = tool.notes ? (notesEl.textContent = "Notes: " + tool.notes, 'block') : 'none';
-            const inputsContainer = document.getElementById('toolInputsContainer'); inputsContainer.innerHTML = ''; 
-            tool.input_fields.forEach(field => {
-                const group = document.createElement('div'); group.classList.add('input-group');
-                const label = document.createElement('label'); label.htmlFor = `tool-input-${field.id}`; label.textContent = field.label || field.id; group.appendChild(label);
-                if (field.type === 'select') {
-                    const select = document.createElement('select'); select.id = `tool-input-${field.id}`; select.name = field.id;
-                    (field.options || []).forEach(opt => {
-                        const option = document.createElement('option'); option.value = opt.value; option.textContent = opt.text || opt.value;
-                        if (opt.value === (field.default_value || (field.options[0] ? field.options[0].value : ''))) { option.selected = true; }
-                        select.appendChild(option);
-                    }); group.appendChild(select);
-                } else {
-                    const input = document.createElement('input'); input.type = field.type || 'text'; input.id = `tool-input-${field.id}`; input.name = field.id; input.placeholder = field.placeholder || '';
-                    if (field.default_value) input.value = field.default_value; group.appendChild(input);
-                } inputsContainer.appendChild(group);
-            });
-            if (fromHistoryOutput !== null) { displayToolOutput(fromHistoryOutput, "neutral"); document.getElementById('currentToolName').textContent = `${tool.name} (Viewing History)`; }
-            else { displayToolOutput('', "neutral"); document.getElementById('currentToolStatus').textContent = ''; }
-        }
-        async function executeCurrentTool() {
-            if (!activeToolId) return;
-            const tool = currentTools.find(t => t.id === activeToolId); if (!tool) return;
-            displayToolOutput(`Running ${tool.name}, please wait...`, "neutral");
-            const payload = {};
-            tool.input_fields.forEach(field => { const inputElement = document.getElementById(`tool-input-${field.id}`); if (inputElement) payload[field.id] = inputElement.value; });
-            try {
-                const response = await fetch(`${apiUrl}/run_tool/${activeToolId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const data = await response.json();
-                if (!response.ok || data.error) { displayToolOutput(`Error: ${data.error || response.statusText}\n\n${data.output || ''}`, "error"); }
-                else { displayToolOutput(data.output, data.status); }
-            } catch (error) { console.error("Failed to run tool:", error); displayToolOutput(`Client-side error or failed to connect: ${error}`, "error"); }
+      }
+
+      const toolModal = document.getElementById("toolModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const toolIdInput = document.getElementById("toolId");
+      const toolNameInput = document.getElementById("toolName");
+      const toolDescriptionInput = document.getElementById("toolDescription");
+      const toolNotesInput = document.getElementById("toolNotes");
+      const toolCommandTemplateInput = document.getElementById(
+        "toolCommandTemplate"
+      );
+      const toolOutputFilenamePatternInput = document.getElementById(
+        "toolOutputFilenamePattern"
+      );
+      const inputFieldsListDiv = document.getElementById("inputFieldsList");
+      const toolRequiresCloneCheckbox =
+        document.getElementById("toolRequiresClone");
+      const cloneOptionsDiv = document.getElementById("cloneOptions");
+      const toolCloneUrlInput = document.getElementById("toolCloneUrl");
+      const toolRequirementsFileInput = document.getElementById(
+        "toolRequirementsFile"
+      );
+      const toolRunInClonedDirCheckbox = document.getElementById(
+        "toolRunInClonedDirectory"
+      );
+      const installationLogDiv = document.getElementById("installationLog");
+
+      function openToolModal(id = null) {
+        editingToolId = id;
+        installationLogDiv.textContent = "";
+        installationLogDiv.style.display = "none";
+
+        // Always reset fields before filling
+        toolIdInput.value = "";
+        toolNameInput.value = "";
+        toolDescriptionInput.value = "";
+        toolNotesInput.value = "";
+        toolCommandTemplateInput.value = "";
+        toolOutputFilenamePatternInput.value =
+          "{{TOOL_NAME_SANITIZED}}_{{INPUT__your_main_input_id}}_{{TIMESTAMP}}.txt";
+        renderInputFieldConfigs([]);
+        toolRequiresCloneCheckbox.checked = false;
+        cloneOptionsDiv.style.display = "none";
+        toolCloneUrlInput.value = "";
+        toolRequirementsFileInput.value = "";
+        toolRunInClonedDirCheckbox.checked = false;
+
+        if (id) {
+          modalTitle.textContent = "Edit Tool";
+          const tool = currentTools.find((t) => t.id === id);
+          if (!tool) return;
+
+          toolIdInput.value = tool.id;
+          toolNameInput.value = tool.name;
+          toolDescriptionInput.value = tool.description || "";
+          toolNotesInput.value = tool.notes || "";
+          toolCommandTemplateInput.value = tool.command_template;
+          toolOutputFilenamePatternInput.value =
+            tool.output_filename_pattern ||
+            "{{TOOL_NAME_SANITIZED}}_{{INPUT__your_main_input_id}}_{{TIMESTAMP}}.txt";
+          renderInputFieldConfigs(tool.input_fields || []);
+          toolRequiresCloneCheckbox.checked = tool.requires_clone || false;
+          cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked
+            ? "block"
+            : "none";
+          if (tool.requires_clone) {
+            toolCloneUrlInput.value = tool.clone_url || "";
+            toolRequirementsFileInput.value = tool.requirements_file || "";
+            toolRunInClonedDirCheckbox.checked = !!tool.run_in_directory;
+          }
+        } else {
+          modalTitle.textContent = "Add New Tool";
         }
 
-        const toolModal = document.getElementById('toolModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const toolIdInput = document.getElementById('toolId');
-        const toolNameInput = document.getElementById('toolName');
-        const toolDescriptionInput = document.getElementById('toolDescription');
-        const toolNotesInput = document.getElementById('toolNotes');
-        const toolCommandTemplateInput = document.getElementById('toolCommandTemplate');
-        const toolOutputFilenamePatternInput = document.getElementById('toolOutputFilenamePattern'); 
-        const inputFieldsListDiv = document.getElementById('inputFieldsList');
-        const toolRequiresCloneCheckbox = document.getElementById('toolRequiresClone');
-        const cloneOptionsDiv = document.getElementById('cloneOptions');
-        const toolCloneUrlInput = document.getElementById('toolCloneUrl');
-        const toolRequirementsFileInput = document.getElementById('toolRequirementsFile');
-        const toolRunInClonedDirCheckbox = document.getElementById('toolRunInClonedDirectory');
-        const installationLogDiv = document.getElementById('installationLog');
+        // Finally open the modal
+        toolModal.style.display = "block";
+      }
 
-        function openToolModal(id = null) { 
-            editingToolId = id;
-            installationLogDiv.textContent = ''; installationLogDiv.style.display = 'none';
-            if (id) {
-                modalTitle.textContent = 'Edit Tool';
-                const tool = currentTools.find(t => t.id === id); if (!tool) return;
-                toolIdInput.value = tool.id;
-                toolNameInput.value = tool.name;
-                toolDescriptionInput.value = tool.description || '';
-                toolNotesInput.value = tool.notes || '';
-                toolCommandTemplateInput.value = tool.command_template;
-                toolOutputFilenamePatternInput.value = tool.output_filename_pattern || ''; 
-                renderInputFieldConfigs(tool.input_fields || []);
-                toolRequiresCloneCheckbox.checked = tool.requires_clone || false;
-                cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked ? 'block' : 'none';
-                if (tool.requires_clone) {
-                    toolCloneUrlInput.value = tool.clone_url || '';
-                    toolRequirementsFileInput.value = tool.requirements_file || '';
-                    toolRunInClonedDirCheckbox.checked = !!tool.run_in_directory;
-                }
-            } else {
-                modalTitle.textContent = 'Add New Tool';
-                toolIdInput.value = ''; toolNameInput.value = ''; toolDescriptionInput.value = ''; toolNotesInput.value = '';
-                toolCommandTemplateInput.value = '';
-                toolOutputFilenamePatternInput.value = '{{TOOL_NAME_SANITIZED}}_{{INPUT__your_main_input_id}}_{{TIMESTAMP}}.txt'; 
-                renderInputFieldConfigs([]);
-                toolRequiresCloneCheckbox.checked = false; cloneOptionsDiv.style.display = 'none';
-                toolCloneUrlInput.value = ''; toolRequirementsFileInput.value = ''; toolRunInClonedDirCheckbox.checked = false;
-            }
-            toolModal.style.display = 'block';
-        }
-        function closeToolModal() {toolModal.style.display = 'none'; editingToolId = null; }
-        function toggleCloneOptions() {cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked ? 'block' : 'none';}
-        
-        let inputFieldConfigCounter = 0;
-        function addInputFieldConfig(field = {}) {
-            inputFieldConfigCounter++;
-            const div = document.createElement('div'); div.classList.add('input-field-config'); div.dataset.configId = inputFieldConfigCounter;
-            div.innerHTML = `
-                <label>Field ID (for template, e.g., 'username'):</label> <input type="text" class="field-id" value="${field.id || ''}" placeholder="unique_input_id">
-                <label>Display Label:</label> <input type="text" class="field-label" value="${field.label || ''}" placeholder="Username:">
-                <label>Input Type:</label> <select class="field-type"> <option value="text" ${field.type === 'text' ? 'selected' : ''}>Text</option> <option value="email" ${field.type === 'email' ? 'selected' : ''}>Email</option> <option value="url" ${field.type === 'url' ? 'selected' : ''}>URL</option> <option value="select" ${field.type === 'select' ? 'selected' : ''}>Select Dropdown</option> </select>
-                <label>Placeholder (for text inputs):</label> <input type="text" class="field-placeholder" value="${field.placeholder || ''}" placeholder="Enter value">
-                <label>Default Value (optional):</label> <input type="text" class="field-default-value" value="${field.default_value || ''}" placeholder="">
-                <label>Options (for Select, JSON: [{"value":"v1","text":"T1"},...]):</label> <textarea class="field-options" placeholder='[{"value":"opt1","text":"Option 1"}]'>${field.options ? JSON.stringify(field.options) : ''}</textarea>
+      function closeToolModal() {
+        toolModal.style.display = "none";
+        editingToolId = null;
+
+        // Reset the form fields completely
+        toolIdInput.value = "";
+        toolNameInput.value = "";
+        toolDescriptionInput.value = "";
+        toolNotesInput.value = "";
+        toolCommandTemplateInput.value = "";
+        toolOutputFilenamePatternInput.value = "";
+        inputFieldsListDiv.innerHTML = "";
+        toolRequiresCloneCheckbox.checked = false;
+        cloneOptionsDiv.style.display = "none";
+        toolCloneUrlInput.value = "";
+        toolRequirementsFileInput.value = "";
+        toolRunInClonedDirCheckbox.checked = false;
+        installationLogDiv.textContent = "";
+        installationLogDiv.style.display = "none";
+      }
+
+      function closeHistoryModal() {
+        historyModal.style.display = "none";
+        historyModalTitle.textContent = "";
+        historyListUl.innerHTML = "";
+        noHistoryMessage.style.display = "none";
+      }
+
+      function toggleCloneOptions() {
+        cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked
+          ? "block"
+          : "none";
+      }
+
+      let inputFieldConfigCounter = 0;
+      function addInputFieldConfig(field = {}) {
+        inputFieldConfigCounter++;
+        const div = document.createElement("div");
+        div.classList.add("input-field-config");
+        div.dataset.configId = inputFieldConfigCounter;
+        div.innerHTML = `
+                <label>Field ID (for template, e.g., 'username'):</label> <input type="text" class="field-id" value="${
+                  field.id || ""
+                }" placeholder="unique_input_id">
+                <label>Display Label:</label> <input type="text" class="field-label" value="${
+                  field.label || ""
+                }" placeholder="Username:">
+                <label>Input Type:</label> <select class="field-type"> <option value="text" ${
+                  field.type === "text" ? "selected" : ""
+                }>Text</option> <option value="email" ${
+          field.type === "email" ? "selected" : ""
+        }>Email</option> <option value="url" ${
+          field.type === "url" ? "selected" : ""
+        }>URL</option> <option value="select" ${
+          field.type === "select" ? "selected" : ""
+        }>Select Dropdown</option> </select>
+                <label>Placeholder (for text inputs):</label> <input type="text" class="field-placeholder" value="${
+                  field.placeholder || ""
+                }" placeholder="Enter value">
+                <label>Default Value (optional):</label> <input type="text" class="field-default-value" value="${
+                  field.default_value || ""
+                }" placeholder="">
+                <label>Options (for Select, JSON: [{"value":"v1","text":"T1"},...]):</label> <textarea class="field-options" placeholder='[{"value":"opt1","text":"Option 1"}]'>${
+                  field.options ? JSON.stringify(field.options) : ""
+                }</textarea>
                 <button type="button" onclick="removeInputFieldConfig(${inputFieldConfigCounter})" style="background-color:#dc3545; font-size:0.8em;">Remove Field</button>
             `;
-            inputFieldsListDiv.appendChild(div);
-        }
-        function removeInputFieldConfig(configId) {const divToRemove = document.querySelector(`.input-field-config[data-config-id="${configId}"]`); if (divToRemove) inputFieldsListDiv.removeChild(divToRemove); }
-        function renderInputFieldConfigs(fields) {inputFieldsListDiv.innerHTML = ''; inputFieldConfigCounter = 0; (fields || []).forEach(field => addInputFieldConfig(field)); }
+        inputFieldsListDiv.appendChild(div);
+      }
+      function removeInputFieldConfig(configId) {
+        const divToRemove = document.querySelector(
+          `.input-field-config[data-config-id="${configId}"]`
+        );
+        if (divToRemove) inputFieldsListDiv.removeChild(divToRemove);
+      }
+      function renderInputFieldConfigs(fields) {
+        inputFieldsListDiv.innerHTML = "";
+        inputFieldConfigCounter = 0;
+        (fields || []).forEach((field) => addInputFieldConfig(field));
+      }
 
-        async function saveTool() {
-            const toolData = {
-                name: toolNameInput.value.trim(), description: toolDescriptionInput.value.trim(), notes: toolNotesInput.value.trim(), command_template: toolCommandTemplateInput.value.trim(),
-                output_filename_pattern: toolOutputFilenamePatternInput.value.trim() || '{{TOOL_NAME_SANITIZED}}_{{INPUT__default_input}}_{{TIMESTAMP}}.txt',
-                input_fields: [], requires_clone: toolRequiresCloneCheckbox.checked,
-                clone_url: toolRequiresCloneCheckbox.checked ? toolCloneUrlInput.value.trim() : '',
-                requirements_file: toolRequiresCloneCheckbox.checked ? toolRequirementsFileInput.value.trim() : '',
-                run_in_cloned_directory: toolRequiresCloneCheckbox.checked ? toolRunInClonedDirCheckbox.checked : false
-            };
-            if (!toolData.name || !toolData.command_template) { alert("Tool Name and Command Template are required."); return; }
-            document.querySelectorAll('.input-field-config').forEach(div => {
-                const fieldConf = {
-                    id: div.querySelector('.field-id').value.trim(), label: div.querySelector('.field-label').value.trim(), type: div.querySelector('.field-type').value,
-                    placeholder: div.querySelector('.field-placeholder').value.trim(), options_str: div.querySelector('.field-options').value.trim(), default_value: div.querySelector('.field-default-value').value.trim()
-                };
-                if (fieldConf.id && fieldConf.label) {
-                    if (fieldConf.type === 'select' && fieldConf.options_str) { try { fieldConf.options = JSON.parse(fieldConf.options_str); } catch (e) { alert(`Invalid JSON for field ${fieldConf.id}`); fieldConf.options = []; }}
-                    delete fieldConf.options_str; toolData.input_fields.push(fieldConf);
-                }});
-            installationLogDiv.textContent = 'Saving...'; installationLogDiv.style.display = 'block';
-            let url = `${apiUrl}/tools`; let method = 'POST';
-            if (editingToolId) { url = `${apiUrl}/tools/${editingToolId}`; method = 'PUT'; toolData.id = editingToolId; }
-            try {
-                const response = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(toolData) });
-                const result = await response.json();
-                if (!response.ok) {
-                    alert(`Error: ${result.error || response.statusText}\nDetails: ${result.details || ''}`);
-                    installationLogDiv.textContent = `Error: ${result.error || response.statusText}\nDetails:\n${result.details || result.installation_log || ''}`;
-                } else {
-                    alert(result.message || "Tool saved!"); installationLogDiv.textContent = result.installation_log || "No log.";
-                    if (!result.installation_log) installationLogDiv.style.display = 'none';
-                    closeToolModal(); fetchTools(); 
-                }} catch (error) { console.error("Failed to save tool:", error); alert(`Client error: ${error}`); installationLogDiv.textContent = `Client error: ${error}`; }
+      async function saveTool() {
+        const toolData = {
+          name: toolNameInput.value.trim(),
+          description: toolDescriptionInput.value.trim(),
+          notes: toolNotesInput.value.trim(),
+          command_template: toolCommandTemplateInput.value.trim(),
+          output_filename_pattern:
+            toolOutputFilenamePatternInput.value.trim() ||
+            "{{TOOL_NAME_SANITIZED}}_{{INPUT__default_input}}_{{TIMESTAMP}}.txt",
+          input_fields: [],
+          requires_clone: toolRequiresCloneCheckbox.checked,
+          clone_url: toolRequiresCloneCheckbox.checked
+            ? toolCloneUrlInput.value.trim()
+            : "",
+          requirements_file: toolRequiresCloneCheckbox.checked
+            ? toolRequirementsFileInput.value.trim()
+            : "",
+          run_in_cloned_directory: toolRequiresCloneCheckbox.checked
+            ? toolRunInClonedDirCheckbox.checked
+            : false,
+        };
+        if (!toolData.name || !toolData.command_template) {
+          alert("Tool Name and Command Template are required.");
+          return;
         }
-        async function deleteTool(toolId, toolName) {
-            if (!confirm(`Delete "${toolName}"? May delete cloned directory.`)) return;
-            try {
-                const response = await fetch(`${apiUrl}/tools/${toolId}`, { method: 'DELETE' }); const result = await response.json();
-                if (!response.ok) { alert(`Error: ${result.error || response.statusText}`); }
-                else {
-                    alert(result.message || "Deleted!");
-                    if (activeToolId === toolId) { document.getElementById('toolRunPanel').classList.remove('active'); document.getElementById('welcomePanel').classList.add('active'); activeToolId = null; }
-                    fetchTools();
-                }} catch (error) { console.error("Failed to delete tool:", error); alert(`Client error: ${error}`); }
+        document.querySelectorAll(".input-field-config").forEach((div) => {
+          const fieldConf = {
+            id: div.querySelector(".field-id").value.trim(),
+            label: div.querySelector(".field-label").value.trim(),
+            type: div.querySelector(".field-type").value,
+            placeholder: div.querySelector(".field-placeholder").value.trim(),
+            options_str: div.querySelector(".field-options").value.trim(),
+            default_value: div
+              .querySelector(".field-default-value")
+              .value.trim(),
+          };
+          if (fieldConf.id && fieldConf.label) {
+            if (fieldConf.type === "select" && fieldConf.options_str) {
+              try {
+                fieldConf.options = JSON.parse(fieldConf.options_str);
+              } catch (e) {
+                alert(`Invalid JSON for field ${fieldConf.id}`);
+                fieldConf.options = [];
+              }
+            }
+            delete fieldConf.options_str;
+            toolData.input_fields.push(fieldConf);
+          }
+        });
+        installationLogDiv.textContent = "Saving...";
+        installationLogDiv.style.display = "block";
+        let url = `${apiUrl}/tools`;
+        let method = "POST";
+        if (editingToolId) {
+          url = `${apiUrl}/tools/${editingToolId}`;
+          method = "PUT";
+          toolData.id = editingToolId;
         }
+        try {
+          const response = await fetch(url, {
+            method: method,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(toolData),
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            alert(
+              `Error: ${result.error || response.statusText}\nDetails: ${
+                result.details || ""
+              }`
+            );
+            installationLogDiv.textContent = `Error: ${
+              result.error || response.statusText
+            }\nDetails:\n${result.details || result.installation_log || ""}`;
+          } else {
+            alert(result.message || "Tool saved!");
+            installationLogDiv.textContent =
+              result.installation_log || "No log.";
+            if (!result.installation_log)
+              installationLogDiv.style.display = "none";
+            closeToolModal();
+            fetchTools();
+          }
+        } catch (error) {
+          console.error("Failed to save tool:", error);
+          alert(`Client error: ${error}`);
+          installationLogDiv.textContent = `Client error: ${error}`;
+        }
+      }
+      async function deleteTool(toolId, toolName) {
+        if (!confirm(`Delete "${toolName}"? May delete cloned directory.`))
+          return;
+        try {
+          const response = await fetch(`${apiUrl}/tools/${toolId}`, {
+            method: "DELETE",
+          });
+          const result = await response.json();
+          if (!response.ok) {
+            alert(`Error: ${result.error || response.statusText}`);
+          } else {
+            alert(result.message || "Deleted!");
+            if (activeToolId === toolId) {
+              document
+                .getElementById("toolRunPanel")
+                .classList.remove("active");
+              document.getElementById("welcomePanel").classList.add("active");
+              activeToolId = null;
+            }
+            fetchTools();
+          }
+        } catch (error) {
+          console.error("Failed to delete tool:", error);
+          alert(`Client error: ${error}`);
+        }
+      }
 
-        const historyModal = document.getElementById('historyModal');
-        const historyModalTitle = document.getElementById('historyModalTitle');
-        const historyListUl = document.getElementById('historyList');
-        const noHistoryMessage = document.getElementById('noHistoryMessage');
+      const historyModal = document.getElementById("historyModal");
+      const historyModalTitle = document.getElementById("historyModalTitle");
+      const historyListUl = document.getElementById("historyList");
+      const noHistoryMessage = document.getElementById("noHistoryMessage");
 
-        async function openHistoryModal(toolId, toolName) {
-            historyModalTitle.textContent = `History for ${toolName}`; historyListUl.innerHTML = '<li>Loading...</li>';
-            noHistoryMessage.style.display = 'none'; historyModal.style.display = 'block';
-            try {
-                const response = await fetch(`${apiUrl}/history/${toolId}`); if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
-                const historyEntries = await response.json(); historyListUl.innerHTML = ''; 
-                if (historyEntries.length === 0) { noHistoryMessage.style.display = 'block'; }
-                else {
-                    historyEntries.forEach(entry => {
-                        const li = document.createElement('li'); const date = new Date(entry.timestamp).toLocaleString();
-                        let inputsStr = Object.entries(entry.inputs || {}).map(([k,v]) => `${k}: ${v}`).join(', '); if (inputsStr.length > 70) inputsStr = inputsStr.substring(0, 70) + "...";
-                        li.innerHTML = `<strong>${date}</strong> - File: <i>${entry.output_file.split('/').pop()}</i> <small>Status: ${entry.status}</small><small>Inputs: ${inputsStr || 'N/A'}</small>`;
-                        li.onclick = () => loadHistoryOutput(entry.output_file, toolId, toolName); historyListUl.appendChild(li);
-                    }); }} catch (error) { console.error("Failed to fetch history:", error); historyListUl.innerHTML = `<li>Error: ${error.message}</li>`; }
+      async function openHistoryModal(toolId, toolName) {
+        closeToolModal(); // Optionally close the edit modal if open
+
+        historyModalTitle.textContent = `History for ${toolName}`;
+        historyListUl.innerHTML = "";
+        noHistoryMessage.style.display = "none";
+        historyModal.style.display = "block";
+
+        try {
+          const response = await fetch(`${apiUrl}/history/${toolId}`);
+          if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+          const historyEntries = await response.json();
+
+          if (historyEntries.length === 0) {
+            noHistoryMessage.style.display = "block";
+          } else {
+            historyEntries.forEach((entry) => {
+              const li = document.createElement("li");
+              const date = new Date(entry.timestamp).toLocaleString();
+              let inputsStr = Object.entries(entry.inputs || {})
+                .map(([k, v]) => `${k}: ${v}`)
+                .join(", ");
+              if (inputsStr.length > 70)
+                inputsStr = inputsStr.substring(0, 70) + "...";
+              li.innerHTML = `<strong>${date}</strong> - File: <i>${entry.output_file
+                .split("/")
+                .pop()}</i> <small>Status: ${
+                entry.status
+              }</small><small>Inputs: ${inputsStr || "N/A"}</small>`;
+              li.onclick = () =>
+                loadHistoryOutput(entry.output_file, toolId, toolName);
+              historyListUl.appendChild(li);
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch history:", error);
+          historyListUl.innerHTML = `<li>Error: ${error.message}</li>`;
         }
-        function closeHistoryModal() {historyModal.style.display = 'none'; }
-        async function loadHistoryOutput(outputFilePath, originalToolId, originalToolName) {
-            closeHistoryModal(); selectTool(originalToolId); displayToolOutput(`Loading from ${outputFilePath}...`, "neutral");
-            try {
-                const response = await fetch(`${apiUrl}/history_file_content?filepath=${encodeURIComponent(outputFilePath)}`); if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
-                const data = await response.json();
-                if (data.error) { displayToolOutput(`Error: ${data.error}`, "error"); }
-                else { selectTool(originalToolId, data.content); }
-            } catch (error) { console.error("Failed to load history output:", error); displayToolOutput(`Error: ${error.message}`, "error"); }
+      }
+
+      function closeHistoryModal() {
+        historyModal.style.display = "none";
+      }
+      async function loadHistoryOutput(
+        outputFilePath,
+        originalToolId,
+        originalToolName
+      ) {
+        closeHistoryModal();
+        selectTool(originalToolId);
+        displayToolOutput(`Loading from ${outputFilePath}...`, "neutral");
+        try {
+          const response = await fetch(
+            `${apiUrl}/history_file_content?filepath=${encodeURIComponent(
+              outputFilePath
+            )}`
+          );
+          if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
+          const data = await response.json();
+          if (data.error) {
+            displayToolOutput(`Error: ${data.error}`, "error");
+          } else {
+            selectTool(originalToolId, data.content);
+          }
+        } catch (error) {
+          console.error("Failed to load history output:", error);
+          displayToolOutput(`Error: ${error.message}`, "error");
         }
-        window.onclick = function(event) {if (event.target == toolModal) closeToolModal(); if (event.target == historyModal) closeHistoryModal(); }
-        document.addEventListener('DOMContentLoaded', fetchTools);
+      }
+      window.onclick = function (event) {
+        if (event.target == toolModal) closeToolModal();
+        if (event.target == historyModal) closeHistoryModal();
+      };
+      document.addEventListener("DOMContentLoaded", fetchTools);
+      window.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("toolModal").style.display = "none";
+        document.getElementById("historyModal").style.display = "none";
+      });
     </script>
-</body>
+    <div id="glassOverlay">
+      <span>🚀 Running Tool...</span>
+    </div>
+  </body>
 </html>

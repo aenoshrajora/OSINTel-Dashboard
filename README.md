@@ -1,6 +1,6 @@
 # OSINTel - OSINT Dashboard
 
-**A dynamic, Flask-based web application providing a centralized interface for executing various open-source intelligence (OSINT) and cybersecurity command-line tools.**
+**A dynamic, Flask-based web application providing a centralized interface for executing various open-source intelligence (OSINT) and cybersecurity command-line tools. This repository has been expanded: the tool-list was upgraded from the original OSINT-focused pack to include a full suite of recon utilities (now 43 tools total). This change is additive — the UI, history, and workflow stay the same; you’re simply getting a much broader set of tools wired into the same dashboard.**
 
 This dashboard allows users to:
 *   Run pre-configured and user-added OSINT tools through an easy-to-use web UI.
@@ -53,6 +53,70 @@ This project is open source and licensed under the **MIT License** - see the `LI
 *   **GHunt Google Acct Invest. (Cloned):** Investigates Google accounts (requires manual cookie setup).
 *   **Metagoofil Metadata Extr. (Cloned):** Extracts metadata from public documents.
 
+
+## New / Notable tools added (categories, uses, examples)
+The commands below are taken from the command_template entries in data.json. Use them in the UI or as examples for CLI automation. 
+
+### Passive & Active Subdomain / DNS
+
+* `subfinder` – passive subdomain discovery.
+Example: `subfinder -d example.com`. 
+
+* `assetfinder` – find related domains and subdomains.
+Example: `assetfinder --subs-only example.com`. 
+
+* `ctfr` – cert-transparency subdomain discovery.
+* Example: `python3 ./ctfr.py -d example.com`. 
+
+* `dnsrecon` / `dnsenum` / `dnsx` – DNS enumeration & fast probing.
+Examples: `dnsrecon -d example.com -t std` / `dnsenum example.com --enum` / `dnsx -l hosts.txt -a -resp`. 
+
+### Web Enumeration & Content Discovery
+* `gau` / `gauplus` — historical and aggregated URL collection.
+* Example: gau example.com --providers ... (UI exposes flags). 
+
+* `httpx` / `httprobe` — probe which endpoints are alive.
+* Example: `httpx -l urls.txt -o httpx_output.txt`. 
+
+* `gobuster` / `ffuf` / `dirb` — directory, virtual-host and bucket enumeration.
+* Example: `ffuf -w filenames.txt -u https://example.com/FUZZ` / `gobuster dir target -w /path/wordlist`. 
+
+### Scanning & Templated VULN checks
+
+* `nmap` — ports & service discovery (many flags available in UI).
+* Example: `nmap -sS -T4 example.com`. 
+
+* `masscan` — extremely fast port scanning for large ranges.
+* Example: `masscan 192.168.0.0/16 -p1-1000 --rate 1000`. 
+
+* `nuclei` — templated vulnerability scanning.
+* Example: `nuclei -l urls.txt -t /path/to/nuclei-templates/`. 
+
+* `nikto` / `sqlmap` — webserver vuln checks and automated SQLi.
+* Examples: `nikto -h http://example.com` / `sqlmap -u 'http://example.com/vuln?id=1' --batch`. 
+
+
+### OSINT & Enrichment
+* `shodan` / `censys` / `vt` (VirusTotal) / `urlscan` — enrichment / device & URL analysis.
+* Examples: `shodan host 8.8.8.8` / `censys search 'service.service_name: HTTP'` / `vt url scan http://example.com`. 
+
+* `theHarvester` / `recon-ng` / `spiderfoot` — multi-source OSINT collection and automation. 
+
+
+### Metadata, File & Binary Analysis
+* `metagoofil` (cloned) — collect documents and extract metadata.
+* Example (via cloned repo): `python2 metagoofil/metagoofil.py -d example.com -t pdf,doc`. 
+
+* `exiftool` / `pdfinfo` / `strings` / `jq` / `rg` — inspect files, parse JSON, search artifacts.
+* Examples: `exiftool file.jpg`, `pdfinfo report.pdf`, `strings binary.bin | rg 'password'`. 
+
+### Network Tooling & Helpers
+* `nc` (netcat) / `socat` / `traceroute` / `mtr` — low-level networking & relay tools.
+* Example: `nc target 80` / `mtr -r example.com`. 
+
+### Takeover / Special Checks
+* `subjack` — detect some types of subdomain takeover risk.
+* Example: `subjack -w subs.txt -t 100 -timeout 30 -ssl.` 
 ## Tech Stack
 
 *   **Backend:** Python 3.8+, Flask

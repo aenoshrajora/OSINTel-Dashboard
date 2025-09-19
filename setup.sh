@@ -1,308 +1,318 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# setup.sh - OSINTel / Recon workspace setup (v2)
+# Installs system deps, Go tools, Python venv packages, and clonable tools.
+# Run: chmod +x setup.sh && ./setup.sh
+# WARNING: This script runs system-wide package installs (sudo apt). Review before running.
 
-# Setup Script v1.0
+set -o errexit
+set -o pipefail
+set -o nounset
 
-# CAUTION WHEN MODIFYING THIS SCRIPT, it is fully automated, and if using sudo can do system-wide changes, if changed anything without properly caution or study, could harm your PC
-skipped_system_tools=""
-failed_system_tools=""
-skipped_clonable_tools=""
-failed_clonable_tools_clone=""
-failed_clonable_tools_reqs=""
+###############################
+# Configuration / variables
+###############################
+VENV_DIR="./venv"
+TOOLS_DIR="./tools"
+DATA_DIR="./data"
+GOMODTOOLS=(
+  "github.com/owasp-amass/amass/v3/...@latest"
+  "github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest"
+  "github.com/tomnomnom/assetfinder@latest"
+  "github.com/projectdiscovery/dnsx/cmd/dnsx@latest"
+  "github.com/tomnomnom/waybackurls@latest"
+  "github.com/lc/gau/v2/cmd/gau@latest"
+  "github.com/bp0lr/gauplus@latest"
+  "github.com/hakluke/hakrawler@latest"
+  "github.com/tomnomnom/httprobe@latest"
+  "github.com/projectdiscovery/httpx/cmd/httpx@latest"
+  "github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest"
+  "github.com/haccer/subjack@latest"
+)
 
+# System apt packages (base + your requested ones)
+APT_PACKAGES=(
+  nmap whois dnsutils dnsrecon dnsenum host
+  gobuster dirb curl wget
+  masscan zmap nikto sqlmap hydra
+  smbclient traceroute mtr netcat-openbsd socat
+  exiftool poppler-utils binutils jq ripgrep
+  python3-pip python3-venv git build-essential make gcc golang
+  # recon-ng, enum4linux, metagoofil may be available via apt depending on distro; we check later.
+)
+
+# Python packages to install into venv
+PYPI_PACKAGES_VENV=(
+  Flask
+  theHarvester
+  ctfr
+  sublist3r
+  vt-py
+  shodan
+)
+
+# Python system-wide packages to install (for holehe availability with sudo)
+PYPI_PACKAGES_SYSTEM=(
+  holehe
+)
+
+# Clonable tools list (display name|dir|git url|post-install command)
+CLONABLE_TOOLS=(
+  "Sherlock|${TOOLS_DIR}/sherlock|https://github.com/sherlock-project/sherlock.git|if [ -f requirements.txt ]; then pip install -r requirements.txt; fi"
+  "Sublist3r|${TOOLS_DIR}/Sublist3r|https://github.com/aboul3la/Sublist3r.git|if [ -f requirements.txt ]; then pip install -r requirements.txt; fi"
+  "GHunt|${TOOLS_DIR}/GHunt|https://github.com/mxrch/GHunt.git|if [ -f GHunt/requirements.txt ]; then pip install -r GHunt/requirements.txt; fi"
+  "Metagoofil|${TOOLS_DIR}/metagoofil|https://github.com/laramies/metagoofil.git|echo 'Metagoofil cloned; no pip requirements auto-installed.'"
+)
+
+###############################
+# helpers
+###############################
 command_exists() {
-    command -v "$1" >/dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
-handle_clonable_tool_installation() {
-    local tool_name="$1"
-    local target_dir="$2"
-    local clone_url="$3"
-    local install_reqs_cmd="$4"
-    local action="clone"
+warn() { echo -e "\e[33m[WARN]\e[0m $*"; }
+info() { echo -e "\e[36m[INFO]\e[0m $*"; }
+die()  { echo -e "\e[31m[ERR]\e[0m $*"; exit 1; }
 
+###############################
+# Start
+###############################
+echo "--------------------------------------------------"
+echo " OSINTel / Recon Setup v2"
+echo " Review this script before running on production systems."
+echo "--------------------------------------------------"
+echo ""
+
+# Confirm
+read -r -p "Proceed with installation? This script uses sudo to install packages. (y/N): " proceed
+if [[ ! "${proceed:-}" =~ ^[Yy]$ ]]; then
+  die "User aborted setup."
+fi
+
+# Update apt and install base packages
+info "Updating apt package lists..."
+sudo apt update -y
+sudo apt upgrade -y
+
+info "Installing APT packages (this may take time)..."
+sudo apt install -y "${APT_PACKAGES[@]}"
+
+# Some packages may be named differently across distros; try recon-ng, enum4linux, metagoofil via apt if available
+if apt-cache show recon-ng >/dev/null 2>&1; then
+  info "Installing recon-ng via apt..."
+  sudo apt install -y recon-ng || warn "recon-ng apt install failed (you can clone manually)."
+else
+  warn "recon-ng not available in apt repository; you'll be prompted to clone if desired."
+fi
+
+if apt-cache show enum4linux >/dev/null 2>&1; then
+  info "Installing enum4linux via apt..."
+  sudo apt install -y enum4linux || warn "enum4linux apt install failed."
+else
+  warn "enum4linux not in apt repo; fallback: you can clone the repo manually."
+fi
+
+# Create venv if not exists and activate
+if [ ! -d "$VENV_DIR" ]; then
+  info "Creating Python virtual environment at $VENV_DIR..."
+  python3 -m venv "$VENV_DIR"
+fi
+
+# shellcheck disable=SC1091
+# activate venv in current shell for the remainder of the script
+# (this won't affect user's interactive shell after script exits)
+# but pip installs below will go into this venv
+source "${VENV_DIR}/bin/activate"
+
+info "Upgrading pip inside venv..."
+pip install --upgrade pip setuptools wheel
+
+# Install Python packages into venv
+info "Installing Python packages into venv: ${PYPI_PACKAGES_VENV[*]}"
+pip install --break-system-packages "${PYPI_PACKAGES_VENV[@]}" || warn "Some pip installs in venv failed; check output."
+
+# Install system-wide pip packages for tools that must work with sudo/non-sudo (holehe)
+info "Installing select Python packages system-wide (so they are available with sudo): ${PYPI_PACKAGES_SYSTEM[*]}"
+# Attempt to install via apt-managed pip where available; otherwise use sudo pip3.
+if command_exists pip3; then
+  sudo pip3 install --break-system-packages "${PYPI_PACKAGES_SYSTEM[@]}" || warn "sudo pip3 install failed for some packages."
+else
+  warn "pip3 not found for system-wide installs (unexpected)."
+fi
+
+# Ensure GO is installed
+if ! command_exists go; then
+  info "Go not found; attempting to install golang via apt..."
+  sudo apt install -y golang || die "Failed to install golang; please install Go manually and re-run this script."
+fi
+
+# Ensure GOPATH/GOBIN are set and on PATH
+GOBIN_DEFAULT="$HOME/go/bin"
+if [ -z "${GOBIN:-}" ]; then
+  export GOBIN="$GOBIN_DEFAULT"
+fi
+if [ -z "${GOPATH:-}" ]; then
+  export GOPATH="$HOME/go"
+fi
+mkdir -p "$GOBIN" "$GOPATH"
+if ! echo "$PATH" | grep -q "$GOBIN"; then
+  info "Adding $GOBIN to PATH for this session. To persist, add 'export PATH=\$PATH:$GOBIN' to your shell profile."
+  export PATH="$PATH:$GOBIN"
+fi
+
+# Install go-based tools
+info "Installing Go-based tools (this can take time)..."
+for mod in "${GOMODTOOLS[@]}"; do
+  # extract binary name heuristically (last path element before @)
+  binname=$(echo "$mod" | sed -E 's#.*/([^/]+)@.*#\1#')
+  if command_exists "$binname"; then
+    info "Skipping $binname (already on PATH)."
+    continue
+  fi
+  info "Installing $mod ..."
+  # Use 'go install' which places binary into $GOBIN
+  if ! GO111MODULE=on go install "$mod"; then
+    warn "go install failed for $mod. You can try installing manually."
+  fi
+done
+
+# Special: massdns clone & build (manual)
+if [ ! -x "/usr/local/bin/massdns" ]; then
+  info "Cloning and building massdns..."
+  mkdir -p "$TOOLS_DIR"
+  if [ -d "$TOOLS_DIR/massdns" ]; then
+    info "massdns dir exists; attempting to update..."
+    (cd "$TOOLS_DIR/massdns" && git pull) || warn "Failed git pull for massdns"
+  else
+    git clone https://github.com/blechschmidt/massdns.git "$TOOLS_DIR/massdns" || warn "Failed to clone massdns"
+  fi
+  if [ -d "$TOOLS_DIR/massdns" ]; then
+    (cd "$TOOLS_DIR/massdns" && make) || warn "make failed for massdns (missing dev libs?)."
+    if [ -f "$TOOLS_DIR/massdns/bin/massdns" ]; then
+      sudo cp -f "$TOOLS_DIR/massdns/bin/massdns" /usr/local/bin/ || warn "Failed to copy massdns binary to /usr/local/bin."
+    else
+      warn "massdns binary not found after build."
+    fi
+  fi
+else
+  info "massdns already installed at /usr/local/bin/massdns"
+fi
+
+# Ensure commonly used binaries are available (some go-installs may require a new shell to refresh PATH)
+info "Checking some expected binaries: subfinder, httpx, httpx, nuclei, amass, gau, gauplus, assetfinder..."
+for chk in subfinder httpx nuclei amass gau gauplus assetfinder dnsx httprobe; do
+  if ! command_exists "$chk"; then
+    warn "$chk not found in PATH. It may be available in $GOBIN ($GOBIN). If not, try re-sourcing your shell or installing manually."
+  fi
+done
+
+# Clonable tools (interactive)
+mkdir -p "$TOOLS_DIR"
+echo ""
+echo "Clonable tools (optional). These will be cloned into $TOOLS_DIR."
+echo "Options: C_all (install all), C_skip (skip), or comma-separated list (C1,C3)."
+idx=0
+for entry in "${CLONABLE_TOOLS[@]}"; do
+  idx=$((idx+1))
+  IFS='|' read -r display_dir rest <<< "$entry"
+  echo "  C$idx) ${entry%%|*}"
+done
+echo "  C_all) Install all"
+echo "  C_skip) Skip all"
+read -r -p "Your choice for clonable tools (e.g., 'C_all', 'C1,C3', 'C_skip'): " clone_choice
+selected_clone_indices=()
+if [[ "${clone_choice:-}" =~ ^([Cc]_[Aa][Ll][Ll])$ ]]; then
+  for i in $(seq 0 $(( ${#CLONABLE_TOOLS[@]} - 1 ))); do selected_clone_indices+=($i); done
+elif [[ ! "${clone_choice:-}" =~ ^([Cc]_[Ss][Kk][Ii][Pp])$ ]]; then
+  IFS=', ' read -r -a raw_indices <<< "$clone_choice"
+  for i in "${raw_indices[@]}"; do
+    num_idx=${i#[Cc]}
+    if [[ "$num_idx" =~ ^[0-9]+$ ]] && [ "$num_idx" -ge 1 ] && [ "$num_idx" -le ${#CLONABLE_TOOLS[@]} ]; then
+      selected_clone_indices+=($((num_idx - 1)))
+    else
+      warn "Invalid entry ignored: $i"
+    fi
+  done
+fi
+
+if [ ${#selected_clone_indices[@]} -gt 0 ]; then
+  echo "Cloning/updating selected tools..."
+  for idx in "${selected_clone_indices[@]}"; do
+    IFS='|' read -r display target_dir clone_url post_cmd <<< "${CLONABLE_TOOLS[$idx]}"
+    display_name=$(echo "$display" | awk -F'(' '{print $1}' | sed 's/ *$//')
     if [ -d "$target_dir" ]; then
-        echo ""
-        while true; do
-            read -r -p "Directory '$target_dir' for $tool_name already exists. Options: [ri] Reinstall (removes old), [up] Update (git pull), [rm] Remove, [ig] Ignore: " choice
-            case "$choice" in
-                ri|RI) echo "Removing existing '$target_dir' for $tool_name..."; rm -rf "$target_dir"; action="clone"; break ;;
-                up|UP)
-                    echo "Attempting to update $tool_name in '$target_dir' using git pull..."
-                    if (cd "$target_dir" && git pull); then
-                        echo "$tool_name updated successfully via git pull."
-                        echo "Checking/Re-installing requirements for $tool_name after update..."
-                        if ! eval "$install_reqs_cmd"; then failed_clonable_tools_reqs+="$tool_name, "; fi
-                    else
-                        echo "Failed to update $tool_name via git pull."
-                        failed_clonable_tools_clone+="$tool_name (update failed), "
-                    fi
-                    action="skip_clone"; break ;;
-                rm|RM) echo "Removing existing '$target_dir' for $tool_name and skipping re-clone."; rm -rf "$target_dir"; action="skip"; break ;;
-                ig|IG|*) echo "Ignoring existing '$target_dir' for $tool_name, skipping."; action="skip"; break ;;
-            esac
-        done
+      echo "Directory exists for $display_name: $target_dir"
+      read -r -p "Options for existing dir: [ri] Reinstall (rm+clone), [up] Update (git pull), [ig] Ignore: " choice
+      case "$choice" in
+        ri) rm -rf "$target_dir"; echo "Removed $target_dir";;
+        up) (cd "$target_dir" && git pull) || warn "git pull failed for $display_name";;
+        ig|*) echo "Ignoring existing $target_dir"; continue;;
+      esac
     fi
-
-    if [ "$action" == "clone" ]; then
-        echo "Cloning $tool_name from $clone_url..."
-        if git clone "$clone_url" "$target_dir"; then
-            if ! eval "$install_reqs_cmd"; then failed_clonable_tools_reqs+="$tool_name, "; fi
-        else
-            echo "ERROR: Failed to clone $tool_name."; failed_clonable_tools_clone+="$tool_name, ";
-        fi
-    elif [ "$action" == "skip" ]; then
-        skipped_clonable_tools+="$tool_name, "
-    fi
-}
-
-echo "--- OSINTel-Dashboard Setup v1.0 ---"
-echo "This script will guide you through installing necessary system packages and OSINT tools."
-echo ""
-
-non_script_files=$(find . -maxdepth 1 -not -name "$(basename "$0")" -not -name "." -not -name ".." -not -name ".git*" -not -name ".vscode*" -not -name "venv" -print -quit)
-
-if [ -n "$non_script_files" ]; then
-    echo "WARNING: The current directory ($PWD) is not empty."
-    read -r -p "Do you want to proceed with the installation in this directory? (y/N): " proceed_in_current
-    if [[ ! "$proceed_in_current" =~ ^[Yy]$ ]]; then
-        echo "Aborting setup. Please move this script to an empty directory or a dedicated project folder and re-run it from there."
-        exit 1
-    fi
-    echo "Proceeding with installation in the current non-empty directory..."
-else
-    echo "Current directory appears suitable for a new project setup."
-fi
-echo ""
-
-VENV_DIR="./venv" 
-
-if [ -n "$VIRTUAL_ENV" ]; then
-    echo "INFO: Already inside an active virtual environment: $VIRTUAL_ENV"
-    expected_venv_path="$(pwd)/$VENV_DIR"
-    if [ "$(cd "$VIRTUAL_ENV" && pwd)" != "$(cd "$expected_venv_path" && pwd)" ]; then
-      echo "WARNING: The active venv ($VIRTUAL_ENV) is not the local '$VENV_DIR' in the current project."
-      echo "It's recommended to use a local venv for this project."
-      read -r -p "Do you want to proceed using the current active venv? (y/N): " use_current_venv
-      if [[ ! "$use_current_venv" =~ ^[Yy]$ ]]; then
-        echo "Aborting. Please deactivate the current venv or create/activate one in '$VENV_DIR'."
-        exit 1
+    echo "Cloning $display_name into $target_dir ..."
+    if git clone "$clone_url" "$target_dir"; then
+      echo "Cloned $display_name."
+      if [ -n "$post_cmd" ]; then
+        echo "Running post install commands for $display_name..."
+        (cd "$target_dir" && eval "$post_cmd") || warn "Post-install command failed for $display_name"
       fi
+    else
+      warn "Failed to clone $display_name from $clone_url"
     fi
+  done
 else
-    echo "INFO: Not currently inside a virtual environment."
-    if [ -d "$VENV_DIR" ]; then
-        echo "INFO: Virtual environment '$VENV_DIR' found in the current directory."
-        echo "Attempting to activate it..."
-        source "$VENV_DIR/bin/activate"
-        if [ -z "$VIRTUAL_ENV" ] || [ "$(cd "$VIRTUAL_ENV" && pwd)" != "$(cd "$VENV_DIR" && pwd)" ]; then
-            echo "ERROR: Failed to activate the existing virtual environment '$VENV_DIR'."
-            echo "Please activate it manually ('source $VENV_DIR/bin/activate') and re-run this script."
-            exit 1
-        else
-            echo "Successfully activated existing virtual environment: $VIRTUAL_ENV"
-        fi
-    else
-        echo "INFO: Virtual environment '$VENV_DIR' not found. Attempting to create it..."
-        if ! python3 -m venv "$VENV_DIR"; then
-            echo "ERROR: Failed to create virtual environment '$VENV_DIR'."
-            echo "Please ensure 'python3-venv' package is installed ('sudo apt install python3-venv') and try again."
-            exit 1
-        fi
-        echo "Virtual environment '$VENV_DIR' created. Attempting to activate it..."
-        source "$VENV_DIR/bin/activate"
-        if [ -z "$VIRTUAL_ENV" ]; then
-            echo "ERROR: Failed to activate the newly created virtual environment '$VENV_DIR'."
-            echo "Please activate it manually ('source $VENV_DIR/bin/activate') and re-run this script."
-            exit 1
-        else
-            echo "Successfully created and activated virtual environment: $VIRTUAL_ENV"
-        fi
-    fi
+  echo "Skipping clonable tools."
 fi
+
+# Additional pip installs - shodan init note, vt-py
+info "Finalizing Python tooling..."
+# shodan already installed in venv earlier; ensure shodan is initialized if user desires
+if command_exists shodan; then
+  echo ""
+  read -r -p "Do you want to run 'shodan init' now? (You must have a Shodan API key) (y/N): " shchoice
+  if [[ "${shchoice:-}" =~ ^[Yy]$ ]]; then
+    read -r -p "Enter Shodan API key: " SHODAN_KEY
+    shodan init "$SHODAN_KEY" || warn "shodan init failed; set key via 'shodan init <API>' manually."
+  fi
+fi
+
+# SpiderFoot note
+if apt-cache show spiderfoot >/dev/null 2>&1; then
+  info "Installing spiderfoot via apt..."
+  sudo apt install -y spiderfoot || warn "spiderfoot apt install failed."
+else
+  warn "SpiderFoot not available via apt on this distro. Consider installing it from https://github.com/smicallef/spiderfoot and following its README."
+fi
+
+# GHunt / cookie reminder
+if [ -d "${TOOLS_DIR}/GHunt" ]; then
+  info "If you installed GHunt, run the GHunt cookie generation step manually:"
+  echo "  cd ${TOOLS_DIR}/GHunt && python3 check_and_gen_cookies.py"
+fi
+
+# holehe root vs non-root note
+info "Note: holehe was installed both in venv and system-wide (sudo pip3). This helps it run with/without sudo in some environments."
+info "You can test it with: holehe someone@example.com"
+
+# Summarize
 echo ""
-echo "INFO: All Python packages (pip install) will be installed into the active virtual environment: $VIRTUAL_ENV"
+echo "--------------------------------------------------"
+echo "SETUP SUMMARY"
+echo " - Python venv located at: ${VENV_DIR}"
+echo " - Tools dir: ${TOOLS_DIR}"
+echo " - GOBIN: ${GOBIN} (ensure this is in your PATH permanently)"
+echo " - Massdns: $( [ -x /usr/local/bin/massdns ] && echo 'installed' || echo 'not installed' )"
 echo ""
-
-( \
-    echo "STEP 1: Updating system packages (sudo password may be required)..." && \
-    sudo apt update -y && sudo apt upgrade -y && \
-    echo "System package lists updated." && echo "" && \
-    
-    echo "STEP 2: Installing ESSENTIAL system packages..."
-    echo "These are required for basic script operation or by core Python tools."
-    echo "Packages to be installed SYSTEM-WIDE via apt: python3-pip, python3-venv (if not already), git, curl."
-    essential_pkgs_for_apt=("python3-pip" "python3-venv" "git" "curl")
-    if ! sudo apt install -y "${essential_pkgs_for_apt[@]}"; then
-        echo "ERROR: Failed to install essential system packages. Aborting."
-        exit 1;
-    fi
-    echo "Essential system packages installed/verified." && echo "" && \
-
-    echo "STEP 3: Optional OSINT System Packages Installation"
-    osint_system_tools=(
-        "Nmap|nmap|Network exploration tool and security/port scanner."
-        "Whois|whois|Client for the WHOIS directory service (domain/IP ownership)."
-        "Dnsrecon|dnsrecon|Standard DNS enumeration script (subdomains, records)."
-        "WhatWeb|whatweb|Identify technologies used on websites."
-        "FFUF|ffuf|Fast web fuzzer (content discovery, directory/file brute-forcing)."
-        "ExifTool|libimage-exiftool-perl|Utility for reading and writing meta information in files (used by Metagoofil)."
-    )
-    echo "The following OPTIONAL OSINT system packages can be installed SYSTEM-WIDE via apt:"
-    idx=0
-    for tool_entry in "${osint_system_tools[@]}"; do
-        IFS='|' read -r display_name pkg_name description <<< "$tool_entry"; idx=$((idx + 1))
-        already_installed_msg=""; if command_exists "$pkg_name" || (dpkg -s "$pkg_name" >/dev/null 2>&1); then already_installed_msg=" (already installed)"; fi
-        echo "  S$idx) $display_name - $description (Package: $pkg_name)$already_installed_msg"
-    done
-    echo "  S_all) Install ALL optional OSINT system packages listed above."
-    echo "  S_skip) Skip all optional OSINT system packages."
-    echo ""
-    read -r -p "Your choice for OSINT system packages (e.g., 'S_all', 'S1,S3', 'S_skip'): " sys_choice
-    packages_to_install=()
-    if [[ "$sys_choice" =~ ^([Ss]_[Aa][Ll][Ll])$ ]]; then
-        for tool_entry in "${osint_system_tools[@]}"; do IFS='|' read -r _ pkg_name _ <<< "$tool_entry"; packages_to_install+=("$pkg_name"); done
-    elif [[ ! "$sys_choice" =~ ^([Ss]_[Ss][Kk][Ii][Pp])$ ]]; then
-        IFS=', ' read -r -a raw_indices <<< "$sys_choice"
-        for i in "${raw_indices[@]}"; do
-            num_idx=${i#[Ss]}; if [[ "$num_idx" =~ ^[0-9]+$ ]] && [ "$num_idx" -ge 1 ] && [ "$num_idx" -le ${#osint_system_tools[@]} ]; then
-                tool_entry="${osint_system_tools[$((num_idx - 1))]}"; IFS='|' read -r _ pkg_name _ <<< "$tool_entry"; packages_to_install+=("$pkg_name")
-            else echo "Warning: Invalid system package selection '$i' ignored."; fi
-        done
-        packages_to_install=($(printf "%s\n" "${packages_to_install[@]}" | sort -u | tr '\n' ' '))
-    fi
-    if [ ${#packages_to_install[@]} -gt 0 ]; then
-        echo "Attempting to install selected system packages: ${packages_to_install[*]}..."
-        if ! sudo apt install -y "${packages_to_install[@]}"; then
-            echo "ERROR: Failed to install some selected system packages. Please check apt output."
-            failed_system_tools+="Selected OSINT system packages (${packages_to_install[*]}), "
-        else echo "Selected OSINT system packages installed successfully."; fi
-    else
-        echo "No optional OSINT system packages selected for installation or S_skip chosen."
-        if [[ "$sys_choice" =~ ^([Ss]_[Ss][Kk][Ii][Pp])$ ]]; then
-            for tool_entry in "${osint_system_tools[@]}"; do IFS='|' read -r display_name _ _ <<< "$tool_entry"; skipped_system_tools+="$display_name, "; done
-        else
-            for tool_entry in "${osint_system_tools[@]}"; do
-                is_selected=false; IFS='|' read -r current_display_name current_pkg_name _ <<< "$tool_entry"
-                for selected_pkg in "${packages_to_install[@]}"; do if [[ "$current_pkg_name" == "$selected_pkg" ]]; then is_selected=true; break; fi; done
-                if ! $is_selected; then skipped_system_tools+="$current_display_name, "; fi
-            done
-        fi
-    fi
-    echo "OSINT system packages check/installation complete." && echo "" && \
-
-    echo "STEP 4: Installing Core Python Packages into Virtual Environment '$VIRTUAL_ENV'..."
-    echo "Packages: Flask, holehe, theHarvester." && \
-    if ! pip install Flask holehe theHarvester; then
-        echo "ERROR: Failed to install core Python packages into venv. Please check pip output."
-    fi && \
-    echo "Core Python packages installed into venv." && echo "" && \
-
-    echo "STEP 5: Clonable Tools Installation/Update (into Virtual Environment if Python-based)"
-    mkdir -p ./tools
-    clonable_tools=(
-        "Sherlock (Username searching)|./tools/sherlock|https://github.com/sherlock-project/sherlock.git|if [ -f sherlock/requirements.txt ]; then pip install -r sherlock/requirements.txt; else echo 'No requirements.txt at sherlock/ for Sherlock.' && failed_clonable_tools_reqs+='Sherlock, '; fi"
-        "Sublist3r (Subdomain enumeration)|./tools/Sublist3r|https://github.com/aboul3la/Sublist3r.git|if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo 'No requirements.txt for Sublist3r.' && failed_clonable_tools_reqs+='Sublist3r, '; fi"
-        "GHunt (Google Account investigation)|./tools/GHunt|https://github.com/mxrch/GHunt.git|if [ -f GHunt/requirements.txt ]; then pip install -r GHunt/requirements.txt; else echo 'No requirements.txt at GHunt/ for GHunt.' && failed_clonable_tools_reqs+='GHunt, '; fi"
-        "Metagoofil (Metadata extraction)|./tools/metagoofil|https://github.com/laramies/metagoofil.git|echo 'Metagoofil typically does not have a pip requirements.txt.'"
-    )
-    echo "The following CLONABLE tools can be installed/updated from GitHub (Python dependencies go into '$VIRTUAL_ENV'):"
-    idx=0
-    for tool_entry in "${clonable_tools[@]}"; do
-        IFS='|' read -r display_name_desc _ _ _ <<< "$tool_entry"; idx=$((idx + 1))
-        echo "  C$idx) $display_name_desc"
-    done
-    echo "  C_all) Install/Update ALL clonable tools listed above."
-    echo "  C_skip) Skip all clonable tools."
-    echo ""
-    read -r -p "Your choice for clonable tools (e.g., 'C_all', 'C1,C3', 'C_skip'): " clone_choice
-    selected_clone_indices=()
-    if [[ "$clone_choice" =~ ^([Cc]_[Aa][Ll][Ll])$ ]]; then 
-        for i in $(seq 1 ${#clonable_tools[@]}); do selected_clone_indices+=($((i - 1))); done
-    elif [[ ! "$clone_choice" =~ ^([Cc]_[Ss][Kk][Ii][Pp])$ ]]; then
-        IFS=', ' read -r -a raw_indices <<< "$clone_choice"
-        for i in "${raw_indices[@]}"; do
-            num_idx=${i#[Cc]}; if [[ "$num_idx" =~ ^[0-9]+$ ]] && [ "$num_idx" -ge 1 ] && [ "$num_idx" -le ${#clonable_tools[@]} ]; then
-                selected_clone_indices+=($((num_idx - 1)))
-            else echo "Warning: Invalid clonable tool selection '$i' ignored."; fi
-        done
-        selected_clone_indices=($(printf "%s\n" "${selected_clone_indices[@]}" | sort -u | tr '\n' ' '))
-    fi
-    if [ ${#selected_clone_indices[@]} -gt 0 ]; then
-        echo ""
-        for index in "${selected_clone_indices[@]}"; do
-            tool_entry="${clonable_tools[$index]}"; IFS='|' read -r display_name_desc target_dir clone_url reqs_cmd_template <<< "$tool_entry"
-            display_name=$(echo "$display_name_desc" | awk -F'(' '{print $1}' | sed 's/ *$//')
-            full_clone_cmd="git clone $clone_url $target_dir"; full_reqs_cmd="(cd $target_dir && $reqs_cmd_template)"
-            handle_clonable_tool_installation "$display_name" "$target_dir" "$clone_url" "$full_reqs_cmd"
-        done
-    else
-        echo "No clonable tools selected for installation or C_skip chosen."
-         if [[ "$clone_choice" =~ ^([Cc]_[Ss][Kk][Ii][Pp])$ ]]; then
-            for tool_entry in "${clonable_tools[@]}"; do
-                IFS='|' read -r display_name_desc _ _ _ <<< "$tool_entry"
-                display_name=$(echo "$display_name_desc" | awk -F'(' '{print $1}' | sed 's/ *$//')
-                skipped_clonable_tools+="$display_name, "
-            done
-        fi
-    fi
-    echo "Clonable tools processing complete." && echo "" && \
-    
-
-    echo "" && \
-    echo "------------------------------------------------------------------------------------" && \
-    echo "SETUP SCRIPT v1.0 - FINISHED." && \
-    echo "" && \
-    echo "SUMMARY & ATTENTION REQUIRED:" && \
-    echo "" && \
-    ([ -n "$skipped_system_tools" ] || [ -n "$failed_system_tools" ] || [ -n "$skipped_clonable_tools" ] || [ -n "$failed_clonable_tools_clone" ] || [ -n "$failed_clonable_tools_reqs" ]) && \
-    echo "Please review the following:"
-
-    if [ -n "$skipped_system_tools" ]; then
-        echo "  - SKIPPED Optional System Packages (User choice or default): ${skipped_system_tools%, }"
-        echo "    Functionality relying on these tools may be unavailable. Install manually if needed (e.g., 'sudo apt install <package_name>')."
-    fi
-    if [ -n "$failed_system_tools" ]; then
-        echo "  - FAILED System Package Installations: ${failed_system_tools%, }"
-        echo "    Please check 'apt' output above for errors and try manual installation."
-    fi
-    if [ -n "$skipped_clonable_tools" ]; then
-        echo "  - SKIPPED Clonable Tools (User choice or existing dir ignored): ${skipped_clonable_tools%, }"
-        echo "    These tools are not installed/updated. Corresponding dashboard features will not work."
-    fi
-    if [ -n "$failed_clonable_tools_clone" ]; then
-        echo "  - FAILED Tool Clones: ${failed_clonable_tools_clone%, }"
-        echo "    Check network connection or Git URLs. Manual cloning might be required."
-    fi
-    if [ -n "$failed_clonable_tools_reqs" ]; then
-        echo "  - FAILED/SKIPPED Python Requirements for Cloned Tools: ${failed_clonable_tools_reqs%, }"
-        echo "    These tools might not run correctly. Check their directories for 'requirements.txt' and install manually (e.g., 'pip install -r path/to/requirements.txt')."
-    fi
-    if ! ([ -n "$skipped_system_tools" ] || [ -n "$failed_system_tools" ] || [ -n "$skipped_clonable_tools" ] || [ -n "$failed_clonable_tools_clone" ] || [ -n "$failed_clonable_tools_reqs" ]); then
-      echo "  All selected installations and checks seem to have proceeded without major issues noted by the script."
-      echo "  However, always verify functionality."
-    fi
-    echo "" && \
-
-    echo "NEXT STEPS & VERIFICATIONS:" && \
-    echo "1. Ensure app.py, data.json, history.json, and templates/index.html are in this directory ($PWD)." && \
-    echo "2. The 'data' and 'tools' directories should exist here. The 'data' directory was created if missing." && \
-    echo "" && \
-    echo "3. IMPORTANT FOR GHUNT (if installed/updated):" && \
-    echo "   Navigate to './tools/GHunt/GHunt/' (or where GHunt's main scripts are) and manually run:" && \
-    echo "   'python3 check_and_gen_cookies.py' to generate cookies." && \
-    echo "" && \
-    echo "4. IMPORTANT FOR data.json:" && \
-    echo "   Verify that 'clone_dir' and 'run_in_directory' paths in your data.json for all cloned tools" && \
-    echo "   match the actual cloned locations (e.g., 'tools/sherlock', 'tools/Sublist3r', etc.)." && \
-    echo "" && \
-    echo "THIS IS JUST A HELPER SCRIPT. ERRORS CAN OCCUR." && \
-    echo "MAKE SURE TO CHECK EVERYTHING: locations of cloned folders, tool functionality," && \
-    echo "and ensure all tools function as expected from the web dashboard." && \
-    echo "" && \
-    echo "FINAL CONSIDERATION:" && \
-    echo "Now follow the steps above or just try running 'python3 app.py' (ensure venv is active: 'source $VENV_DIR/bin/activate')." && \
-    echo "Make sure to check the IP address the Flask app runs on (usually 0.0.0.0:5001, accessible via your server's IP)," && \
-    echo "or change it to 'localhost:5001' in app.py if you only want local access." && \
-    echo "------------------------------------------------------------------------------------" \
-
-) || echo "A critical error occurred during the main setup process, and the script was exited."
+echo "Recommended next steps:"
+echo " 1) Activate venv: source ${VENV_DIR}/bin/activate"
+echo " 2) Start the app: python3 app.py"
+echo " 3) Use Demo Mode or test targets only. Do NOT scan external targets without authorization."
+echo " 4) If any expected binary (subfinder/httpx/nuclei/...) is missing, try re-sourcing your shell or manually re-running 'go install' for that module."
+echo ""
+echo "Important manual steps:"
+echo " - For GHunt: cd ${TOOLS_DIR}/GHunt && python3 check_and_gen_cookies.py"
+echo " - For Shodan: shodan init <APIKEY>"
+echo " - SpiderFoot: if not installed via apt, install from its GitHub repo."
+echo ""
+echo "Done. If you saw warnings above, please review them and re-run the relevant step."
+echo "--------------------------------------------------"
