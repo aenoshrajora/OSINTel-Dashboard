@@ -2767,7 +2767,78 @@
     "requires_clone": false,
     "output_filename_pattern": "myip_{{TIMESTAMP}}.json"
   },
-
+  {
+    "id": "hudsonrock-username",
+    "name": "Hudson Rock — Username Lookup",
+    "description": "Check if a username was compromised in a global Infostealer malware attack via Hudson Rock's Cavalier API.",
+    "notes": "Free OSINT API by Hudson Rock. No API key required. Results include compromised credentials, machine info, and malware family.",
+    "command_template": "curl -s 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-username?username={{username}}'",
+    "input_fields": [
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "testadmin",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hudsonrock_username_{{INPUT__username}}_{{TIMESTAMP}}.json"
+  },
+  {
+    "id": "hudsonrock-email",
+    "name": "Hudson Rock — Email Lookup",
+    "description": "Check if an email address was compromised in a global Infostealer malware attack via Hudson Rock's Cavalier API.",
+    "notes": "Free OSINT API by Hudson Rock. No API key required. Returns stealer logs, compromised credentials, and associated machine fingerprint.",
+    "command_template": "curl -s 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-email?email={{email}}'",
+    "input_fields": [
+      {
+        "id": "email",
+        "label": "Email:",
+        "type": "email",
+        "placeholder": "target@example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hudsonrock_email_{{INPUT__email}}_{{TIMESTAMP}}.json"
+  },
+  {
+    "id": "hudsonrock-domain",
+    "name": "Hudson Rock — Domain Lookup",
+    "description": "Check if a domain has employees or users compromised in Infostealer malware attacks via Hudson Rock's Cavalier API.",
+    "notes": "Free OSINT API by Hudson Rock. No API key required. Useful for corporate exposure checks — returns count and sample of compromised accounts associated with the domain.",
+    "command_template": "curl -s 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-domain?domain={{domain}}'",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "tesla.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hudsonrock_domain_{{INPUT__domain}}_{{TIMESTAMP}}.json"
+  },
+  {
+    "id": "hudsonrock-phone",
+    "name": "Hudson Rock — Phone Lookup",
+    "description": "Check if a phone number is associated with a compromised account in global Infostealer malware attacks via Hudson Rock's Cavalier API.",
+    "notes": "Free OSINT API by Hudson Rock. No API key required. Include country code in E.164 format (e.g. +19777334049).",
+    "command_template": "curl -s 'https://cavalier.hudsonrock.com/api/json/v2/osint-tools/search-by-username?username={{phone}}'",
+    "input_fields": [
+      {
+        "id": "phone",
+        "label": "Phone number (E.164):",
+        "type": "text",
+        "placeholder": "+19777334049",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hudsonrock_phone_{{INPUT__phone}}_{{TIMESTAMP}}.json"
+  },
   {
     "id": "dnstwist-builtin",
     "name": "DNSTwist Typosquat Finder",
