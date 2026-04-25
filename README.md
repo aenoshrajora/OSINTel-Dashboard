@@ -1,311 +1,330 @@
-# OSINTel - OSINT Dashboard
+# OSINTel Dashboard — v3.0
 
-**A dynamic, Flask-based web application providing a centralized interface for executing various open-source intelligence (OSINT) and cybersecurity command-line tools. This repository has been expanded: the tool-list was upgraded from the original OSINT-focused pack to include a full suite of recon utilities (now 43 tools total). This change is additive — the UI, history, and workflow stay the same; you’re simply getting a much broader set of tools wired into the same dashboard.**
+> A glassmorphic, dual-theme recon suite. Flask backend. 70+ tools. Built for operators.
 
-This dashboard allows users to:
-*   Run pre-configured and user-added OSINT tools through an easy-to-use web UI.
-*   Manage tool configurations (add, edit, delete).
-*   View execution history for each tool.
-*   Save tool outputs to files.
-*   Make links in tool output clickable.
+![Python](https://img.shields.io/badge/Python-3.8+-3ae0ff?style=flat-square&logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-2.x-00ffb2?style=flat-square&logo=flask&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-a050ff?style=flat-square)
+![Status](https://img.shields.io/badge/Status-Actively%20Developed-00ffb2?style=flat-square)
 
-**Project Status:** Actively Developed. Open to contributions, feature requests, and feedback!
+---
 
-## Disclaimer
+## ⚠️ Disclaimer
 
-⚠️ **FOR EDUCATIONAL AND AUTHORIZED RESEARCH PURPOSES ONLY.** ⚠️
+**FOR EDUCATIONAL AND AUTHORIZED RESEARCH PURPOSES ONLY.**
 
-This software is intended to help users learn about OSINT techniques and cybersecurity tools in a controlled environment. The user is solely responsible for their actions and for ensuring that their use of this software complies with all applicable local, state, national, and international laws and regulations. The creators and contributors of this project assume NO liability and are NOT responsible for any misuse or damage caused by this program. **Always obtain explicit, written permission before scanning or investigating any target that you do not own or have prior authorization to test.**
+You are solely responsible for your actions. Always obtain explicit written permission before scanning or testing any target you do not own. The creators and contributors assume **no liability** for misuse or damage caused by this software. Use responsibly and legally.
 
-## License
+---
 
-This project is open source and licensed under the **MIT License** - see the `LICENSE` file for details.. 
+## What's New in v3.0
+
+- **Full UI rewrite** — glassmorphic dual-theme interface (dark/light) with JetBrains Mono + Syne typography, scanline overlays, ambient depth orbs, and macOS-style terminal output
+- **`ctfr.py` upgraded** — now a proper module with `--no-banner`, `--json`, `--timeout`, wildcard filtering, multi-name cert parsing, and full dashboard integration
+- **70+ tools pre-wired** in `data.json` across recon, web enum, exploitation, forensics, crypto, OSINT, wireless, and binary analysis
+- **Streaming execution** via Server-Sent Events on `/api/run_tool_stream/<id>`
+- **Hardened backend** — `shlex`-based command splitting (no `shell=True`), path traversal guards, atomic JSON saves, per-tool timeout override, and `MAX_HISTORY_ENTRIES` cap
+- **Live tool search** in sidebar, welcome dashboard with run stats, breadcrumb navigation, copy-to-clipboard on output
+- **History improvements** — status badges (success/error), per-entry timestamps, output file previews
+
+---
 
 ## Features
 
-*   **Dynamic Web Interface:** Built with HTML, CSS, and JavaScript.
-*   **Flask Backend:** Python-based server to manage tools and execute commands.
-*   **Centralized Tooling:** Access multiple OSINT tools from a single dashboard.
-*   **User-Managed Tool Configuration:**
-    *   Add new tools with custom command templates, input fields, and output filename patterns.
-    *   Edit existing tool configurations.
-    *   Delete tools.
-    *   Support for tools requiring `git clone` and `pip install requirements.txt`.
-*   **Execution History:**
-    *   Logs each tool run with inputs, status, and a link to the saved output file.
-    *   View history per tool.
-    *   Load and display past results.
-*   **File-Based Output:** Full tool outputs are saved to files in a `data/` directory.
-*   **Clickable Links:** URLs in tool output are automatically converted to clickable links.
-*   **Interactive Setup Script (`setup.sh`):** Guides users through dependency and tool installation.
+- **Glassmorphic UI** — layered `rgba` backgrounds, `backdrop-filter: blur()`, dual CSS variable theme system switchable at runtime
+- **Flask backend** — `shell=False` subprocess execution, SSE streaming, atomic JSON I/O, configurable timeouts
+- **Tool management** — add, edit, delete tools with full form UI; supports git clone + pip install on add
+- **Execution history** — per-tool and global history, saved output files, click-to-reload past results
+- **Template substitution** — `{{field_id}}` placeholders in command templates, shell-quoted per value
+- **Custom handlers** — extensible `CUSTOM_HANDLERS` dict in `app.py` for tools needing special logic (e.g. `ffuf-file-finder`)
+- **Output persistence** — all runs saved to `data/` with configurable filename patterns
+- **Clickable URLs** — auto-linked in terminal output
 
-### Pre-configured Tools (via `data.json` and installable with `setup.sh`):
+---
 
-*   **Holehe Email Check:** Checks if an email is used on various sites.
-*   **Nmap Network Scan:** Network exploration and port scanner.
-*   **IP/Domain Info:** Performs WHOIS and DIG lookups.
-*   **TheHarvester:** Gathers emails, subdomains, hosts, etc.
-*   **Dnsrecon DNS Enumeration:** DNS enumeration and reconnaissance.
-*   **WhatWeb - Website Technologies:** Identifies technologies used on websites.
-*   **FFUF - Domain File Finder:** Fast web fuzzer for content discovery.
-*   **Sherlock Username Search (Cloned):** Hunts for social media accounts by username.
-*   **Sublist3r Subdomain Enum (Cloned):** Enumerates subdomains.
-*   **GHunt Google Acct Invest. (Cloned):** Investigates Google accounts (requires manual cookie setup).
-*   **Metagoofil Metadata Extr. (Cloned):** Extracts metadata from public documents.
+## Tool Categories
 
+### Passive Recon & Subdomain Enumeration
+`ctfr` · `subfinder` · `assetfinder` · `amass` · `sublist3r` · `fierce` · `dnstwist` · `dnsdumpster` · `crt.sh` · `waybackurls` · `theHarvester` · `recon-ng` · `spiderfoot`
 
-## New / Notable tools added (categories, uses, examples)
-The commands below are taken from the command_template entries in data.json. Use them in the UI or as examples for CLI automation. 
-
-### Passive & Active Subdomain / DNS
-
-* `subfinder` – passive subdomain discovery.
-Example: `subfinder -d example.com`. 
-
-* `assetfinder` – find related domains and subdomains.
-Example: `assetfinder --subs-only example.com`. 
-
-* `ctfr` – cert-transparency subdomain discovery.
-* Example: `python3 ./ctfr.py -d example.com`. 
-
-* `dnsrecon` / `dnsenum` / `dnsx` – DNS enumeration & fast probing.
-Examples: `dnsrecon -d example.com -t std` / `dnsenum example.com --enum` / `dnsx -l hosts.txt -a -resp`. 
+### DNS & Network
+`nslookup` · `dnsrecon` · `dnsenum` · `dnsx` · `whois/rdap` · `ping` · `fping` · `hping3` · `arp` · `netstat` · `ss` · `ip addr` · `tcpdump` · `snmpwalk` · `traceroute` · `mtr` · `nc` · `socat`
 
 ### Web Enumeration & Content Discovery
-* `gau` / `gauplus` — historical and aggregated URL collection.
-* Example: gau example.com --providers ... (UI exposes flags). 
+`gobuster` · `ffuf` · `feroxbuster` · `dirb` · `wfuzz` · `gau` · `gauplus` · `httpx` · `httprobe` · `robots.txt fetcher` · `curl headers` · `wafw00f` · `arjun` · `whatweb` · `WPScan` · `JoomScan` · `CMSeeK`
 
-* `httpx` / `httprobe` — probe which endpoints are alive.
-* Example: `httpx -l urls.txt -o httpx_output.txt`. 
+### Vulnerability Scanning & Exploitation
+`nmap` (port scan + vuln scripts) · `masscan` · `nuclei` · `nikto` · `sqlmap` · `dalfox` · `XSStrike` · `commix` · `Medusa` · `Ncrack` · `hydra` · `Responder` · `CrackMapExec` · `Impacket secretsdump`
 
-* `gobuster` / `ffuf` / `dirb` — directory, virtual-host and bucket enumeration.
-* Example: `ffuf -w filenames.txt -u https://example.com/FUZZ` / `gobuster dir target -w /path/wordlist`. 
-
-### Scanning & Templated VULN checks
-
-* `nmap` — ports & service discovery (many flags available in UI).
-* Example: `nmap -sS -T4 example.com`. 
-
-* `masscan` — extremely fast port scanning for large ranges.
-* Example: `masscan 192.168.0.0/16 -p1-1000 --rate 1000`. 
-
-* `nuclei` — templated vulnerability scanning.
-* Example: `nuclei -l urls.txt -t /path/to/nuclei-templates/`. 
-
-* `nikto` / `sqlmap` — webserver vuln checks and automated SQLi.
-* Examples: `nikto -h http://example.com` / `sqlmap -u 'http://example.com/vuln?id=1' --batch`. 
-
+### TLS / SSL Analysis
+`openssl cert inspector` · `sslyze` · `testssl.sh` · `sslscan`
 
 ### OSINT & Enrichment
-* `shodan` / `censys` / `vt` (VirusTotal) / `urlscan` — enrichment / device & URL analysis.
-* Examples: `shodan host 8.8.8.8` / `censys search 'service.service_name: HTTP'` / `vt url scan http://example.com`. 
+`shodan` · `censys` · `VirusTotal` · `urlscan` · `ipinfo` · `abuseipdb` · `emailrep` · `socialscan` · `maigret` · `holehe` · `GHunt` · `photon` · `cloud-enum` · `AWS S3 check`
 
-* `theHarvester` / `recon-ng` / `spiderfoot` — multi-source OSINT collection and automation. 
+### Secrets & Git
+`gitleaks` · `trufflehog` · `git-dumper`
 
+### Password & Hash
+`hashcat` · `john` · `hashid` · `openssl dgst` · `aircrack-ng` · `crunch` · `CeWL`
 
-### Metadata, File & Binary Analysis
-* `metagoofil` (cloned) — collect documents and extract metadata.
-* Example (via cloned repo): `python2 metagoofil/metagoofil.py -d example.com -t pdf,doc`. 
+### Steganography & Forensics
+`steghide` · `stegseek` · `binwalk` · `foremost` · `volatility3` · `exiftool` · `pdfinfo` · `strings`
 
-* `exiftool` / `pdfinfo` / `strings` / `jq` / `rg` — inspect files, parse JSON, search artifacts.
-* Examples: `exiftool file.jpg`, `pdfinfo report.pdf`, `strings binary.bin | rg 'password'`. 
+### Binary Analysis & Reverse Engineering
+`objdump` · `readelf` · `ltrace` · `strace` · `checksec` · `ghidra headless` · `file`
 
-### Network Tooling & Helpers
-* `nc` (netcat) / `socat` / `traceroute` / `mtr` — low-level networking & relay tools.
-* Example: `nc target 80` / `mtr -r example.com`. 
+### Utilities
+`base64` · `xxd` · `tr/ROT13` · `awk` · `sed` · `sort/uniq` · `grep` · `find` · `lsof` · `ps` · `URL parser` · `Python decode helper` · `public IP lookup` · `airodump-ng`
 
-### Takeover / Special Checks
-* `subjack` — detect some types of subdomain takeover risk.
-* Example: `subjack -w subs.txt -t 100 -timeout 30 -ssl.` 
+---
+
 ## Tech Stack
 
-*   **Backend:** Python 3.8+, Flask
-*   **Frontend:** HTML5, CSS3, JavaScript (Vanilla)
-*   **Data Storage:** JSON files (`data.json` for tool configs, `history.json` for run logs)
-*   **OSINT Tools:** Various command-line utilities (see above).
-*   **Environment Management:** Python `venv`
-*   **Setup:** Bash Script (`setup.sh`)
+| Layer | Tech |
+|---|---|
+| Backend | Python 3.8+, Flask |
+| Frontend | HTML5, CSS3 (custom properties), Vanilla JS |
+| Fonts | JetBrains Mono, Syne (Google Fonts) |
+| Icons | Font Awesome 6 |
+| Storage | `data.json` (tool configs), `history.json` (run logs), `data/` (output files) |
+| Execution | `subprocess.Popen` — `shell=False`, SSE streaming |
 
-## Prerequisites & System Compatibility
+---
 
-This project is designed and primarily tested for **Linux-based systems**, specifically on **Debian-based distributions (like Ubuntu, Kali Linux, Debian itself)**. While some components might work on other operating systems with adjustments, full functionality and the `setup.sh` script are tailored for this environment.
+## Prerequisites
 
-Before you begin, ensure your system has the following base components. The `setup.sh` script will attempt to install or verify many of these, but it's good to be aware.
+Designed and tested on **Debian-based Linux** (Ubuntu, Kali, Debian). Core requirements:
 
-*   **Python:** Version 3.8 or higher.
-    *   To check: `python3 --version`
-    *   To install (if missing on a Debian-based system): `sudo apt update && sudo apt install python3`
-*   **`pip` (Python package installer):**
-    *   To check: `pip3 --version`
-    *   To install (if missing, usually comes with `python3-pip`): `sudo apt install python3-pip`
-*   **`python3-venv` (for creating Python virtual environments):**
-    *   To install: `sudo apt install python3-venv`
-*   **`git`**: For cloning tool repositories.
-    *   To check: `git --version`
-    *   To install: `sudo apt install git`
-*   **`curl`**: Often used by setup scripts or tools for downloads.
-    *   To check: `curl --version`
-    *   To install: `sudo apt install curl`
+| Requirement | Check | Install |
+|---|---|---|
+| Python 3.8+ | `python3 --version` | `sudo apt install python3` |
+| pip | `pip3 --version` | `sudo apt install python3-pip` |
+| venv | — | `sudo apt install python3-venv` |
+| git | `git --version` | `sudo apt install git` |
+| curl | `curl --version` | `sudo apt install curl` |
 
-The `setup.sh` script will guide you through installing other specific command-line OSINT tools (like Nmap, FFUF, etc.) via `apt`.
+---
 
 ## Installation
 
-You have two primary methods for setting up the OSINT Dashboard: using the interactive `setup.sh` script (recommended for most users) or performing a manual installation.
+### Method 1 — Setup Script (Recommended)
 
-### Method 1: Using the Interactive Setup Script (Recommended)
+```bash
+git clone https://github.com/aenoshrajora/OSINTel-Dashboard.git
+cd OSINTel-Dashboard
+chmod +x setup.sh
+./setup.sh
+```
 
-The `setup.sh` script automates most of the installation process, including system dependencies, Python packages, and cloning/setting up common OSINT tools.
+The script handles: venv creation, pip packages, apt tool installs, and cloning optional tools. Follow the on-screen prompts. `sudo` is only requested for `apt` steps.
 
-1.  **Download/Clone Project:**
-    If you haven't already, get the project files.
-    ```bash
-    git clone https://github.com/aenoshrajora/osintelOSINTel-Dashboard.git
-    cd OSINTel-Dashboard 
-    ```
-    Ensure `setup.sh`, `app.py`, `data.json`, `history.json` (can be empty `[]`), and the `templates/index.html` file are in this directory.
+**Post-setup checklist:**
+- **GHunt:** run `python3 check_and_gen_cookies.py` inside `tools/GHunt/GHunt/` to generate `cookies.json`
+- **`data.json` paths:** verify `clone_dir` and `run_in_directory` match your actual clone locations
+- **`data/` directory:** created by setup script; if missing run `mkdir data`
 
-2.  **Make `setup.sh` Executable:**
-    ```bash
-    chmod +x setup.sh
-    ```
+### Method 2 — Manual
 
-3.  **Run the Setup Script:**
-    It's highly recommended to run the script from within a dedicated, preferably empty, project directory. The script will guide you through creating/activating a Python virtual environment.
-    ```bash
-    ./setup.sh
-    ```
-    *   The script will first check if you are in an empty directory and if a virtual environment is active/needs creation.
-    *   It will then prompt you to install essential system packages (like `python3-pip`, `git`) and optional OSINT system tools (like `nmap`, `ffuf`) via `apt`. This step will require `sudo` privileges.
-    *   Next, it will ask which of the common clonable OSINT tools (Sherlock, Sublist3r, etc.) you wish to install or update.
-    *   Follow the on-screen prompts.
-    *   **Note on `sudo`:** The script is designed to ask for `sudo` only when needed for `apt` commands.
+```bash
+# 1. Clone project
+git clone https://github.com/aenoshrajora/OSINTel-Dashboard.git
+cd OSINTel-Dashboard
 
-4.  **Post-Setup Steps (CRITICAL - Read output from `setup.sh`):**
-    *   **GHunt Cookies:** If you installed GHunt, you **MUST** manually generate its `cookies.json` file. Navigate to where GHunt was cloned (e.g., `./tools/GHunt/GHunt/`) and run `python3 check_and_gen_cookies.py`.
-    *   **`data.json` Paths:** Verify that the `clone_dir` and `run_in_directory` paths in your `data.json` file match the actual locations where tools were cloned by the `setup.sh` script (e.g., `tools/sherlock`, `tools/Sublist3r`). The script attempts to use these standard names.
-    *   **Create `data` directory:** The `setup.sh` script now creates the `./data` and `./tools` directories. If `./data` is still missing for any reason: `mkdir data`.
-    *   Review any warnings or error messages printed by the `setup.sh` script regarding skipped or failed installations.
+# 2. System dependencies
+sudo apt update
+sudo apt install -y python3 python3-pip python3-venv git curl \
+  whois nmap dnsrecon whatweb libimage-exiftool-perl ffuf
 
-### Method 2: Manual Installation
+# 3. Virtual environment
+python3 -m venv venv
+source venv/bin/activate
 
-If you prefer to install everything manually or the setup script encounters issues on your specific system:
+# 4. Python packages
+pip install Flask requests
 
-1.  **Project Directory:**
-    Create your project directory and navigate into it:
-    ```bash
-    mkdir osintelOSINTel-Dashboard
-    cd osintelOSINTel-Dashboard
-    ```
-    Place `app.py`, `data.json`, `history.json` (empty `[]`), and the `templates/index.html` file here.
+# 5. Directories
+mkdir -p data tools
 
-2.  **Install Prerequisites (System-Wide):**
-    Ensure Python 3.8+, pip, venv, git, curl, and other OSINT tools are installed.
-    ```bash
-    sudo apt update
-    sudo apt install -y python3 python3-pip python3-venv git curl whois nmap dnsrecon whatweb libimage-exiftool-perl ffuf
-    ```
+# 6. Clone optional tools (examples)
+cd tools
+git clone https://github.com/sherlock-project/sherlock.git sherlock
+git clone https://github.com/aboul3la/Sublist3r.git Sublist3r
+git clone https://github.com/mxrch/GHunt.git GHunt
+git clone https://github.com/laramies/metagoofil.git metagoofil
+cd ..
 
-3.  **Python Virtual Environment:**
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate
-    ```
+# Install requirements for cloned tools
+pip install -r tools/sherlock/sherlock/requirements.txt
+pip install -r tools/Sublist3r/requirements.txt
+```
 
-4.  **Install Core Python Packages (into venv):**
-    ```bash
-    pip install Flask holehe theHarvester
-    ```
+---
 
-5.  **Manually Clone and Set Up Tools:**
-    Create a `./tools` directory: `mkdir tools`. Then, for each tool defined in `data.json` that has `"requires_clone": true`:
+## ctfr.py — Certificate Transparency Recon (v1.3)
 
-    *   **Sherlock:**
-        ```bash
-        cd tools
-        git clone https://github.com/sherlock-project/sherlock.git sherlock 
-        cd sherlock
-        if [ -f sherlock/requirements.txt ]; then pip install -r sherlock/requirements.txt; fi
-        cd ../.. 
-        ```
-        *In `data.json`, ensure:* `"clone_dir": "tools/sherlock"`, `"run_in_directory": "tools/sherlock"`, `"requirements_file": "sherlock/requirements.txt"`.
+`ctfr.py` is a first-class module in v3.0, not just a bundled script.
 
-    *   **Sublist3r:**
-        ```bash
-        cd tools
-        git clone https://github.com/aboul3la/Sublist3r.git Sublist3r
-        cd Sublist3r
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-        cd ../..
-        ```
-        *In `data.json`, ensure:* `"clone_dir": "tools/Sublist3r"`, `"run_in_directory": "tools/Sublist3r"`, `"requirements_file": "requirements.txt"`.
+```bash
+# Basic usage
+python3 ctfr.py -d example.com
 
-    *   **GHunt:**
-        ```bash
-        cd tools
-        git clone https://github.com/mxrch/GHunt.git GHunt
-        cd GHunt 
-        if [ -f GHunt/requirements.txt ]; then (cd GHunt && pip install -r requirements.txt); fi
-        (cd GHunt && python3 check_and_gen_cookies.py) # CRITICAL: Manual cookie generation
-        cd ../..
-        ```
-        *In `data.json`, ensure:* `"clone_dir": "tools/GHunt"`, `"run_in_directory": "tools/GHunt"`, `"requirements_file": "GHunt/requirements.txt"`.
+# Dashboard-friendly (no banner, clean output)
+python3 ctfr.py -d example.com --no-banner
 
-    *   **Metagoofil:**
-        ```bash
-        cd tools
-        git clone https://github.com/laramies/metagoofil.git metagoofil
-        cd ../..
-        ```
-        *In `data.json`, ensure:* `"clone_dir": "tools/metagoofil"`, `"run_in_directory": "tools/metagoofil"`. (Ensure `libimage-exiftool-perl` is installed via `apt`).
+# JSON output
+python3 ctfr.py -d example.com --no-banner --json
 
-    **Note on `data.json` paths:** The `clone_dir` and `run_in_directory` fields in `data.json` tell `app.py` where to find these tools. Ensure they match your manual cloning structure.
+# Save to file
+python3 ctfr.py -d example.com --no-banner -o /tmp/subs.txt
 
-6.  **Create `data` Directory:**
-    In your project root: `mkdir data`
+# Custom timeout
+python3 ctfr.py -d example.com --timeout 30
+```
+
+**Changes from v1.2:**
+- `--no-banner` flag for clean programmatic invocation from the dashboard
+- `--json` output with `{domain, subdomains, count}` structure
+- `--timeout` flag passed through to requests
+- Wildcard entries (`*.example.com`) stripped automatically
+- Multi-name `name_value` fields parsed (newline-separated certs)
+- Protocol, query string, and fragment stripped from input URL
+- File output uses `"w"` (overwrite) not `"a"` (append)
+- Proper `RuntimeError` handling for timeouts, connection errors, bad JSON
+
+Update the `crt-sh-builtin` entry in `data.json` to use it:
+```
+python3 ctfr.py -d {{domain}} --no-banner
+```
+
+---
 
 ## Running the Application
 
-1.  **Activate Virtual Environment:**
-    If not already active, navigate to your project directory and run:
-    ```bash
-    source venv/bin/activate
-    ```
+```bash
+# Activate venv
+source venv/bin/activate
 
-2.  **Start the Flask Server:**
-    ```bash
-    python3 app.py
-    ```
+# Start server
+python3 app.py
+```
 
-3.  **Access the Dashboard:**
-    The Flask development server, by default in `app.py`, runs on `host='0.0.0.0'` and `port=5001`.
-    *   **`0.0.0.0`** means it listens on all available network interfaces on the machine where it's running.
-    *   This allows you to access the dashboard from **any other machine on the same local network** by navigating to `http://YOUR_SERVER_IP:5001` (e.g., `http://192.168.1.10:5001`), where `YOUR_SERVER_IP` is the local IP address of the machine running the dashboard.
-    *   If you are accessing it from the same machine it's running on, you can use `http://localhost:5001` or `http://127.0.0.1:5001`.
-    *   If you only want the dashboard to be accessible from the machine it's running on (localhost only), you can change `host='0.0.0.0'` to `host='localhost'` in the `app.run(...)` line at the bottom of `app.py`.
+Access at `http://localhost:5001` (or `http://YOUR_LAN_IP:5001` from another machine on the network).
 
-## Usage
+Environment overrides:
 
-*   **Sidebar:** Select a tool from the list.
-*   **Tool Panel:** Input required information.
-*   **Run Tool:** Click the "Run Tool" button. Output appears below. URLs are clickable.
-*   **Manage Tools:**
-    *   **Add New Tool:** Configure name, command template (`{{input_id}}` for placeholders), input fields, output filename pattern, and optional Git cloning.
-    *   **Edit/Delete:** Buttons next to each tool.
-*   **History:** Click "Hist" next to a tool to view past executions. Click an entry to load its saved output.
+```bash
+PORT=8080 HOST=127.0.0.1 FLASK_DEBUG=1 python3 app.py
+```
 
-## Contributing & Feedback
+---
 
-This project is open source and contributions are welcome! If you have suggestions, bug reports, or want to add new features or tools:
+## API Reference
 
-*   **Open an Issue:** Use the GitHub Issues tracker for bugs or feature discussions.
-*   **Pull Requests:** Feel free to fork the repository and submit pull requests.
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/tools` | List all tool configs |
+| `POST` | `/api/tools` | Add a new tool (clones repo if needed) |
+| `PUT` | `/api/tools/<id>` | Update tool config |
+| `DELETE` | `/api/tools/<id>` | Delete tool + cloned directory |
+| `POST` | `/api/run_tool/<id>` | Execute tool, return full output |
+| `POST` | `/api/run_tool_stream/<id>` | Execute tool, stream output via SSE |
+| `GET` | `/api/history/<tool_id>` | Tool-specific history |
+| `GET` | `/api/history?limit=N` | Global history (latest N entries) |
+| `DELETE` | `/api/history` | Clear all history (`?purge_files=true` to delete output files too) |
+| `GET` | `/api/history_file_content?filepath=` | Read saved output file |
+| `GET` | `/data/<filename>` | Download output file |
 
+### Command Template Syntax
+
+```
+nmap -sV {{flags}} {{target}}
+python3 ctfr.py -d {{domain}} --no-banner -o {{output}}
+```
+
+Tokens in command templates are replaced with shell-quoted user input values. Filename pattern tokens:
+
+| Token | Resolves to |
+|---|---|
+| `{{TOOL_ID}}` | Tool's UUID |
+| `{{TOOL_NAME_SANITIZED}}` | Lowercased, special-chars-stripped name |
+| `{{INPUT__field_id}}` | Value of that input field |
+| `{{TIMESTAMP}}` | `YYYYMMDD_HHMMSS` |
+| `{{UUID}}` | Random 8-char hex |
+
+---
+
+## Adding Custom Tools
+
+1. Click **+ new tool** in the sidebar
+2. Fill in name, description, and command template using `{{field_id}}` placeholders
+3. Add input field definitions (text, select, URL, password, email types supported)
+4. Optionally enable git clone — the backend will clone the repo and pip-install requirements on save
+5. Set an output filename pattern
+
+For tools needing special execution logic, add a handler to `CUSTOM_HANDLERS` in `app.py`:
+
+```python
+def _handle_my_tool(tool_config, user_inputs):
+    # ... custom logic ...
+    return output_string, success_bool
+
+CUSTOM_HANDLERS['my-tool-id'] = _handle_my_tool
+```
+
+---
+
+## Project Structure
+
+```
+OSINTel-Dashboard/
+├── app.py              # Flask backend — routing, execution, history
+├── ctfr.py             # Certificate transparency recon module (v1.3)
+├── data.json           # Tool configurations (70+ pre-wired)
+├── history.json        # Execution log (auto-managed)
+├── setup.sh            # Interactive install script
+├── data/               # Saved tool output files (auto-created)
+├── tools/              # Cloned tool repositories (auto-created)
+│   ├── sherlock/
+│   ├── Sublist3r/
+│   ├── GHunt/
+│   └── ...
+└── templates/
+    └── index.html      # Frontend — glassmorphic dual-theme UI
+```
+
+---
 
 ## Troubleshooting
 
-*   **"Command not found" (Nmap, ffuf, etc.):** Ensure the tool is installed globally (`sudo apt install <tool_name>`).
-*   **Python errors:** Check Flask server console output. Ensure Python dependencies are in the active virtual environment.
-*   **Tool cloning/requirements errors:** Check internet, Git URLs. For nested `requirements.txt`, verify paths.
-*   **GHunt not working:** Likely missing/invalid `GHunt/cookies.json`. Re-run `check_and_gen_cookies.py`.
-*   **Jinja2 Template Errors:** Avoid active Jinja2 tags `{{ ... }}` in HTML attributes like `placeholder` if they are not meant to be rendered by Flask.
+**"Command not found"** — tool not installed globally. Check `sudo apt install <tool>` or the tool's own install docs.
+
+**Python errors on startup** — activate your venv first: `source venv/bin/activate`. Check Flask is installed.
+
+**Tool clone fails on save** — verify the git URL is reachable and you have internet access. Check `install_log` in the modal response.
+
+**ctfr returns no results** — crt.sh can be slow or temporarily down. Try increasing `--timeout`. Check connectivity with `curl -s 'https://crt.sh/?q=%.example.com&output=json'`.
+
+**GHunt not working** — missing or expired `cookies.json`. Navigate to `tools/GHunt/GHunt/` and re-run `python3 check_and_gen_cookies.py`.
+
+**Output file not found in history** — ensure `data/` directory exists and Flask process has write permission.
+
+**Streaming endpoint not updating** — verify the client supports SSE (`EventSource` or `fetch` + `ReadableStream`). Custom-handled tools fall back to the standard (non-streaming) endpoint automatically.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome. If you want to add a tool to `data.json`, follow the existing schema — include `id`, `name`, `description`, `command_template`, `input_fields`, and `output_filename_pattern` at minimum.
+
+For backend changes, keep the `shell=False` constraint and run new command strings through `build_command_list()` before passing to `run_command()`.
+
+---
+
+## License
+
+MIT — see `LICENSE` for details.
+
+---
+
+*OSINTel Dashboard is built for security researchers, CTF players, and red teamers. Use it on infrastructure you own or have explicit authorization to test.*

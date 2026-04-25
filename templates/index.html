@@ -1,1469 +1,2042 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>OSINTle</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <style>
-        /* Global */
-        body {
-          margin: 0;
-          font-family: 'Segoe UI', Roboto, sans-serif;
-          background: linear-gradient(135deg, #1a1a1a, #0d0d0d); /* Dark background gradient */
-          color: #ccc;
-          display: flex;
-          height: 100vh;
-        }
-        
-        body.light-theme {
-          background: linear-gradient(135deg, #f6f8fb, #eef1f7); /* light mode background */
-          color: #333;
-        }
-        
-        body.light-theme .sidebar {
-          background: #fff;
-        }
-        
-        body.light-theme .panel {
-          background: #fff;
-          color: #333;
-        }
-        
-        body.light-theme .modal-content {
-          background: #fff;
-          color: #333;
-        }
-        
-        body.light-theme .input-group input,
-        body.light-theme .input-group select,
-        body.light-theme .modal-content input,
-        body.light-theme .modal-content textarea,
-        body.light-theme .modal-content select {
-          background: #fff;
-          color: #333;
-          border: 1px solid #ccc;
-        }
-        
-        body.light-theme .input-group input::placeholder,
-        body.light-theme .input-group select::placeholder,
-        body.light-theme .modal-content input::placeholder,
-        body.light-theme .modal-content textarea::placeholder,
-        body.light-theme .modal-content select::placeholder {
-          color: #999;
-        }
-        
-        body.light-theme #toolOutputDisplay {
-          background: #f9f9f9;
-          color: #333;
-          border-color: #ccc;
-        }
-        
-        body.light-theme #glassOverlay {
-          background: rgba(255, 255, 255, 0.3);
-        }
-        
-        body.light-theme .sidebar li.tool-item {
-          background: #f5f5f5;
-          color: #333;
-        }
-        
-        body.light-theme .sidebar li.tool-item:hover,
-        body.light-theme .sidebar li.tool-item.active {
-          background: linear-gradient(90deg, #dfdfdf, #f302e7);
-          color: #fff;
-        }
-        
-        body.light-theme .sidebar .tool-actions button {
-          background: rgba(0, 0, 0, 0.1);
-          color: #333;
-        }
-        
-        body.light-theme .sidebar .tool-actions button:hover {
-          background: rgba(0, 0, 0, 0.2);
-        }
-        
-        body.light-theme .modal-content .input-field-config {
-          background: #f5f5f5;
-          border-color: #ccc;
-        }
-        
-        body.light-theme .modal-content .input-field-config label {
-          color: #333;
-        }
-        
-        body.light-theme .modal-content input[type="text"],
-        body.light-theme .modal-content input[type="url"],
-        body.light-theme .modal-content textarea,
-        body.light-theme .modal-content select {
-          background: #fff;
-          color: #333;
-          border: 1px solid #ccc;
-        }
-        
-        body.light-theme .modal-content input[type="text"]::placeholder,
-        body.light-theme .modal-content input[type="url"]::placeholder,
-        body.light-theme .modal-content textarea::placeholder,
-        body.light-theme .modal-content select::placeholder {
-          color: #999;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-          width: 280px;
-          background: #111;
-          padding: 20px;
-          display: flex;
-          flex-direction: column;
-          border-radius: 0 20px 20px 0;
-          box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-          height: 100vh;
-          overflow: hidden;
-        }
-        
-        .sidebar ul#toolList {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-          flex-grow: 1;
-          overflow-y: auto;
-          scrollbar-width: thin;
-        }
-        
-        .sidebar ul#toolList::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        .sidebar ul#toolList::-webkit-scrollbar-thumb {
-          background: rgba(139, 0, 0, 0.4);
-          border-radius: 10px;
-        }
-        
-        .sidebar h2 {
-          font-size: 1.4em;
-          font-weight: 700;
-          text-align: center;
-          margin-bottom: 20px;
-          background: linear-gradient(90deg, #6003ca, #0033cc);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        
-        .sidebar li.tool-item {
-          background: #222;
-          padding: 12px 15px;
-          margin-bottom: 10px;
-          border-radius: 12px;
-          cursor: pointer;
-          font-size: 0.95em;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          transition: all 0.25s ease;
-        }
-        
-        .sidebar li.tool-item:hover,
-        .sidebar li.tool-item.active {
-          background: linear-gradient(90deg, #8b0000, #000000);
-          color: #fff;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        
-        .sidebar .tool-actions button {
-          background: rgba(255,255,255,0.1);
-          border: none;
-          color: #fff;
-          padding: 5px 8px;
-          margin-left: 5px;
-          border-radius: 8px;
-          cursor: pointer;
-          font-size: 0.7em;
-          transition: all 0.2s;
-        }
-        
-        .sidebar li.tool-item:hover .tool-actions button {
-          background: rgba(255,255,255,0.2);
-        }
-        
-        .sidebar .manage-tools-btn {
-          padding: 12px;
-          margin-top: 20px;
-          border: none;
-          border-radius: 14px;
-          font-size: 1em;
-          font-weight: 600;
-          cursor: pointer;
-          color: #fff;
-          background: linear-gradient(90deg, #00008b, #2e004f);
-          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-          transition: all 0.25s ease;
-        }
-        
-        .sidebar .manage-tools-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-        }
-        
-        /* Main Content */
-        .main-content {
-          flex-grow: 1;
-          padding: 30px;
-          overflow-y: auto;
-        }
-        
-        .panel {
-          background: #1a1a1a;
-          border-radius: 20px;
-          padding: 25px;
-          margin-bottom: 20px;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.5);
-          display: none;
-          animation: fadeIn 0.3s ease;
-        }
-        
-        .panel.active {
-          display: block;
-        }
-        
-        .panel h3 {
-          margin-top: 0;
-          font-size: 1.3em;
-          font-weight: 700;
-          color: #8b0000;
-          border-bottom: 2px solid #333;
-          padding-bottom: 12px;
-        }
-        
-        .panel .input-group {
-          margin-bottom: 15px;
-        }
-        
-        .panel .input-group label {
-          font-weight: 500;
-          margin-bottom: 6px;
-          display: block;
-        }
-        
-        .panel .input-group input,
-        .panel .input-group select {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #333;
-          border-radius: 12px;
-          font-size: 0.95em;
-          transition: border 0.2s;
-        }
-        
-        .panel .input-group input:focus,
-        .panel .input-group select:focus {
-          outline: none;
-          border: 1px solid #00008b;
-          box-shadow: 0 0 0 3px rgba(0,0,139,0.3);
-        }
-        
-        .panel button.run-tool-btn {
-          background: linear-gradient(90deg, #004d00, #333333);
-          border: none;
-          color: #fff;
-          padding: 12px 20px;
-          border-radius: 14px;
-          font-size: 1em;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.25s ease;
-          margin-top: 10px;
-        }
-        
-        .panel button.run-tool-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-        }
-        
-        /* Tool Output */
-        #toolOutputDisplay {
-          background: rgba(0, 0, 0, 0.7);
-          border-radius: 16px;
-          border: 1px solid rgba(255,255,255,0.1);
-          backdrop-filter: blur(8px);
-          padding: 18px;
-          margin-top: 20px;
-          min-height: 200px;
-          font-family: "Courier New", monospace;
-          font-size: 0.95em;
-          color: #ccc;
-          white-space: pre-wrap;
-          overflow-y: auto;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-          animation: fadeIn 0.3s ease;
-        }
-        
-        #toolOutputDisplay.success-output {
-          border-left: 5px solid #004d00;
-        }
-        
-        #toolOutputDisplay.error-output {
-          border-left: 5px solid #8b0000;
-        }
-        
-        /* Modal Overlay */
-        .modal {
-          display: none;
-          position: fixed;
-          z-index: 1000;
-          left: 0; top: 0;
-          width: 100%; height: 100%;
-          background-color: rgba(0, 0, 0, 0.7);
-          backdrop-filter: blur(8px);
-          animation: fadeIn 0.3s ease;
-        }
-        
-        /* Modal Content */
-        .modal-content {
-          background: #272727;
-          border-radius: 20px;
-          width: 85%;
-          max-width: 750px;
-          padding: 25px 30px;
-          box-shadow: 0 12px 28px rgba(0,0,0,0.15);
-          animation: scaleIn 0.25s ease;
-          position: absolute;
-          top: 45%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          max-height: 80vh;
-          overflow-y: auto;
-        }
-        
-        .modal-content h4 {
-          margin-top: 0;
-          font-size: 1.3em;
-          font-weight: 700;
-          color: #8b0000;
-          border-bottom: 2px solid #333;
-          padding-bottom: 12px;
-        }
-        
-        .modal-content .close-btn {
-          position: absolute;
-          top: 15px;
-          right: 20px;
-          font-size: 26px;
-          font-weight: bold;
-          color: #888;
-          cursor: pointer;
-          transition: color 0.2s;
-        }
-        
-        .modal-content .close-btn:hover {
-          color: #8b0000;
-        }
-        
-        .modal-content label {
-          display: block;
-          margin-top: 12px;
-          margin-bottom: 5px;
-          font-weight: 600;
-          font-size: 0.9em;
-          color: #ccc;
-        }
-        
-        .modal-content input[type="text"],
-        .modal-content input[type="url"],
-        .modal-content textarea,
-        .modal-content select {
-          width: 100%;
-          padding: 12px;
-          border: 1px solid #333;
-          border-radius: 12px;
-          font-size: 0.95em;
-          margin-bottom: 10px;
-          transition: all 0.2s ease;
-        }
-        
-        .modal-content input:focus,
-        .modal-content textarea:focus,
-        .modal-content select:focus {
-          outline: none;
-          border: 1px solid #00008b;
-          box-shadow: 0 0 0 3px rgba(0,0,139,0.3);
-        }
-        
-        .modal-content textarea {
-          min-height: 70px;
-          resize: vertical;
-        }
-        
-        .modal-content button {
-          background: linear-gradient(90deg, #00008b, #2e004f);
-          color: #fff;
-          border: none;
-          padding: 12px 18px;
-          border-radius: 12px;
-          font-weight: 600;
-          cursor: pointer;
-          font-size: 0.95em;
-          transition: all 0.25s ease;
-        }
-        
-        .modal-content button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba(0,0,0,0.5);
-        }
-        
-        .modal-content .input-field-config {
-          background: #222;
-          border: 1px dashed #444;
-          padding: 12px;
-          margin-bottom: 12px;
-          border-radius: 12px;
-        }
-        
-        .modal-content .input-field-config label {
-          font-weight: normal;
-          font-size: 0.85em;
-        }
-        
-        /* History Modal */
-        #historyModalContent ul {
-          list-style: none;
-          padding: 0;
-          max-height: 400px;
-          overflow-y: auto;
-        }
-        
-        #historyModalContent li {
-          padding: 12px;
-          border-bottom: 1px solid #333;
-          cursor: pointer;
-          font-size: 0.95em;
-          border-radius: 10px;
-          transition: background 0.2s;
-        }
-        
-        #historyModalContent li:hover {
-          background: #333;
-        }
-        
-        #historyModalContent li small {
-          display: block;
-          color: #999;
-          font-size: 0.8em;
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.9); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        
-        @keyframes pulse {
-          0% { opacity: 0.8; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.05); }
-          100% { opacity: 0.8; transform: scale(1); }
-        }
-        
-        /* Glass Overlay */
-        #glassOverlay {
-          display: none;
-          position: fixed;
-          top: 0; left: 0;
-          width: 100%; height: 100%;
-          background: rgba(0, 0, 0, 0.7);
-          backdrop-filter: blur(8px);
-          -webkit-backdrop-filter: blur(8px);
-          z-index: 2000;
-        }
-        
-        #glassOverlay.active {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          animation: fadeIn 0.3s ease;
-        }
-        
-        #glassOverlay span {
-          padding: 15px 25px;
-          border-radius: 16px;
-          font-size: 1.1em;
-          font-weight: 600;
-          color: #fff;
-          background: linear-gradient(90deg, #8b0000, #333333);
-          box-shadow: 0 8px 18px rgba(0,0,0,0.5);
-          animation: pulse 1.5s infinite;
-        }
-        /* Input Fields Configuration - Base Styling */
-.modal-content .input-field-config {
-  background: #222; /* Dark mode default background */
-  border: 1px dashed #444;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 12px;
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OSINTel — Recon Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* ─── THEME TOKENS ─────────────────────────────────────────── */
+:root {
+  --mono: 'JetBrains Mono', 'Courier New', monospace;
+  --sans: 'Syne', system-ui, sans-serif;
+
+  /* transitions */
+  --t: 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Adjust label color for better contrast */
-.modal-content .input-field-config label {
-  color: #ccc;
-  font-weight: 500;
+[data-theme="dark"] {
+  --bg-base:        #050510;
+  --bg-layer1:      rgba(8, 8, 24, 0.92);
+  --bg-layer2:      rgba(14, 12, 32, 0.70);
+  --bg-layer3:      rgba(20, 16, 44, 0.45);
+  --bg-input:       rgba(0, 0, 0, 0.50);
+  --bg-item:        rgba(255,255,255,0.03);
+  --bg-item-hover:  rgba(0,255,178,0.06);
+  --bg-item-active: rgba(0,255,178,0.09);
+
+  --border-base:    rgba(255,255,255,0.06);
+  --border-accent:  rgba(0,255,178,0.22);
+  --border-purple:  rgba(160,80,255,0.22);
+  --border-input:   rgba(255,255,255,0.10);
+
+  --text-primary:   #dde0f0;
+  --text-secondary: #7880a0;
+  --text-muted:     #454868;
+
+  --green:   #00ffb2;
+  --purple:  #a050ff;
+  --red:     #ff3a5c;
+  --amber:   #ffaa00;
+  --blue:    #3ae0ff;
+
+  --glow-green:  0 0 20px rgba(0,255,178,0.20);
+  --glow-purple: 0 0 20px rgba(160,80,255,0.20);
+  --glow-red:    0 0 20px rgba(255,58,92,0.20);
+
+  --scanline: rgba(0,255,178,0.015);
+  --noise:    rgba(0,255,178,0.04);
+
+  --shadow-modal: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,255,178,0.10);
+  --shadow-panel: 0 8px 40px rgba(0,0,0,0.6);
+  --shadow-sidebar: 2px 0 40px rgba(0,0,0,0.6);
+
+  --run-btn-bg: linear-gradient(135deg, rgba(0,40,26,0.9), rgba(20,0,50,0.9));
+  --run-btn-text: var(--green);
+  --run-btn-border: rgba(0,255,178,0.3);
+
+  --terminal-prompt: var(--purple);
+  --terminal-output: var(--green);
 }
 
-/* Make sure text inputs inside don't overflow and are nicely contained */
-.modal-content .input-field-config input,
-.modal-content .input-field-config select,
-.modal-content .input-field-config textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #333;
-  border-radius: 8px;
-  font-size: 0.95em;
-  box-sizing: border-box;
+[data-theme="light"] {
+  --bg-base:        #f0eeff;
+  --bg-layer1:      rgba(252,250,255,0.92);
+  --bg-layer2:      rgba(255,255,255,0.72);
+  --bg-layer3:      rgba(240,236,255,0.50);
+  --bg-input:       rgba(255,255,255,0.80);
+  --bg-item:        rgba(100,60,220,0.03);
+  --bg-item-hover:  rgba(100,60,220,0.06);
+  --bg-item-active: rgba(100,60,220,0.09);
+
+  --border-base:    rgba(100,60,220,0.10);
+  --border-accent:  rgba(0,140,120,0.25);
+  --border-purple:  rgba(100,60,220,0.22);
+  --border-input:   rgba(100,60,220,0.18);
+
+  --text-primary:   #1a1430;
+  --text-secondary: #5a4e80;
+  --text-muted:     #a090c0;
+
+  --green:   #008c78;
+  --purple:  #6025d4;
+  --red:     #d42550;
+  --amber:   #c07800;
+  --blue:    #0068c0;
+
+  --glow-green:  0 0 20px rgba(0,140,120,0.15);
+  --glow-purple: 0 0 20px rgba(96,37,212,0.15);
+  --glow-red:    0 0 20px rgba(212,37,80,0.15);
+
+  --scanline: rgba(100,60,220,0.012);
+  --noise:    rgba(100,60,220,0.03);
+
+  --shadow-modal: 0 40px 100px rgba(60,20,140,0.18), 0 0 0 1px rgba(100,60,220,0.12);
+  --shadow-panel: 0 8px 40px rgba(60,20,140,0.10);
+  --shadow-sidebar: 2px 0 40px rgba(60,20,140,0.10);
+
+  --run-btn-bg: linear-gradient(135deg, #008c78, #6025d4);
+  --run-btn-text: #fff;
+  --run-btn-border: rgba(0,140,120,0.4);
+
+  --terminal-prompt: var(--purple);
+  --terminal-output: var(--green);
 }
 
-/* Focus state */
-.modal-content .input-field-config input:focus,
-.modal-content .input-field-config select:focus,
-.modal-content .input-field-config textarea:focus {
-  border: 1px solid #00008b;
-  box-shadow: 0 0 0 3px rgba(0, 0, 139, 0.3);
-  outline: none;
-}
+/* ─── RESET + BASE ──────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ✅ Light Theme Adjustments */
-body.light-theme .modal-content .input-field-config {
-  background: #f5f5f5;
-  border-color: #ccc;
-}
-
-body.light-theme .modal-content .input-field-config label {
-  color: #333;
-}
-
-body.light-theme .modal-content .input-field-config input,
-body.light-theme .modal-content .input-field-config select,
-body.light-theme .modal-content .input-field-config textarea {
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-}
-
-body.light-theme .modal-content .input-field-config input::placeholder,
-body.light-theme .modal-content .input-field-config select::placeholder,
-body.light-theme .modal-content .input-field-config textarea::placeholder {
-  color: #999;
-}
-/* ✅ Dark mode adjustments for Input Fields Configuration */
-body:not(.light-theme) .modal-content .input-field-config {
-  background: #1a1a1a; /* match modal background */
-  border: 1px dashed #333; /* subtle border to distinguish section */
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 12px;
-}
-
-body:not(.light-theme) .modal-content .input-field-config label {
-  color: #ccc; /* match modal text color */
-}
-
-body:not(.light-theme) .modal-content .input-field-config input,
-body:not(.light-theme) .modal-content .input-field-config select,
-body:not(.light-theme) .modal-content .input-field-config textarea {
-  background: #222; /* darker but within modal theme */
-  color: #ccc;
-  border: 1px solid #333;
-  border-radius: 8px;
-  width: 100%;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-body:not(.light-theme) .modal-content .input-field-config input::placeholder,
-body:not(.light-theme) .modal-content .input-field-config select::placeholder,
-body:not(.light-theme) .modal-content .input-field-config textarea::placeholder {
-  color: #999;
-}
-
-body:not(.light-theme) .modal-content .input-field-config input:focus,
-body:not(.light-theme) .modal-content .input-field-config select:focus,
-body:not(.light-theme) .modal-content .input-field-config textarea:focus {
-  border: 1px solid #00008b;
-  box-shadow: 0 0 0 3px rgba(0, 0, 139, 0.3);
-  outline: none;
-}
-/* Floating bottom-right sun/moon toggle */
-.switch {
-  --total_transition_duration: .3s;
-  --slider_width: 2.875em;
-  --slider_height: 1.5em;
-  --slider_light_bg: linear-gradient(90deg, #f32a85 0%, #f19d36 100%);
-  --slider_night_bg: linear-gradient(90deg, #1701a1 0%, #af0693 75%);
-  --circle_diameter: 1.125em;
-  --circle_rotation: 360deg;
-  --slider_offset: calc((var(--slider_height) - var(--circle_diameter)) / 2);
-  --slider_radius: calc(var(--slider_height) / 2);
-  --sun-color: #fff;
-  --moon-color: #fff;
-
-  position: fixed;     
-  bottom: 20px;          
-  right: 20px;           
-  z-index: 3000;         
-  transform: scale(1);   
-  transform-origin: bottom right;
-}
-
-.switch input { display: none; }
-
-.slider {
-  display: inline-block;
-  width: var(--slider_width);
-  height: var(--slider_height);
-  border-radius: var(--slider_radius);
-  position: relative;
-  cursor: pointer;
+html, body {
+  height: 100%;
   overflow: hidden;
-  transition: var(--total_transition_duration) ease;
+  font-family: var(--sans);
+  background: var(--bg-base);
+  color: var(--text-primary);
+  transition: background var(--t), color var(--t);
 }
 
-.slider::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  opacity:0;
-  background:var(--slider_night_bg);
-  transition: var(--total_transition_duration) ease;
+/* scanline texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px, transparent 2px,
+    var(--scanline) 2px, var(--scanline) 4px
+  );
 }
 
-.slider::after {
-  content:"";
-  position:absolute;
-  inset:0;
-  opacity:1;
-  background:var(--slider_light_bg);
-  transition: var(--total_transition_duration) ease;
+/* ambient orbs */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 20%, rgba(0,255,178,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 80%, rgba(160,80,255,0.07) 0%, transparent 60%);
+  transition: background var(--t);
 }
 
-.circle {
+[data-theme="light"] body::after {
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 20%, rgba(0,140,120,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 85% 80%, rgba(96,37,212,0.06) 0%, transparent 60%);
+}
+
+/* ─── LAYOUT ────────────────────────────────────────────────── */
+#app {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── SIDEBAR ───────────────────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg-layer1);
+  border-right: 1px solid var(--border-base);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-sidebar);
+  transition: background var(--t);
+  position: relative;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0.4;
+}
+
+/* logo */
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border-base);
+  position: relative;
+}
+
+.logo-wordmark {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.logo-wordmark span {
+  color: var(--green);
+  text-shadow: var(--glow-green);
+}
+
+.logo-tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* search */
+.sidebar-search {
+  padding: 14px 14px 10px;
+  border-bottom: 1px solid var(--border-base);
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 9px;
+  padding: 8px 12px;
+  transition: border-color var(--t), box-shadow var(--t);
+}
+
+.search-wrap:focus-within {
+  border-color: var(--green);
+  box-shadow: var(--glow-green);
+}
+
+.search-wrap i {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.search-wrap input {
+  background: none;
+  border: none;
+  outline: none;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.search-wrap input::placeholder { color: var(--text-muted); }
+
+/* category label */
+.cat-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  padding: 14px 18px 6px;
+}
+
+/* tool list */
+#toolList {
+  list-style: none;
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-accent) transparent;
+}
+
+#toolList::-webkit-scrollbar { width: 3px; }
+#toolList::-webkit-scrollbar-thumb { background: var(--border-accent); border-radius: 10px; }
+
+.tool-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 11px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-bottom: 3px;
+  background: var(--bg-item);
+  border: 1px solid transparent;
+  transition: all var(--t);
+  gap: 8px;
+}
+
+.tool-item:hover {
+  background: var(--bg-item-hover);
+  border-color: var(--border-accent);
+  transform: translateX(2px);
+}
+
+.tool-item.active {
+  background: var(--bg-item-active);
+  border-color: var(--green);
+  box-shadow: var(--glow-green);
+}
+
+.tool-item-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.tool-pip {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--text-muted);
+  transition: all var(--t);
+}
+
+.tool-item.active .tool-pip {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.tool-item-name {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--t);
+}
+
+.tool-item.active .tool-item-name { color: var(--green); }
+.tool-item:hover .tool-item-name { color: var(--text-primary); }
+
+.tool-actions {
+  display: flex;
+  gap: 3px;
+  opacity: 0;
+  transition: opacity var(--t);
+  flex-shrink: 0;
+}
+
+.tool-item:hover .tool-actions { opacity: 1; }
+
+.tool-actions button {
+  background: var(--bg-layer3);
+  border: 1px solid var(--border-base);
+  border-radius: 6px;
+  color: var(--text-muted);
+  padding: 3px 6px;
+  font-size: 9px;
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: all var(--t);
+  letter-spacing: 0.05em;
+}
+
+.tool-actions button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-accent);
+  background: var(--bg-item-hover);
+}
+
+.tool-actions .del-btn:hover {
+  color: var(--red);
+  border-color: rgba(255,58,92,0.3);
+}
+
+/* add tool btn */
+.add-tool-btn {
+  margin: 10px;
+  padding: 11px;
+  border-radius: 10px;
+  border: 1px dashed var(--border-accent);
+  background: transparent;
+  color: var(--green);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all var(--t);
+  text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: var(--circle_diameter);
-  height: var(--circle_diameter);
+  gap: 7px;
+}
+
+.add-tool-btn:hover {
+  background: var(--bg-item-hover);
+  border-style: solid;
+  box-shadow: var(--glow-green);
+}
+
+/* ─── MAIN AREA ─────────────────────────────────────────────── */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  border-bottom: 1px solid var(--border-base);
+  background: var(--bg-layer2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.breadcrumb {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.breadcrumb .sep { color: var(--text-muted); opacity: 0.4; }
+.breadcrumb .cur { color: var(--green); }
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse-dot 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.toggle-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  min-width: 32px;
+  text-align: right;
+}
+
+.toggle-track {
+  width: 46px;
+  height: 25px;
+  border-radius: 13px;
+  background: var(--bg-layer3);
+  border: 1px solid var(--border-accent);
+  position: relative;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.toggle-thumb {
   position: absolute;
-  top: var(--slider_offset);
-  left: var(--slider_offset);
-  transition: var(--total_transition_duration) ease;
-  z-index: 10;
+  top: 3.5px;
+  left: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: var(--glow-green);
+  transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
 }
 
-.circle svg.sun { transform: scale(1); color: var(--sun-color); }
-.circle svg.moon { transform: scale(0); color: var(--moon-color); width: calc(100% - 2px); }
-
-.switch input:checked + .slider::before { opacity: 1; }
-.switch input:checked + .slider::after { opacity: 0; }
-
-.switch input:active + .slider .circle { transform: scale(0.9); }
-.switch input:checked + .slider .circle {
-  left: calc(100% - var(--circle_diameter) - var(--slider_offset));
+[data-theme="light"] .toggle-thumb {
+  transform: translateX(20px);
 }
 
-.switch input:checked + .slider .sun { transform: scale(0) rotate(var(--circle_rotation)); }
-.switch input:checked + .slider .moon { transform: scale(1) rotate(var(--circle_rotation)); }
+.topbar-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border-base);
+  background: var(--bg-item);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--t);
+}
 
-        </style>
-         
-  </head>
-  <body class="light-theme">
-    <div class="sidebar">
-      <h2>OSINT Tools</h2>
-      <ul id="toolList"></ul>
-      <button class="manage-tools-btn" onclick="openToolModal()">
-        Add New Tool
-      </button>
+.topbar-icon-btn:hover {
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+  background: var(--bg-item-hover);
+}
+
+/* ─── PANELS ────────────────────────────────────────────────── */
+.panel-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 26px 28px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-base) transparent;
+}
+
+.panel-area::-webkit-scrollbar { width: 4px; }
+.panel-area::-webkit-scrollbar-thumb { background: var(--border-base); border-radius: 10px; }
+
+.panel { display: none; animation: fadeUp 0.3s ease; }
+.panel.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* welcome panel */
+.welcome-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.welcome-card {
+  background: var(--bg-layer2);
+  border: 1px solid var(--border-base);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  transition: all var(--t);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity var(--t);
+}
+
+.welcome-card.green::before { background: var(--green); }
+.welcome-card.purple::before { background: var(--purple); }
+.welcome-card.red::before { background: var(--red); }
+
+.welcome-card:hover { transform: translateY(-2px); }
+.welcome-card:hover::before { opacity: 1; }
+.welcome-card:hover.green { box-shadow: var(--glow-green); border-color: var(--border-accent); }
+.welcome-card:hover.purple { box-shadow: var(--glow-purple); border-color: var(--border-purple); }
+.welcome-card:hover.red { box-shadow: var(--glow-red); border-color: rgba(255,58,92,0.3); }
+
+.wcard-num {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.wcard-num.green { color: var(--green); }
+.wcard-num.purple { color: var(--purple); }
+.wcard-num.red { color: var(--red); }
+
+.wcard-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.welcome-tip {
+  background: var(--bg-layer2);
+  border: 1px solid var(--border-base);
+  border-radius: 14px;
+  padding: 22px 24px;
+  backdrop-filter: blur(12px);
+}
+
+.welcome-tip h2 {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.welcome-tip h2 i { color: var(--green); font-size: 13px; }
+
+.welcome-tip p {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+/* ─── TOOL RUN PANEL ────────────────────────────────────────── */
+.tool-run-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.tool-run-meta { flex: 1; }
+
+.tool-run-name {
+  font-family: var(--sans);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.tool-run-desc {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  margin-top: 5px;
+  line-height: 1.6;
+}
+
+.tool-run-notes {
+  display: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--amber);
+  margin-top: 6px;
+  padding: 8px 12px;
+  background: rgba(255,170,0,0.06);
+  border: 1px solid rgba(255,170,0,0.18);
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.tool-badges {
+  display: flex;
+  gap: 7px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.badge-green {
+  color: var(--green);
+  background: rgba(0,255,178,0.07);
+  border-color: rgba(0,255,178,0.25);
+}
+
+.badge-purple {
+  color: var(--purple);
+  background: rgba(160,80,255,0.07);
+  border-color: rgba(160,80,255,0.25);
+}
+
+/* inputs */
+.inputs-section {
+  background: var(--bg-layer2);
+  border: 1px solid var(--border-base);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+}
+
+.inputs-section-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inputs-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-base);
+}
+
+#toolInputsContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-group.full { grid-column: span 2; }
+
+.input-group label {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.input-group input,
+.input-group select {
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all var(--t);
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--green);
+  box-shadow: var(--glow-green);
+}
+
+.input-group input::placeholder { color: var(--text-muted); }
+
+/* run button */
+.run-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 11px;
+  border: 1px solid var(--run-btn-border);
+  background: var(--run-btn-bg);
+  color: var(--run-btn-text);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t);
+  box-shadow: var(--glow-green);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.run-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+
+.run-btn:hover::before { transform: translateX(100%); }
+.run-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(0,255,178,0.35);
+}
+
+.run-btn:active { transform: translateY(0); }
+
+.run-btn .run-icon {
+  width: 0;
+  height: 0;
+  border-left: 10px solid var(--run-btn-text);
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  flex-shrink: 0;
+}
+
+.run-status {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+  height: 16px;
+}
+
+.run-status.success { color: var(--green); }
+.run-status.error { color: var(--red); }
+
+/* terminal output */
+.terminal-wrap {
+  background: var(--bg-input);
+  border: 1px solid var(--border-base);
+  border-radius: 14px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  transition: border-color var(--t), box-shadow var(--t);
+}
+
+.terminal-wrap.success { border-color: rgba(0,255,178,0.25); box-shadow: var(--glow-green); }
+.terminal-wrap.error { border-color: rgba(255,58,92,0.25); box-shadow: var(--glow-red); }
+
+.terminal-topbar {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border-base);
+  background: var(--bg-layer3);
+}
+
+.t-dot { width: 10px; height: 10px; border-radius: 50%; }
+.t-dot-r { background: #ff5f57; }
+.t-dot-y { background: #febc2e; }
+.t-dot-g { background: #28c840; }
+
+.terminal-title-bar {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-left: 8px;
+  letter-spacing: 0.12em;
+}
+
+.terminal-copy-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 5px;
+  transition: color var(--t);
+}
+
+.terminal-copy-btn:hover { color: var(--green); }
+
+#toolOutputDisplay {
+  padding: 16px 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  word-break: break-all;
+  min-height: 180px;
+  max-height: 380px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-base) transparent;
+}
+
+#toolOutputDisplay::-webkit-scrollbar { width: 3px; }
+#toolOutputDisplay::-webkit-scrollbar-thumb { background: var(--border-base); border-radius: 10px; }
+
+#toolOutputDisplay a { color: var(--blue); text-decoration: none; }
+#toolOutputDisplay a:hover { text-decoration: underline; }
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 14px;
+  background: var(--green);
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ─── MODALS ────────────────────────────────────────────────── */
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.70);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-backdrop.open { display: flex; }
+
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+.modal-box {
+  background: var(--bg-layer1);
+  border: 1px solid var(--border-base);
+  border-radius: 18px;
+  width: 90%;
+  max-width: 680px;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-modal);
+  animation: scaleIn 0.22s cubic-bezier(0.4,0,0.2,1);
+  position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-base) transparent;
+}
+
+.modal-box::-webkit-scrollbar { width: 4px; }
+.modal-box::-webkit-scrollbar-thumb { background: var(--border-base); }
+
+@keyframes scaleIn {
+  from { opacity:0; transform:scale(0.94) translateY(10px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+
+.modal-box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  opacity: 0.4;
+  border-radius: 18px 18px 0 0;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--border-base);
+  position: sticky;
+  top: 0;
+  background: var(--bg-layer1);
+  z-index: 2;
+  border-radius: 18px 18px 0 0;
+}
+
+.modal-title {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border-base);
+  background: var(--bg-item);
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--t);
+  line-height: 1;
+}
+
+.modal-close:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(255,58,92,0.08);
+}
+
+.modal-body { padding: 22px 26px 26px; }
+
+/* modal form */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 7px;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-input);
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all var(--t);
+  -webkit-appearance: none;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 64px;
+  line-height: 1.6;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--green);
+  box-shadow: var(--glow-green);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder { color: var(--text-muted); }
+
+.form-hint {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 5px;
+  line-height: 1.6;
+}
+
+.form-section-title {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 22px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-section-title::after {
+  content:'';
+  flex:1;
+  height:1px;
+  background: var(--border-base);
+}
+
+/* checkbox row */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.check-row input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+.check-row label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.clone-opts {
+  display: none;
+  padding: 16px;
+  background: var(--bg-layer3);
+  border: 1px solid var(--border-base);
+  border-radius: 11px;
+  margin-bottom: 16px;
+}
+
+/* input field config card */
+.field-config-card {
+  background: var(--bg-layer3);
+  border: 1px solid var(--border-base);
+  border-radius: 11px;
+  padding: 16px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.field-config-card .remove-field-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(255,58,92,0.08);
+  border: 1px solid rgba(255,58,92,0.2);
+  border-radius: 6px;
+  color: var(--red);
+  font-size: 10px;
+  font-family: var(--mono);
+  padding: 3px 8px;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.field-config-card .remove-field-btn:hover {
+  background: rgba(255,58,92,0.15);
+}
+
+/* modal buttons */
+.modal-btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 22px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1px solid var(--run-btn-border);
+  background: var(--run-btn-bg);
+  color: var(--run-btn-text);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--glow-green);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  padding: 11px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border-base);
+  background: var(--bg-item);
+  color: var(--text-secondary);
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all var(--t);
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-accent);
+  color: var(--text-primary);
+}
+
+.btn-add-field {
+  width: 100%;
+  padding: 9px;
+  border-radius: 9px;
+  border: 1px dashed var(--border-purple);
+  background: transparent;
+  color: var(--purple);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all var(--t);
+  margin-top: 4px;
+}
+
+.btn-add-field:hover {
+  background: rgba(160,80,255,0.06);
+  border-style: solid;
+}
+
+/* install log */
+.install-log {
+  display: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border-base);
+  border-radius: 9px;
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-top: 12px;
+}
+
+/* ─── HISTORY MODAL ─────────────────────────────────────────── */
+.history-list {
+  list-style: none;
+  max-height: 420px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-base) transparent;
+}
+
+.history-list::-webkit-scrollbar { width: 3px; }
+.history-list::-webkit-scrollbar-thumb { background: var(--border-base); }
+
+.history-item {
+  padding: 13px 16px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all var(--t);
+  background: var(--bg-item);
+}
+
+.history-item:hover {
+  background: var(--bg-item-hover);
+  border-color: var(--border-accent);
+}
+
+.history-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.history-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.history-status {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.history-status.success {
+  color: var(--green);
+  background: rgba(0,255,178,0.08);
+  border: 1px solid rgba(0,255,178,0.2);
+}
+
+.history-status.error {
+  color: var(--red);
+  background: rgba(255,58,92,0.08);
+  border: 1px solid rgba(255,58,92,0.2);
+}
+
+.history-file {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-history-msg {
+  display: none;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 40px 20px;
+}
+
+/* ─── GLASS OVERLAY (running) ───────────────────────────────── */
+#glassOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#glassOverlay.active { display: flex; }
+
+.overlay-spinner {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--border-base);
+  border-top-color: var(--green);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.overlay-text {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--green);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  animation: pulse-text 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-text { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ─── RESPONSIVE ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .sidebar { width: 220px; }
+  #toolInputsContainer { grid-template-columns: 1fr; }
+  .input-group.full { grid-column: span 1; }
+  .welcome-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-wordmark">OSINT<span>el</span></div>
+      <div class="logo-tag">// Recon Suite v2.0</div>
     </div>
-<label class="switch">
-    <input id="themeToggle" type="checkbox">
-    <span class="slider">
-      <span class="circle">
-        <!-- Sun SVG -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" class="sun">
-          <g>
-            <circle cx="16" cy="16" r="8.312" fill="currentColor"></circle>
-            <path d="M31.72 16.706a1.03 1.03 0 0 0 0-1.413l-2.816-3.023a1.037 1.037 0 0 1-.28-.831l.509-4.104c.072-.54-.291-1.05-.832-1.153l-4.062-.78a1.035 1.035 0 0 1-.707-.519l-1.994-3.616a1.037 1.037 0 0 0-1.35-.436l-3.751 1.756c-.27.125-.603.125-.873-.01L11.814.83a1.037 1.037 0 0 0-1.351.436L8.468 4.883c-.146.27-.406.457-.707.52L3.7 6.182c-.54.104-.904.613-.831 1.153l.509 4.104c.03.301-.063.602-.28.831L.28 15.293a1.03 1.03 0 0 0 0 1.413l2.815 3.024c.218.228.312.53.28.831l-.508 4.104c-.073.54.29 1.05.83 1.153l4.063.78c.301.062.561.249.707.519l1.994 3.615c.27.478.863.676 1.351.437l3.75-1.756c.27-.125.603-.125.873.01l3.751 1.746c.488.239 1.08.041 1.35-.437l1.995-3.615c.146-.27.406-.457.707-.52l4.062-.779c.54-.104.904-.613.832-1.153l-.51-4.104a1.037 1.037 0 0 1 .28-.831l2.816-3.023zM16 26.39c-5.725 0-10.39-4.665-10.39-10.39S10.275 5.61 16 5.61 26.39 10.275 26.39 16 21.725 26.39 16 26.39z" fill="currentColor"></path>
-          </g>
-        </svg>
-        <!-- Moon SVG -->
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="moon">
-          <g clip-path="url(#clip0_68_17)">
-            <path fill="currentColor" d="M355.2 142.08C355.2 162.133 338.773 178.56 318.72 178.56C298.667 178.56 282.453 162.133 282.453 142.08C282.453 122.027 298.667 105.813 318.72 105.813C338.773 105.813 355.2 122.027 355.2 142.08Z"></path>
-            <path fill="currentColor" d="M151.253 283.52C142.72 283.52 135.893 290.347 135.893 298.88C135.893 307.413 142.72 314.453 151.253 314.453C159.787 314.453 166.613 307.413 166.613 298.88C166.613 290.347 159.787 283.52 151.253 283.52Z"></path>
-          </g>
-          <defs>
-            <clipPath id="clip0_68_17">
-              <rect fill="currentColor" width="512" height="512"></rect>
-            </clipPath>
-          </defs>
-        </svg>
-      </span>
-    </span>
-  </label>
-  
-  
-    <div class="main-content">
-      <div id="welcomePanel" class="panel active">
-        <h3>Welcome to the OSINTel Dashboard</h3>
-        <p>
-          Select a tool from the sidebar, view its history, or add a new tool
-          configuration.
-        </p>
-        <p>
-          Tool outputs are saved to files in the 'data/' directory on the server
-          and can be reviewed via the history feature.
-        </p>
-      </div>
-      <div id="toolRunPanel" class="panel">
-        <h3 id="currentToolName"></h3>
-        <p
-          id="currentToolDescription"
-          class="tool-description"
-          style="display: none"
-        ></p>
-        <p id="currentToolNotes" class="tool-notes" style="display: none"></p>
-        <div id="toolInputsContainer"></div>
-        <button class="run-tool-btn" onclick="executeCurrentTool()">
-          Run Tool
-        </button>
-        <div id="currentToolStatus"></div>
-        <div
-          id="toolOutputDisplay"
-          placeholder="Tool output will appear here..."
-        ></div>
+
+    <div class="sidebar-search">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input id="toolSearch" type="text" placeholder="search tools..." oninput="filterTools(this.value)" />
       </div>
     </div>
 
-    <div id="toolModal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" onclick="closeToolModal()">×</span>
-        <h4 id="modalTitle">Add New Tool</h4>
-        <input type="hidden" id="toolId" />
-        <label for="toolName">Tool Name:</label>
-        <input
-          type="text"
-          id="toolName"
-          placeholder="e.g., Sherlock Username Search"
-        />
-        <label for="toolDescription">Description (optional):</label>
-        <textarea
-          id="toolDescription"
-          placeholder="Brief description of the tool"
-        ></textarea>
-        <label for="toolNotes">Notes/Instructions (optional):</label>
-        <textarea
-          id="toolNotes"
-          placeholder="Any specific notes for using this tool"
-        ></textarea>
-        <label for="toolCommandTemplate">Command Template:</label>
-        <input
-          type="text"
-          id="toolCommandTemplate"
-          placeholder="e.g., python3 tools/myscript.py {{input1}} -o {{input2}}"
-        />
-        <small
-          >Use `{{input_id}}` for placeholders that match Input Field
-          IDs.</small
-        >
+    <div class="cat-label">// tools</div>
+    <ul id="toolList"></ul>
 
-        <label for="toolOutputFilenamePattern"
-          >Output Filename Pattern (optional):</label
-        >
-        <input
-          type="text"
-          id="toolOutputFilenamePattern"
-          placeholder="Example: tool_name_input_value_timestamp.txt"
-        />
-        <small
-          >Use placeholders like: `{{TOOL_ID}}`, `{{TOOL_NAME_SANITIZED}}`,
-          `{{INPUT__field_id}}`, `{{TIMESTAMP}}`, `{{UUID}}`</small
-        >
+    <button class="add-tool-btn" onclick="openToolModal()">
+      <i class="fas fa-plus"></i> new tool
+    </button>
+  </nav>
 
-        <h4>Input Fields Configuration:</h4>
-        <div id="inputFieldsList"></div>
-        <button type="button" onclick="addInputFieldConfig()">
-          + Add Input Field
-        </button>
+  <!-- MAIN -->
+  <div class="main-content">
 
-        <h4>Cloning & Execution (Optional):</h4>
-        <input
-          type="checkbox"
-          id="toolRequiresClone"
-          onchange="toggleCloneOptions()"
-        />
-        <label
-          for="toolRequiresClone"
-          style="display: inline; font-weight: normal"
-          >Requires Git Clone?</label
-        >
-        <div
-          id="cloneOptions"
-          style="
-            display: none;
-            margin-left: 20px;
-            padding-top: 10px;
-            border-left: 2px solid #eee;
-          "
-        >
-          <label for="toolCloneUrl">Git Clone URL:</label>
-          <input
-            type="url"
-            id="toolCloneUrl"
-            placeholder="https://github.com/user/repo.git"
-          />
-          <label for="toolRequirementsFile"
-            >Requirements File Path (relative to cloned dir, optional):</label
-          >
-          <input
-            type="text"
-            id="toolRequirementsFile"
-            placeholder="e.g., requirements.txt"
-          />
-          <input type="checkbox" id="toolRunInClonedDirectory" />
-          <label
-            for="toolRunInClonedDirectory"
-            style="display: inline; font-weight: normal"
-            >Run command from inside the cloned directory?</label
-          >
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="status-dot"></span>
+        <div class="breadcrumb">
+          <span>osintel</span>
+          <span class="sep">/</span>
+          <span class="cur" id="breadcrumbCur">dashboard</span>
         </div>
-        <button id="saveToolButton" onclick="saveTool()">Save Tool</button>
-        <div id="installationLog" style="display: none"></div>
+      </div>
+      <div class="topbar-right">
+        <button class="topbar-icon-btn" title="Clear history" onclick="promptClearHistory()">
+          <i class="fas fa-trash-can"></i>
+        </button>
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+          <span class="toggle-label" id="themeLabel">dark</span>
+          <div class="toggle-track">
+            <div class="toggle-thumb"></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="historyModal" class="modal">
-      <div class="modal-content" id="historyModalContent">
-        <span class="close-btn" onclick="closeHistoryModal()">×</span>
-        <h4 id="historyModalTitle">Execution History for Tool</h4>
-        <ul id="historyList"></ul>
-        <p
-          id="noHistoryMessage"
-          style="display: none; text-align: center; color: #777"
-        >
-          No history found for this tool.
-        </p>
+    <!-- PANEL AREA -->
+    <div class="panel-area">
+
+      <!-- Welcome -->
+      <div id="welcomePanel" class="panel active">
+        <div class="welcome-grid">
+          <div class="welcome-card green">
+            <div class="wcard-num green" id="wcToolCount">0</div>
+            <div class="wcard-label">tools loaded</div>
+          </div>
+          <div class="welcome-card purple">
+            <div class="wcard-num purple" id="wcHistoryCount">—</div>
+            <div class="wcard-label">total runs</div>
+          </div>
+          <div class="welcome-card red">
+            <div class="wcard-num red" id="wcActiveCount">0</div>
+            <div class="wcard-label">active sessions</div>
+          </div>
+        </div>
+        <div class="welcome-tip">
+          <h2><i class="fas fa-terminal"></i> Getting Started</h2>
+          <p>Select a tool from the sidebar to load its interface.<br>
+          Use <span style="color:var(--green)">Hist</span> on any tool to review saved outputs.<br>
+          All results are persisted to <span style="color:var(--purple)">data/</span> on the server.<br>
+          Add custom tools via <span style="color:var(--green)">+ new tool</span> below the list.</p>
+        </div>
       </div>
+
+      <!-- Tool Run -->
+      <div id="toolRunPanel" class="panel">
+        <div class="tool-run-header">
+          <div class="tool-run-meta">
+            <div class="tool-run-name" id="currentToolName"></div>
+            <div class="tool-run-desc" id="currentToolDescription" style="display:none"></div>
+            <div class="tool-run-notes" id="currentToolNotes"></div>
+          </div>
+          <div class="tool-badges" id="toolBadges">
+            <span class="badge badge-green">active</span>
+          </div>
+        </div>
+
+        <div class="inputs-section">
+          <div class="inputs-section-title">parameters</div>
+          <div id="toolInputsContainer"></div>
+        </div>
+
+        <button class="run-btn" onclick="executeCurrentTool()">
+          <span class="run-icon"></span>
+          execute
+        </button>
+
+        <div class="run-status" id="currentToolStatus"></div>
+
+        <div class="terminal-wrap" id="terminalWrap">
+          <div class="terminal-topbar">
+            <span class="t-dot t-dot-r"></span>
+            <span class="t-dot t-dot-y"></span>
+            <span class="t-dot t-dot-g"></span>
+            <span class="terminal-title-bar" id="terminalTitle">stdout :: ready</span>
+            <button class="terminal-copy-btn" onclick="copyOutput()" title="Copy output">
+              <i class="fas fa-copy"></i>
+            </button>
+          </div>
+          <div id="toolOutputDisplay"></div>
+        </div>
+      </div>
+
+    </div><!-- /panel-area -->
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ADD / EDIT TOOL MODAL -->
+<div id="toolModal" class="modal-backdrop" onclick="handleBackdropClick(event,'toolModal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">New Tool</span>
+      <button class="modal-close" onclick="closeToolModal()">×</button>
     </div>
+    <div class="modal-body">
+      <input type="hidden" id="toolId"/>
 
-    <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const toggle = document.getElementById('themeToggle');
+      <div class="form-group">
+        <label class="form-label">Tool Name</label>
+        <input class="form-input" type="text" id="toolName" placeholder="e.g., Sherlock Username Search"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="toolDescription" placeholder="Brief description of what this tool does"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes / Requirements</label>
+        <textarea class="form-textarea" id="toolNotes" placeholder="Any install requirements, warnings, or usage notes"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Command Template</label>
+        <input class="form-input" type="text" id="toolCommandTemplate" placeholder="e.g., python3 tools/script.py {{input1}} -o {{input2}}"/>
+        <div class="form-hint">Use <code style="color:var(--green)">{{input_id}}</code> placeholders matching Input Field IDs below.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Output Filename Pattern</label>
+        <input class="form-input" type="text" id="toolOutputFilenamePattern" placeholder="{{TOOL_NAME_SANITIZED}}_{{INPUT__target}}_{{TIMESTAMP}}.txt"/>
+        <div class="form-hint">Tokens: <code style="color:var(--purple)">{{TOOL_ID}}</code> <code style="color:var(--purple)">{{TOOL_NAME_SANITIZED}}</code> <code style="color:var(--purple)">{{INPUT__field_id}}</code> <code style="color:var(--purple)">{{TIMESTAMP}}</code> <code style="color:var(--purple)">{{UUID}}</code></div>
+      </div>
 
-  document.body.classList.add('light-theme');
-  toggle.checked = false;
+      <div class="form-section-title">Input Fields</div>
+      <div id="inputFieldsList"></div>
+      <button class="btn-add-field" onclick="addInputFieldConfig()">+ add input field</button>
 
-  // Toggle listener
-  toggle.addEventListener('change', function () {
-    if (this.checked) {
-      // Night mode
-      document.body.classList.add('dark-theme');
-      document.body.classList.remove('light-theme');
+      <div class="form-section-title">Clone &amp; Execution</div>
+      <div class="check-row">
+        <input type="checkbox" id="toolRequiresClone" onchange="toggleCloneOptions()"/>
+        <label for="toolRequiresClone">Requires Git Clone?</label>
+      </div>
+      <div class="clone-opts" id="cloneOptions">
+        <div class="form-group">
+          <label class="form-label">Git Clone URL</label>
+          <input class="form-input" type="url" id="toolCloneUrl" placeholder="https://github.com/user/repo.git"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Requirements File (relative to cloned dir)</label>
+          <input class="form-input" type="text" id="toolRequirementsFile" placeholder="requirements.txt"/>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="toolRunInClonedDirectory"/>
+          <label for="toolRunInClonedDirectory">Run command from inside the cloned directory</label>
+        </div>
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-primary" onclick="saveTool()">save tool</button>
+        <button class="btn-secondary" onclick="closeToolModal()">cancel</button>
+      </div>
+      <div class="install-log" id="installationLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="historyModal" class="modal-backdrop" onclick="handleBackdropClick(event,'historyModal')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title" id="historyModalTitle">Execution History</span>
+      <button class="modal-close" onclick="closeHistoryModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <ul class="history-list" id="historyList"></ul>
+      <p class="no-history-msg" id="noHistoryMessage">no executions recorded yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RUNNING OVERLAY -->
+<div id="glassOverlay">
+  <div class="overlay-spinner"></div>
+  <div class="overlay-text">executing...</div>
+</div>
+
+<script>
+/* ─── STATE ───────────────────────────────────────────────────── */
+const apiUrl = '/api';
+let currentTools = [];
+let filteredTools = [];
+let activeToolId = null;
+let editingToolId = null;
+let inputFieldConfigCounter = 0;
+
+/* ─── THEME ───────────────────────────────────────────────────── */
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeLabel').textContent = isDark ? 'light' : 'dark';
+}
+
+/* ─── TOOLS FETCH / RENDER ────────────────────────────────────── */
+async function fetchTools() {
+  try {
+    const r = await fetch(`${apiUrl}/tools`);
+    if (!r.ok) throw new Error(r.status);
+    currentTools = await r.json();
+    filteredTools = [...currentTools];
+    renderToolList(filteredTools);
+    document.getElementById('wcToolCount').textContent = currentTools.length;
+    fetchHistoryCount();
+  } catch(e) {
+    console.error('fetchTools:', e);
+  }
+}
+
+async function fetchHistoryCount() {
+  try {
+    const r = await fetch(`${apiUrl}/history?limit=500`);
+    if (!r.ok) return;
+    const h = await r.json();
+    document.getElementById('wcHistoryCount').textContent = h.length;
+  } catch(e) {}
+}
+
+function filterTools(query) {
+  const q = query.trim().toLowerCase();
+  filteredTools = q
+    ? currentTools.filter(t => t.name.toLowerCase().includes(q) || (t.description||'').toLowerCase().includes(q))
+    : [...currentTools];
+  renderToolList(filteredTools);
+}
+
+function renderToolList(tools) {
+  const ul = document.getElementById('toolList');
+  ul.innerHTML = '';
+  if (!tools.length) {
+    ul.innerHTML = '<li style="padding:20px;text-align:center;font-family:var(--mono);font-size:11px;color:var(--text-muted)">no tools found</li>';
+    return;
+  }
+  tools.forEach(tool => {
+    const li = document.createElement('li');
+    li.className = 'tool-item' + (tool.id === activeToolId ? ' active' : '');
+    li.dataset.toolId = tool.id;
+    li.innerHTML = `
+      <div class="tool-item-left" onclick="selectTool('${tool.id}')">
+        <span class="tool-pip"></span>
+        <span class="tool-item-name">${escHtml(tool.name)}</span>
+      </div>
+      <div class="tool-actions">
+        <button onclick="openHistoryModal('${tool.id}','${escHtml(tool.name)}');event.stopPropagation()">hist</button>
+        <button onclick="openToolModal('${tool.id}');event.stopPropagation()">edit</button>
+        <button class="del-btn" onclick="deleteTool('${tool.id}','${escHtml(tool.name)}');event.stopPropagation()">del</button>
+      </div>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ─── SELECT TOOL ─────────────────────────────────────────────── */
+function selectTool(toolId, historyOutput = null) {
+  activeToolId = toolId;
+  const tool = currentTools.find(t => t.id === toolId);
+  if (!tool) return;
+
+  document.querySelectorAll('.tool-item').forEach(li => li.classList.remove('active'));
+  const li = document.querySelector(`.tool-item[data-tool-id="${toolId}"]`);
+  if (li) li.classList.add('active');
+
+  document.getElementById('welcomePanel').classList.remove('active');
+  document.getElementById('toolRunPanel').classList.add('active');
+  document.getElementById('breadcrumbCur').textContent = tool.name.toLowerCase();
+  document.getElementById('currentToolName').textContent = tool.name;
+
+  const descEl = document.getElementById('currentToolDescription');
+  if (tool.description) { descEl.textContent = tool.description; descEl.style.display = 'block'; }
+  else descEl.style.display = 'none';
+
+  const notesEl = document.getElementById('currentToolNotes');
+  if (tool.notes) { notesEl.textContent = '⚠ ' + tool.notes; notesEl.style.display = 'block'; }
+  else notesEl.style.display = 'none';
+
+  // badges
+  const badgesEl = document.getElementById('toolBadges');
+  badgesEl.innerHTML = `<span class="badge badge-green">active</span>`;
+  if (tool.requires_clone) badgesEl.innerHTML += `<span class="badge badge-purple">cloned</span>`;
+
+  // inputs
+  const container = document.getElementById('toolInputsContainer');
+  container.innerHTML = '';
+  (tool.input_fields || []).forEach((field, i) => {
+    const div = document.createElement('div');
+    div.className = 'input-group' + (i === 0 && tool.input_fields.length % 2 !== 0 ? ' full' : '');
+
+    const label = document.createElement('label');
+    label.textContent = (field.label || field.id).replace(/:$/, '');
+    div.appendChild(label);
+
+    if (field.type === 'select') {
+      const sel = document.createElement('select');
+      sel.id = `tool-input-${field.id}`;
+      sel.name = field.id;
+      (field.options || []).forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.text || opt.value;
+        if (opt.value === field.default_value) o.selected = true;
+        sel.appendChild(o);
+      });
+      div.appendChild(sel);
     } else {
-      // Day mode
-      document.body.classList.add('light-theme');
-      document.body.classList.remove('dark-theme');
+      const inp = document.createElement('input');
+      inp.type = field.type || 'text';
+      inp.id = `tool-input-${field.id}`;
+      inp.name = field.id;
+      inp.placeholder = field.placeholder || '';
+      if (field.default_value) inp.value = field.default_value;
+      div.appendChild(inp);
+    }
+    container.appendChild(div);
+  });
+
+  // terminal
+  document.getElementById('terminalTitle').textContent = `stdout :: ${tool.name.toLowerCase()}`;
+  document.getElementById('currentToolStatus').textContent = '';
+  document.getElementById('currentToolStatus').className = 'run-status';
+  const termWrap = document.getElementById('terminalWrap');
+  termWrap.className = 'terminal-wrap';
+
+  if (historyOutput !== null) {
+    displayOutput(historyOutput, 'neutral');
+    document.getElementById('currentToolName').textContent = tool.name + ' — history';
+  } else {
+    document.getElementById('toolOutputDisplay').innerHTML =
+      `<span style="color:var(--text-muted)">// ready. configure parameters above and press execute.</span>`;
+  }
+}
+
+/* ─── EXECUTE ─────────────────────────────────────────────────── */
+async function executeCurrentTool() {
+  if (!activeToolId) return;
+  const tool = currentTools.find(t => t.id === activeToolId);
+  if (!tool) return;
+
+  const overlay = document.getElementById('glassOverlay');
+  overlay.classList.add('active');
+
+  const payload = {};
+  (tool.input_fields || []).forEach(f => {
+    const el = document.getElementById(`tool-input-${f.id}`);
+    if (el) payload[f.id] = el.value;
+  });
+
+  try {
+    const r = await fetch(`${apiUrl}/run_tool/${activeToolId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json();
+    if (!r.ok || data.error) {
+      displayOutput(`error: ${data.error || r.statusText}\n\n${data.output || ''}`, 'error');
+    } else {
+      displayOutput(data.output, data.status);
+    }
+    fetchHistoryCount();
+  } catch(e) {
+    displayOutput(`connection error: ${e}`, 'error');
+  } finally {
+    overlay.classList.remove('active');
+  }
+}
+
+function displayOutput(text, status = 'neutral') {
+  const display = document.getElementById('toolOutputDisplay');
+  const wrap = document.getElementById('terminalWrap');
+  const statusEl = document.getElementById('currentToolStatus');
+
+  display.innerHTML = makeLinksClickable(escHtml(text || ''));
+  wrap.className = 'terminal-wrap' + (status === 'success' ? ' success' : status === 'error' ? ' error' : '');
+
+  if (status === 'success') {
+    statusEl.textContent = '✓ completed successfully';
+    statusEl.className = 'run-status success';
+  } else if (status === 'error') {
+    statusEl.textContent = '✗ error — check output';
+    statusEl.className = 'run-status error';
+  } else {
+    statusEl.textContent = '';
+    statusEl.className = 'run-status';
+  }
+}
+
+function copyOutput() {
+  const text = document.getElementById('toolOutputDisplay').innerText;
+  navigator.clipboard.writeText(text).catch(() => {});
+}
+
+/* ─── TOOL MODAL ──────────────────────────────────────────────── */
+function openToolModal(id = null) {
+  editingToolId = id;
+  document.getElementById('toolId').value = '';
+  document.getElementById('toolName').value = '';
+  document.getElementById('toolDescription').value = '';
+  document.getElementById('toolNotes').value = '';
+  document.getElementById('toolCommandTemplate').value = '';
+  document.getElementById('toolOutputFilenamePattern').value = '{{TOOL_NAME_SANITIZED}}_{{INPUT__target}}_{{TIMESTAMP}}.txt';
+  document.getElementById('inputFieldsList').innerHTML = '';
+  document.getElementById('toolRequiresClone').checked = false;
+  document.getElementById('cloneOptions').style.display = 'none';
+  document.getElementById('toolCloneUrl').value = '';
+  document.getElementById('toolRequirementsFile').value = '';
+  document.getElementById('toolRunInClonedDirectory').checked = false;
+  document.getElementById('installationLog').style.display = 'none';
+  document.getElementById('installationLog').textContent = '';
+  inputFieldConfigCounter = 0;
+
+  if (id) {
+    const tool = currentTools.find(t => t.id === id);
+    if (!tool) return;
+    document.getElementById('modalTitle').textContent = 'Edit Tool';
+    document.getElementById('toolId').value = tool.id;
+    document.getElementById('toolName').value = tool.name;
+    document.getElementById('toolDescription').value = tool.description || '';
+    document.getElementById('toolNotes').value = tool.notes || '';
+    document.getElementById('toolCommandTemplate').value = tool.command_template;
+    document.getElementById('toolOutputFilenamePattern').value = tool.output_filename_pattern || '';
+    renderInputFieldConfigs(tool.input_fields || []);
+    document.getElementById('toolRequiresClone').checked = tool.requires_clone || false;
+    if (tool.requires_clone) {
+      document.getElementById('cloneOptions').style.display = 'block';
+      document.getElementById('toolCloneUrl').value = tool.clone_url || '';
+      document.getElementById('toolRequirementsFile').value = tool.requirements_file || '';
+      document.getElementById('toolRunInClonedDirectory').checked = !!tool.run_in_directory;
+    }
+  } else {
+    document.getElementById('modalTitle').textContent = 'New Tool';
+  }
+  document.getElementById('toolModal').classList.add('open');
+}
+
+function closeToolModal() {
+  document.getElementById('toolModal').classList.remove('open');
+  editingToolId = null;
+}
+
+function toggleCloneOptions() {
+  document.getElementById('cloneOptions').style.display =
+    document.getElementById('toolRequiresClone').checked ? 'block' : 'none';
+}
+
+function addInputFieldConfig(field = {}) {
+  inputFieldConfigCounter++;
+  const id = inputFieldConfigCounter;
+  const div = document.createElement('div');
+  div.className = 'field-config-card';
+  div.dataset.configId = id;
+  div.innerHTML = `
+    <button class="remove-field-btn" onclick="removeInputFieldConfig(${id})">remove</button>
+    <div class="form-group">
+      <label class="form-label">Field ID</label>
+      <input class="form-input field-id" type="text" value="${field.id||''}" placeholder="e.g. target"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Display Label</label>
+      <input class="form-input field-label" type="text" value="${field.label||''}" placeholder="Target IP:"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Input Type</label>
+      <select class="form-select field-type">
+        <option value="text"${field.type==='text'?' selected':''}>Text</option>
+        <option value="email"${field.type==='email'?' selected':''}>Email</option>
+        <option value="url"${field.type==='url'?' selected':''}>URL</option>
+        <option value="password"${field.type==='password'?' selected':''}>Password</option>
+        <option value="select"${field.type==='select'?' selected':''}>Select Dropdown</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Placeholder</label>
+      <input class="form-input field-placeholder" type="text" value="${field.placeholder||''}" placeholder="192.168.1.1"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Default Value</label>
+      <input class="form-input field-default-value" type="text" value="${field.default_value||''}" placeholder=""/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Options (Select only — JSON)</label>
+      <textarea class="form-textarea field-options" style="min-height:52px" placeholder='[{"value":"opt1","text":"Option 1"}]'>${field.options?JSON.stringify(field.options):''}</textarea>
+    </div>`;
+  document.getElementById('inputFieldsList').appendChild(div);
+}
+
+function removeInputFieldConfig(id) {
+  const el = document.querySelector(`.field-config-card[data-config-id="${id}"]`);
+  if (el) el.remove();
+}
+
+function renderInputFieldConfigs(fields) {
+  document.getElementById('inputFieldsList').innerHTML = '';
+  inputFieldConfigCounter = 0;
+  (fields || []).forEach(f => addInputFieldConfig(f));
+}
+
+async function saveTool() {
+  const toolData = {
+    name: document.getElementById('toolName').value.trim(),
+    description: document.getElementById('toolDescription').value.trim(),
+    notes: document.getElementById('toolNotes').value.trim(),
+    command_template: document.getElementById('toolCommandTemplate').value.trim(),
+    output_filename_pattern: document.getElementById('toolOutputFilenamePattern').value.trim() || '{{TOOL_NAME_SANITIZED}}_{{TIMESTAMP}}.txt',
+    input_fields: [],
+    requires_clone: document.getElementById('toolRequiresClone').checked,
+    clone_url: document.getElementById('toolRequiresClone').checked ? document.getElementById('toolCloneUrl').value.trim() : '',
+    requirements_file: document.getElementById('toolRequiresClone').checked ? document.getElementById('toolRequirementsFile').value.trim() : '',
+    run_in_cloned_directory: document.getElementById('toolRequiresClone').checked ? document.getElementById('toolRunInClonedDirectory').checked : false,
+  };
+
+  if (!toolData.name || !toolData.command_template) {
+    alert('Tool Name and Command Template are required.');
+    return;
+  }
+
+  document.querySelectorAll('.field-config-card').forEach(div => {
+    const fc = {
+      id: div.querySelector('.field-id').value.trim(),
+      label: div.querySelector('.field-label').value.trim(),
+      type: div.querySelector('.field-type').value,
+      placeholder: div.querySelector('.field-placeholder').value.trim(),
+      default_value: div.querySelector('.field-default-value').value.trim(),
+    };
+    if (fc.id && fc.label) {
+      const optsStr = div.querySelector('.field-options').value.trim();
+      if (fc.type === 'select' && optsStr) {
+        try { fc.options = JSON.parse(optsStr); } catch(e) { fc.options = []; }
+      }
+      toolData.input_fields.push(fc);
     }
   });
-});
 
-      const apiUrl = "/api";
-      let currentTools = [];
-      let activeToolId = null;
-      let editingToolId = null;
-      const toolOutputDisplay = document.getElementById("toolOutputDisplay");
-    
-              function toggleTheme() {
-    document.body.classList.toggle('light-theme');
+  const logEl = document.getElementById('installationLog');
+  logEl.textContent = 'saving...';
+  logEl.style.display = 'block';
+
+  const url = editingToolId ? `${apiUrl}/tools/${editingToolId}` : `${apiUrl}/tools`;
+  const method = editingToolId ? 'PUT' : 'POST';
+  if (editingToolId) toolData.id = editingToolId;
+
+  try {
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(toolData),
+    });
+    const result = await r.json();
+    if (!r.ok) {
+      logEl.textContent = `error: ${result.error || r.statusText}\n${result.details || ''}`;
+    } else {
+      logEl.textContent = result.install_log || 'saved.';
+      if (!result.install_log) logEl.style.display = 'none';
+      closeToolModal();
+      fetchTools();
+    }
+  } catch(e) {
+    logEl.textContent = `client error: ${e}`;
+  }
 }
-      function makeLinksClickable(text) {
-        const urlRegex =
-          /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
-        return text.replace(urlRegex, function (url) {
-          return `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-        });
-      }
-      function displayToolOutput(text, status = "neutral") {
-        toolOutputDisplay.innerHTML = makeLinksClickable(escapeHtml(text));
-        toolOutputDisplay.className = "";
-        if (status === "success")
-          toolOutputDisplay.classList.add("success-output");
-        else if (status === "error")
-          toolOutputDisplay.classList.add("error-output");
-        const statusEl = document.getElementById("currentToolStatus");
-        statusEl.textContent =
-          status === "success"
-            ? "Status: Success"
-            : status === "error"
-            ? "Status: Error (see output)"
-            : "";
-        statusEl.className =
-          status === "success"
-            ? "status-success"
-            : status === "error"
-            ? "status-error"
-            : "";
-      }
-      function escapeHtml(unsafe) {
-        if (typeof unsafe !== "string") return "";
-        return unsafe
-          .replace(/&/g, "&")
-          .replace(/</g, "<")
-          .replace(/>/g, ">")
-          .replace(/"/g, "")
-          .replace(/'/g, "'");
-      }
-      async function fetchTools() {
-        try {
-          const response = await fetch(`${apiUrl}/tools`);
-          if (!response.ok)
-            throw new Error(`HTTP error! status: ${response.status}`);
-          currentTools = await response.json();
-          renderToolList();
-        } catch (error) {
-          console.error("Failed to fetch tools:", error);
-          alert("Error fetching tools. Check console.");
-        }
-      }
-      function renderToolList() {
-        const toolListUl = document.getElementById("toolList");
-        toolListUl.innerHTML = "";
-        if (currentTools.length === 0) {
-          toolListUl.innerHTML =
-            '<p style="padding:10px; text-align:center; color:#777;">No tools. Click "Add New Tool".</p>';
-        }
-        currentTools.forEach((tool) => {
-          const li = document.createElement("li");
-          li.classList.add("tool-item");
-          li.dataset.toolId = tool.id;
-          const nameSpan = document.createElement("span");
-          nameSpan.classList.add("tool-item-name");
-          nameSpan.textContent = tool.name;
-          nameSpan.onclick = () => selectTool(tool.id);
-          li.appendChild(nameSpan);
-          const actionsDiv = document.createElement("div");
-          actionsDiv.classList.add("tool-actions");
-          const historyBtn = document.createElement("button");
-          historyBtn.textContent = "Hist";
-          historyBtn.classList.add("history-btn");
-          historyBtn.title = "View History";
-          historyBtn.onclick = (e) => {
-            e.stopPropagation();
-            openHistoryModal(tool.id, tool.name);
-          };
-          const editBtn = document.createElement("button");
-          editBtn.textContent = "Edit";
-          editBtn.title = "Edit Tool";
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
-            openToolModal(tool.id);
-          };
-          const deleteBtn = document.createElement("button");
-          deleteBtn.textContent = "Del";
-          deleteBtn.title = "Delete Tool";
-          deleteBtn.onclick = (e) => {
-            e.stopPropagation();
-            deleteTool(tool.id, tool.name);
-          };
-          actionsDiv.appendChild(historyBtn);
-          actionsDiv.appendChild(editBtn);
-          actionsDiv.appendChild(deleteBtn);
-          li.appendChild(actionsDiv);
-          toolListUl.appendChild(li);
-        });
-      }
-      function selectTool(toolId, fromHistoryOutput = null) {
-        // Close modals to ensure stale data is not shown
-        closeToolModal();
-        closeHistoryModal();
 
-        activeToolId = toolId;
-        const tool = currentTools.find((t) => t.id === toolId);
-        if (!tool) return;
+async function deleteTool(toolId, toolName) {
+  if (!confirm(`Delete "${toolName}"?\nThis may also remove the cloned directory.`)) return;
+  try {
+    const r = await fetch(`${apiUrl}/tools/${toolId}`, { method: 'DELETE' });
+    const result = await r.json();
+    if (!r.ok) { alert(`error: ${result.error}`); return; }
+    if (activeToolId === toolId) {
+      document.getElementById('toolRunPanel').classList.remove('active');
+      document.getElementById('welcomePanel').classList.add('active');
+      document.getElementById('breadcrumbCur').textContent = 'dashboard';
+      activeToolId = null;
+    }
+    fetchTools();
+  } catch(e) { alert(`client error: ${e}`); }
+}
 
-        document
-          .querySelectorAll(".sidebar li.tool-item")
-          .forEach((li) => li.classList.remove("active"));
-        const activeLi = document.querySelector(
-          `.sidebar li.tool-item[data-tool-id="${toolId}"]`
-        );
-        if (activeLi) activeLi.classList.add("active");
+/* ─── HISTORY MODAL ───────────────────────────────────────────── */
+async function openHistoryModal(toolId, toolName) {
+  document.getElementById('historyModalTitle').textContent = `history — ${toolName}`;
+  const listEl = document.getElementById('historyList');
+  const noMsg = document.getElementById('noHistoryMessage');
+  listEl.innerHTML = '';
+  noMsg.style.display = 'none';
+  document.getElementById('historyModal').classList.add('open');
 
-        document.getElementById("welcomePanel").classList.remove("active");
-        const toolRunPanel = document.getElementById("toolRunPanel");
-        toolRunPanel.classList.add("active");
+  try {
+    const r = await fetch(`${apiUrl}/history/${toolId}`);
+    if (!r.ok) throw new Error(r.status);
+    const entries = await r.json();
+    if (!entries.length) { noMsg.style.display = 'block'; return; }
+    entries.forEach(entry => {
+      const li = document.createElement('li');
+      li.className = 'history-item';
+      const date = new Date(entry.timestamp).toLocaleString();
+      const fname = (entry.output_file || '').split('/').pop();
+      li.innerHTML = `
+        <div class="history-item-top">
+          <span class="history-date">${date}</span>
+          <span class="history-status ${entry.status}">${entry.status}</span>
+        </div>
+        <div class="history-file">${fname}</div>`;
+      li.onclick = () => loadHistoryOutput(entry.output_file, toolId, toolName);
+      listEl.appendChild(li);
+    });
+  } catch(e) {
+    listEl.innerHTML = `<li style="padding:16px;font-family:var(--mono);font-size:11px;color:var(--red)">error: ${e.message}</li>`;
+  }
+}
 
-        document.getElementById("currentToolName").textContent = tool.name;
+function closeHistoryModal() {
+  document.getElementById('historyModal').classList.remove('open');
+}
 
-        const descriptionEl = document.getElementById("currentToolDescription");
-        descriptionEl.style.display = tool.description
-          ? ((descriptionEl.textContent = tool.description), "block")
-          : "none";
+async function loadHistoryOutput(filePath, toolId, toolName) {
+  closeHistoryModal();
+  selectTool(toolId);
+  displayOutput(`loading ${filePath}...`, 'neutral');
+  try {
+    const r = await fetch(`${apiUrl}/history_file_content?filepath=${encodeURIComponent(filePath)}`);
+    if (!r.ok) throw new Error(r.status);
+    const data = await r.json();
+    if (data.error) displayOutput(`error: ${data.error}`, 'error');
+    else selectTool(toolId, data.content);
+  } catch(e) {
+    displayOutput(`error loading history: ${e.message}`, 'error');
+  }
+}
 
-        const notesEl = document.getElementById("currentToolNotes");
-        notesEl.style.display = tool.notes
-          ? ((notesEl.textContent = "Notes: " + tool.notes), "block")
-          : "none";
+async function promptClearHistory() {
+  if (!confirm('Clear all execution history? This cannot be undone.')) return;
+  try {
+    const r = await fetch(`${apiUrl}/history`, { method: 'DELETE' });
+    const d = await r.json();
+    alert(d.message || 'History cleared.');
+    fetchHistoryCount();
+  } catch(e) { alert(`error: ${e}`); }
+}
 
-        const inputsContainer = document.getElementById("toolInputsContainer");
-        inputsContainer.innerHTML = "";
+/* ─── UTILS ───────────────────────────────────────────────────── */
+function escHtml(s) {
+  if (typeof s !== 'string') return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 
-        tool.input_fields.forEach((field) => {
-          const group = document.createElement("div");
-          group.classList.add("input-group");
-          const label = document.createElement("label");
-          label.htmlFor = `tool-input-${field.id}`;
-          label.textContent = field.label || field.id;
-          group.appendChild(label);
+function makeLinksClickable(text) {
+  return text.replace(/(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gi,
+    url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+}
 
-          if (field.type === "select") {
-            const select = document.createElement("select");
-            select.id = `tool-input-${field.id}`;
-            select.name = field.id;
-            (field.options || []).forEach((opt) => {
-              const option = document.createElement("option");
-              option.value = opt.value;
-              option.textContent = opt.text || opt.value;
-              if (
-                opt.value ===
-                (field.default_value ||
-                  (field.options[0] ? field.options[0].value : ""))
-              ) {
-                option.selected = true;
-              }
-              select.appendChild(option);
-            });
-            group.appendChild(select);
-          } else {
-            const input = document.createElement("input");
-            input.type = field.type || "text";
-            input.id = `tool-input-${field.id}`;
-            input.name = field.id;
-            input.placeholder = field.placeholder || "";
-            if (field.default_value) input.value = field.default_value;
-            group.appendChild(input);
-          }
-          inputsContainer.appendChild(group);
-        });
+function handleBackdropClick(e, modalId) {
+  if (e.target === document.getElementById(modalId)) {
+    modalId === 'toolModal' ? closeToolModal() : closeHistoryModal();
+  }
+}
 
-        if (fromHistoryOutput !== null) {
-          displayToolOutput(fromHistoryOutput, "neutral");
-          document.getElementById(
-            "currentToolName"
-          ).textContent = `${tool.name} (Viewing History)`;
-        } else {
-          displayToolOutput("", "neutral");
-          document.getElementById("currentToolStatus").textContent = "";
-        }
-      }
+/* ─── INIT ────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', fetchTools);
+</script>
 
-      async function executeCurrentTool() {
-        if (!activeToolId) return;
-        const tool = currentTools.find((t) => t.id === activeToolId);
-        if (!tool) return;
-        displayToolOutput(`Running ${tool.name}, please wait...`, "neutral");
-        const payload = {};
-        tool.input_fields.forEach((field) => {
-          const inputElement = document.getElementById(
-            `tool-input-${field.id}`
-          );
-          if (inputElement) payload[field.id] = inputElement.value;
-        });
-        try {
-          const response = await fetch(`${apiUrl}/run_tool/${activeToolId}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-          const data = await response.json();
-          if (!response.ok || data.error) {
-            displayToolOutput(
-              `Error: ${data.error || response.statusText}\n\n${
-                data.output || ""
-              }`,
-              "error"
-            );
-          } else {
-            displayToolOutput(data.output, data.status);
-          }
-        } catch (error) {
-          console.error("Failed to run tool:", error);
-          displayToolOutput(
-            `Client-side error or failed to connect: ${error}`,
-            "error"
-          );
-        }
-      }
-
-      const toolModal = document.getElementById("toolModal");
-      const modalTitle = document.getElementById("modalTitle");
-      const toolIdInput = document.getElementById("toolId");
-      const toolNameInput = document.getElementById("toolName");
-      const toolDescriptionInput = document.getElementById("toolDescription");
-      const toolNotesInput = document.getElementById("toolNotes");
-      const toolCommandTemplateInput = document.getElementById(
-        "toolCommandTemplate"
-      );
-      const toolOutputFilenamePatternInput = document.getElementById(
-        "toolOutputFilenamePattern"
-      );
-      const inputFieldsListDiv = document.getElementById("inputFieldsList");
-      const toolRequiresCloneCheckbox =
-        document.getElementById("toolRequiresClone");
-      const cloneOptionsDiv = document.getElementById("cloneOptions");
-      const toolCloneUrlInput = document.getElementById("toolCloneUrl");
-      const toolRequirementsFileInput = document.getElementById(
-        "toolRequirementsFile"
-      );
-      const toolRunInClonedDirCheckbox = document.getElementById(
-        "toolRunInClonedDirectory"
-      );
-      const installationLogDiv = document.getElementById("installationLog");
-
-      function openToolModal(id = null) {
-        editingToolId = id;
-        installationLogDiv.textContent = "";
-        installationLogDiv.style.display = "none";
-
-        // Always reset fields before filling
-        toolIdInput.value = "";
-        toolNameInput.value = "";
-        toolDescriptionInput.value = "";
-        toolNotesInput.value = "";
-        toolCommandTemplateInput.value = "";
-        toolOutputFilenamePatternInput.value =
-          "{{TOOL_NAME_SANITIZED}}_{{INPUT__your_main_input_id}}_{{TIMESTAMP}}.txt";
-        renderInputFieldConfigs([]);
-        toolRequiresCloneCheckbox.checked = false;
-        cloneOptionsDiv.style.display = "none";
-        toolCloneUrlInput.value = "";
-        toolRequirementsFileInput.value = "";
-        toolRunInClonedDirCheckbox.checked = false;
-
-        if (id) {
-          modalTitle.textContent = "Edit Tool";
-          const tool = currentTools.find((t) => t.id === id);
-          if (!tool) return;
-
-          toolIdInput.value = tool.id;
-          toolNameInput.value = tool.name;
-          toolDescriptionInput.value = tool.description || "";
-          toolNotesInput.value = tool.notes || "";
-          toolCommandTemplateInput.value = tool.command_template;
-          toolOutputFilenamePatternInput.value =
-            tool.output_filename_pattern ||
-            "{{TOOL_NAME_SANITIZED}}_{{INPUT__your_main_input_id}}_{{TIMESTAMP}}.txt";
-          renderInputFieldConfigs(tool.input_fields || []);
-          toolRequiresCloneCheckbox.checked = tool.requires_clone || false;
-          cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked
-            ? "block"
-            : "none";
-          if (tool.requires_clone) {
-            toolCloneUrlInput.value = tool.clone_url || "";
-            toolRequirementsFileInput.value = tool.requirements_file || "";
-            toolRunInClonedDirCheckbox.checked = !!tool.run_in_directory;
-          }
-        } else {
-          modalTitle.textContent = "Add New Tool";
-        }
-
-        // Finally open the modal
-        toolModal.style.display = "block";
-      }
-
-      function closeToolModal() {
-        toolModal.style.display = "none";
-        editingToolId = null;
-
-        // Reset the form fields completely
-        toolIdInput.value = "";
-        toolNameInput.value = "";
-        toolDescriptionInput.value = "";
-        toolNotesInput.value = "";
-        toolCommandTemplateInput.value = "";
-        toolOutputFilenamePatternInput.value = "";
-        inputFieldsListDiv.innerHTML = "";
-        toolRequiresCloneCheckbox.checked = false;
-        cloneOptionsDiv.style.display = "none";
-        toolCloneUrlInput.value = "";
-        toolRequirementsFileInput.value = "";
-        toolRunInClonedDirCheckbox.checked = false;
-        installationLogDiv.textContent = "";
-        installationLogDiv.style.display = "none";
-      }
-
-      function closeHistoryModal() {
-        historyModal.style.display = "none";
-        historyModalTitle.textContent = "";
-        historyListUl.innerHTML = "";
-        noHistoryMessage.style.display = "none";
-      }
-
-      function toggleCloneOptions() {
-        cloneOptionsDiv.style.display = toolRequiresCloneCheckbox.checked
-          ? "block"
-          : "none";
-      }
-
-      let inputFieldConfigCounter = 0;
-      function addInputFieldConfig(field = {}) {
-        inputFieldConfigCounter++;
-        const div = document.createElement("div");
-        div.classList.add("input-field-config");
-        div.dataset.configId = inputFieldConfigCounter;
-        div.innerHTML = `
-                <label>Field ID (for template, e.g., 'username'):</label> <input type="text" class="field-id" value="${
-                  field.id || ""
-                }" placeholder="unique_input_id">
-                <label>Display Label:</label> <input type="text" class="field-label" value="${
-                  field.label || ""
-                }" placeholder="Username:">
-                <label>Input Type:</label> <select class="field-type"> <option value="text" ${
-                  field.type === "text" ? "selected" : ""
-                }>Text</option> <option value="email" ${
-          field.type === "email" ? "selected" : ""
-        }>Email</option> <option value="url" ${
-          field.type === "url" ? "selected" : ""
-        }>URL</option> <option value="select" ${
-          field.type === "select" ? "selected" : ""
-        }>Select Dropdown</option> </select>
-                <label>Placeholder (for text inputs):</label> <input type="text" class="field-placeholder" value="${
-                  field.placeholder || ""
-                }" placeholder="Enter value">
-                <label>Default Value (optional):</label> <input type="text" class="field-default-value" value="${
-                  field.default_value || ""
-                }" placeholder="">
-                <label>Options (for Select, JSON: [{"value":"v1","text":"T1"},...]):</label> <textarea class="field-options" placeholder='[{"value":"opt1","text":"Option 1"}]'>${
-                  field.options ? JSON.stringify(field.options) : ""
-                }</textarea>
-                <button type="button" onclick="removeInputFieldConfig(${inputFieldConfigCounter})" style="background-color:#dc3545; font-size:0.8em;">Remove Field</button>
-            `;
-        inputFieldsListDiv.appendChild(div);
-      }
-      function removeInputFieldConfig(configId) {
-        const divToRemove = document.querySelector(
-          `.input-field-config[data-config-id="${configId}"]`
-        );
-        if (divToRemove) inputFieldsListDiv.removeChild(divToRemove);
-      }
-      function renderInputFieldConfigs(fields) {
-        inputFieldsListDiv.innerHTML = "";
-        inputFieldConfigCounter = 0;
-        (fields || []).forEach((field) => addInputFieldConfig(field));
-      }
-
-      async function saveTool() {
-        const toolData = {
-          name: toolNameInput.value.trim(),
-          description: toolDescriptionInput.value.trim(),
-          notes: toolNotesInput.value.trim(),
-          command_template: toolCommandTemplateInput.value.trim(),
-          output_filename_pattern:
-            toolOutputFilenamePatternInput.value.trim() ||
-            "{{TOOL_NAME_SANITIZED}}_{{INPUT__default_input}}_{{TIMESTAMP}}.txt",
-          input_fields: [],
-          requires_clone: toolRequiresCloneCheckbox.checked,
-          clone_url: toolRequiresCloneCheckbox.checked
-            ? toolCloneUrlInput.value.trim()
-            : "",
-          requirements_file: toolRequiresCloneCheckbox.checked
-            ? toolRequirementsFileInput.value.trim()
-            : "",
-          run_in_cloned_directory: toolRequiresCloneCheckbox.checked
-            ? toolRunInClonedDirCheckbox.checked
-            : false,
-        };
-        if (!toolData.name || !toolData.command_template) {
-          alert("Tool Name and Command Template are required.");
-          return;
-        }
-        document.querySelectorAll(".input-field-config").forEach((div) => {
-          const fieldConf = {
-            id: div.querySelector(".field-id").value.trim(),
-            label: div.querySelector(".field-label").value.trim(),
-            type: div.querySelector(".field-type").value,
-            placeholder: div.querySelector(".field-placeholder").value.trim(),
-            options_str: div.querySelector(".field-options").value.trim(),
-            default_value: div
-              .querySelector(".field-default-value")
-              .value.trim(),
-          };
-          if (fieldConf.id && fieldConf.label) {
-            if (fieldConf.type === "select" && fieldConf.options_str) {
-              try {
-                fieldConf.options = JSON.parse(fieldConf.options_str);
-              } catch (e) {
-                alert(`Invalid JSON for field ${fieldConf.id}`);
-                fieldConf.options = [];
-              }
-            }
-            delete fieldConf.options_str;
-            toolData.input_fields.push(fieldConf);
-          }
-        });
-        installationLogDiv.textContent = "Saving...";
-        installationLogDiv.style.display = "block";
-        let url = `${apiUrl}/tools`;
-        let method = "POST";
-        if (editingToolId) {
-          url = `${apiUrl}/tools/${editingToolId}`;
-          method = "PUT";
-          toolData.id = editingToolId;
-        }
-        try {
-          const response = await fetch(url, {
-            method: method,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(toolData),
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            alert(
-              `Error: ${result.error || response.statusText}\nDetails: ${
-                result.details || ""
-              }`
-            );
-            installationLogDiv.textContent = `Error: ${
-              result.error || response.statusText
-            }\nDetails:\n${result.details || result.installation_log || ""}`;
-          } else {
-            alert(result.message || "Tool saved!");
-            installationLogDiv.textContent =
-              result.installation_log || "No log.";
-            if (!result.installation_log)
-              installationLogDiv.style.display = "none";
-            closeToolModal();
-            fetchTools();
-          }
-        } catch (error) {
-          console.error("Failed to save tool:", error);
-          alert(`Client error: ${error}`);
-          installationLogDiv.textContent = `Client error: ${error}`;
-        }
-      }
-      async function deleteTool(toolId, toolName) {
-        if (!confirm(`Delete "${toolName}"? May delete cloned directory.`))
-          return;
-        try {
-          const response = await fetch(`${apiUrl}/tools/${toolId}`, {
-            method: "DELETE",
-          });
-          const result = await response.json();
-          if (!response.ok) {
-            alert(`Error: ${result.error || response.statusText}`);
-          } else {
-            alert(result.message || "Deleted!");
-            if (activeToolId === toolId) {
-              document
-                .getElementById("toolRunPanel")
-                .classList.remove("active");
-              document.getElementById("welcomePanel").classList.add("active");
-              activeToolId = null;
-            }
-            fetchTools();
-          }
-        } catch (error) {
-          console.error("Failed to delete tool:", error);
-          alert(`Client error: ${error}`);
-        }
-      }
-
-      const historyModal = document.getElementById("historyModal");
-      const historyModalTitle = document.getElementById("historyModalTitle");
-      const historyListUl = document.getElementById("historyList");
-      const noHistoryMessage = document.getElementById("noHistoryMessage");
-
-      async function openHistoryModal(toolId, toolName) {
-        closeToolModal(); // Optionally close the edit modal if open
-
-        historyModalTitle.textContent = `History for ${toolName}`;
-        historyListUl.innerHTML = "";
-        noHistoryMessage.style.display = "none";
-        historyModal.style.display = "block";
-
-        try {
-          const response = await fetch(`${apiUrl}/history/${toolId}`);
-          if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
-          const historyEntries = await response.json();
-
-          if (historyEntries.length === 0) {
-            noHistoryMessage.style.display = "block";
-          } else {
-            historyEntries.forEach((entry) => {
-              const li = document.createElement("li");
-              const date = new Date(entry.timestamp).toLocaleString();
-              let inputsStr = Object.entries(entry.inputs || {})
-                .map(([k, v]) => `${k}: ${v}`)
-                .join(", ");
-              if (inputsStr.length > 70)
-                inputsStr = inputsStr.substring(0, 70) + "...";
-              li.innerHTML = `<strong>${date}</strong> - File: <i>${entry.output_file
-                .split("/")
-                .pop()}</i> <small>Status: ${
-                entry.status
-              }</small><small>Inputs: ${inputsStr || "N/A"}</small>`;
-              li.onclick = () =>
-                loadHistoryOutput(entry.output_file, toolId, toolName);
-              historyListUl.appendChild(li);
-            });
-          }
-        } catch (error) {
-          console.error("Failed to fetch history:", error);
-          historyListUl.innerHTML = `<li>Error: ${error.message}</li>`;
-        }
-      }
-
-      function closeHistoryModal() {
-        historyModal.style.display = "none";
-      }
-      async function loadHistoryOutput(
-        outputFilePath,
-        originalToolId,
-        originalToolName
-      ) {
-        closeHistoryModal();
-        selectTool(originalToolId);
-        displayToolOutput(`Loading from ${outputFilePath}...`, "neutral");
-        try {
-          const response = await fetch(
-            `${apiUrl}/history_file_content?filepath=${encodeURIComponent(
-              outputFilePath
-            )}`
-          );
-          if (!response.ok) throw new Error(`HTTP error! ${response.status}`);
-          const data = await response.json();
-          if (data.error) {
-            displayToolOutput(`Error: ${data.error}`, "error");
-          } else {
-            selectTool(originalToolId, data.content);
-          }
-        } catch (error) {
-          console.error("Failed to load history output:", error);
-          displayToolOutput(`Error: ${error.message}`, "error");
-        }
-      }
-      window.onclick = function (event) {
-        if (event.target == toolModal) closeToolModal();
-        if (event.target == historyModal) closeHistoryModal();
-      };
-      document.addEventListener("DOMContentLoaded", fetchTools);
-      window.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("toolModal").style.display = "none";
-        document.getElementById("historyModal").style.display = "none";
-      });
-    </script>
-    <div id="glassOverlay">
-      <span>🚀 Running Tool...</span>
-    </div>
-  </body>
+<div id="glassOverlay">
+  <div class="overlay-spinner"></div>
+  <div class="overlay-text">executing...</div>
+</div>
+</body>
 </html>

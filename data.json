@@ -1,225 +1,41 @@
 [
   {
-    "id": "holehe-builtin",
-    "name": "Holehe Email Check",
-    "description": "Check if an email is used on different sites. Assumes 'holehe' is globally installed via pip.",
+    "id": "ping-builtin",
+    "name": "Ping",
+    "description": "Check host reachability with ICMP ping.",
     "notes": "",
-    "command_template": "holehe {{email}} --no-color",
-    "input_fields": [
-      {
-        "id": "email",
-        "label": "Email Address:",
-        "type": "email",
-        "placeholder": "Enter email to check"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "holehe_{{INPUT__email}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "nmap-builtin",
-    "name": "Nmap Network Scan",
-    "description": "Network scanner. Assumes 'nmap' is globally installed.",
-    "command_template": "nmap {{scan_flags}} {{misc_flags}} {{timing_flag}} {{extra_flags}} {{nse_profile}} {{nse_custom}} {{target}}",
+    "command_template": "ping -c {{count}} {{target}}",
     "input_fields": [
       {
         "id": "target",
-        "label": "Target (IP/Hostname):",
+        "label": "Target (IP/Domain):",
         "type": "text",
-        "placeholder": "192.168.1.1 or example.com",
+        "placeholder": "example.com",
         "default_value": ""
       },
       {
-        "id": "scan_flags",
-        "label": "Scan Flags:",
+        "id": "count",
+        "label": "Packet Count:",
         "type": "select",
         "options": [
-          {
-            "value": "-sS",
-            "text": "TCP SYN Scan (-sS)"
-          },
-          {
-            "value": "-sT",
-            "text": "TCP Connect Scan (-sT)"
-          },
-          {
-            "value": "-sU",
-            "text": "UDP Scan (-sU)"
-          },
-          {
-            "value": "-sC",
-            "text": "Default Scripts (-sC)"
-          },
-          {
-            "value": "-sV",
-            "text": "Service Version Detection (-sV)"
-          }
+          { "value": "4", "text": "4 (Quick)" },
+          { "value": "10", "text": "10" },
+          { "value": "20", "text": "20" },
+          { "value": "100", "text": "100 (Stress)" }
         ],
-        "default_value": "-sS"
-      },
-      {
-        "id": "misc_flags",
-        "label": "Miscellaneous Flags:",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "-A",
-            "text": "Aggressive Scan (-A)"
-          },
-          {
-            "value": "-O",
-            "text": "OS Detection (-O)"
-          },
-          {
-            "value": "-Pn",
-            "text": "No Ping (-Pn)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "timing_flag",
-        "label": "Timing (T1\u2013T5):",
-        "type": "select",
-        "options": [
-          {
-            "value": "-T1",
-            "text": "T1 (Slow)"
-          },
-          {
-            "value": "-T2",
-            "text": "T2"
-          },
-          {
-            "value": "-T3",
-            "text": "T3 (Default)"
-          },
-          {
-            "value": "-T4",
-            "text": "T4 (Fast)"
-          },
-          {
-            "value": "-T5",
-            "text": "T5 (Aggressive)"
-          }
-        ],
-        "default_value": "-T4"
-      },
-      {
-        "id": "extra_flags",
-        "label": "Extra Options:",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "-p-",
-            "text": "All Ports (-p-)"
-          },
-          {
-            "value": "--top-ports 100",
-            "text": "Top 100 Ports"
-          },
-          {
-            "value": "--open",
-            "text": "Show Only Open Ports"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "nse_profile",
-        "label": "NSE Profile:",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "--script=default",
-            "text": "default"
-          },
-          {
-            "value": "--script=vuln",
-            "text": "vuln (vulnerability checks)"
-          },
-          {
-            "value": "--script=discovery",
-            "text": "discovery"
-          },
-          {
-            "value": "--script=auth",
-            "text": "auth"
-          },
-          {
-            "value": "--script=exploit",
-            "text": "exploit"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "nse_custom",
-        "label": "Custom NSE scripts (optional)",
-        "type": "text",
-        "placeholder": "Leave empty or paste full --script=... token",
-        "default_value": ""
+        "default_value": "4"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "nmap_{{INPUT__target}}_{{TIMESTAMP}}.log"
+    "output_filename_pattern": "ping_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "whatweb-builtin",
-    "name": "WhatWeb - Website Technologies",
-    "description": "Identify technologies used on websites. Assumes 'whatweb' is globally installed.",
-    "notes": "Provide full URL including http/https.",
-    "command_template": "whatweb --colour never {{url}}",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "Target URL:",
-        "type": "url",
-        "placeholder": "http://example.com"
-      }
-    ],
-    "requires_clone": false,
-    "clone_url": "",
-    "clone_dir": "",
-    "requirements_file": "",
-    "run_in_directory": null,
-    "output_filename_pattern": "whatweb_{{INPUT__url}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "whois-builtin",
-    "name": "Whois Lookup",
-    "description": "Performs WHOIS lookup. Assumes 'whois' is installed.",
+    "id": "nslookup-builtin",
+    "name": "Nslookup",
+    "description": "Query DNS name servers for IP/host info.",
     "notes": "",
-    "command_template": "whois {{target}}",
-    "input_fields": [
-      {
-        "id": "target",
-        "label": "Target IP/Domain:",
-        "type": "text",
-        "placeholder": "example.com or 8.8.8.8"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "whois_{{INPUT__target}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "dig-builtin",
-    "name": "Dig DNS Lookup",
-    "description": "Retrieves DNS records using dig.",
-    "notes": "",
-    "command_template": "dig {{target}} ANY +noall +answer",
+    "command_template": "nslookup {{target}} {{server}}",
     "input_fields": [
       {
         "id": "target",
@@ -227,1798 +43,2765 @@
         "type": "text",
         "placeholder": "example.com",
         "default_value": ""
+      },
+      {
+        "id": "server",
+        "label": "DNS Server (optional):",
+        "type": "text",
+        "placeholder": "8.8.8.8",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "dig_{{INPUT__target}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "nslookup_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "ffuf-file-finder",
-    "name": "Domain File Finder (ffuf)",
-    "description": "Searches for specific files on a domain using ffuf. Provide one filename per line.",
-    "notes": "Requires 'ffuf' to be globally installed on the server. This tool creates temporary files (wordlist, ffuf JSON output) during execution, which are then deleted.",
-    "command_template": "ffuf -w {{wordlist_path}} -u {{protocol}}://{{domain}}/FUZZ -mc 200 -H \"User-Agent: OSINTDashboard/1.0\" -t 50 -timeout 10",
+    "id": "arp-builtin",
+    "name": "ARP Scan",
+    "description": "Display or scan the ARP table on the local network.",
+    "notes": "arp-scan requires root. Standard arp command does not.",
+    "command_template": "arp {{mode_flag}} {{target}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target/Interface:",
+        "type": "text",
+        "placeholder": "192.168.1.1 or -n",
+        "default_value": ""
+      },
+      {
+        "id": "mode_flag",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "-a", "text": "Show all (-a)" },
+          { "value": "-n", "text": "Numeric (-n)" },
+          { "value": "-d", "text": "Delete entry (-d)" }
+        ],
+        "default_value": "-a"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "arp_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "netstat-builtin",
+    "name": "Netstat",
+    "description": "Display network connections, routing tables, and interface stats.",
+    "notes": "",
+    "command_template": "netstat {{flags}}",
+    "input_fields": [
+      {
+        "id": "flags",
+        "label": "Flags:",
+        "type": "select",
+        "options": [
+          { "value": "-tuln", "text": "TCP/UDP listening ports (-tuln)" },
+          { "value": "-tulnp", "text": "With process names (-tulnp)" },
+          { "value": "-r", "text": "Routing table (-r)" },
+          { "value": "-s", "text": "Statistics (-s)" },
+          { "value": "-an", "text": "All connections (-an)" }
+        ],
+        "default_value": "-tuln"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "netstat_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "ss-builtin",
+    "name": "SS (Socket Statistics)",
+    "description": "Modern replacement for netstat — show socket stats.",
+    "notes": "",
+    "command_template": "ss {{flags}}",
+    "input_fields": [
+      {
+        "id": "flags",
+        "label": "Flags:",
+        "type": "select",
+        "options": [
+          { "value": "-tuln", "text": "TCP/UDP listening (-tuln)" },
+          { "value": "-tulnp", "text": "With processes (-tulnp)" },
+          { "value": "-s", "text": "Summary (-s)" },
+          { "value": "-a", "text": "All sockets (-a)" }
+        ],
+        "default_value": "-tuln"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "ss_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "ifconfig-builtin",
+    "name": "Ifconfig / ip addr",
+    "description": "Show or configure network interfaces.",
+    "notes": "",
+    "command_template": "ip {{subcommand}}",
+    "input_fields": [
+      {
+        "id": "subcommand",
+        "label": "Subcommand:",
+        "type": "select",
+        "options": [
+          { "value": "addr show", "text": "Show addresses (addr show)" },
+          { "value": "link show", "text": "Show links (link show)" },
+          { "value": "route show", "text": "Show routes (route show)" },
+          {
+            "value": "neigh show",
+            "text": "Show neighbours / ARP (neigh show)"
+          }
+        ],
+        "default_value": "addr show"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "ip_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "tcpdump-builtin",
+    "name": "Tcpdump",
+    "description": "Capture and inspect network packets.",
+    "notes": "May require sudo. -c limits packet count to avoid runaway capture.",
+    "command_template": "tcpdump -i {{interface}} -c {{count}} {{filter}} -nn",
+    "input_fields": [
+      {
+        "id": "interface",
+        "label": "Interface:",
+        "type": "text",
+        "placeholder": "eth0",
+        "default_value": "eth0"
+      },
+      {
+        "id": "count",
+        "label": "Packet Count:",
+        "type": "select",
+        "options": [
+          { "value": "50", "text": "50" },
+          { "value": "100", "text": "100" },
+          { "value": "200", "text": "200" },
+          { "value": "500", "text": "500" }
+        ],
+        "default_value": "100"
+      },
+      {
+        "id": "filter",
+        "label": "BPF Filter (optional):",
+        "type": "text",
+        "placeholder": "port 80 or host 1.2.3.4",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "tcpdump_{{INPUT__interface}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "openssl-cert",
+    "name": "OpenSSL Cert Inspector",
+    "description": "Fetch and display the TLS certificate of a remote host.",
+    "notes": "",
+    "command_template": "echo | openssl s_client -connect {{host}}:{{port}} -servername {{host}} 2>/dev/null | openssl x509 -noout {{output_flags}}",
+    "input_fields": [
+      {
+        "id": "host",
+        "label": "Host:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "port",
+        "label": "Port:",
+        "type": "select",
+        "options": [
+          { "value": "443", "text": "443 (HTTPS)" },
+          { "value": "465", "text": "465 (SMTPS)" },
+          { "value": "993", "text": "993 (IMAPS)" },
+          { "value": "8443", "text": "8443" }
+        ],
+        "default_value": "443"
+      },
+      {
+        "id": "output_flags",
+        "label": "Show:",
+        "type": "select",
+        "options": [
+          { "value": "-text", "text": "Full certificate (-text)" },
+          { "value": "-dates", "text": "Validity dates (-dates)" },
+          { "value": "-subject -issuer", "text": "Subject & Issuer" },
+          { "value": "-fingerprint -sha256", "text": "SHA-256 Fingerprint" }
+        ],
+        "default_value": "-text"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "openssl_cert_{{INPUT__host}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "openssl-hash",
+    "name": "OpenSSL Hash / Digest",
+    "description": "Compute file hash using openssl dgst.",
+    "notes": "",
+    "command_template": "openssl dgst -{{algorithm}} {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "File path:",
+        "type": "text",
+        "placeholder": "/path/to/file",
+        "default_value": ""
+      },
+      {
+        "id": "algorithm",
+        "label": "Algorithm:",
+        "type": "select",
+        "options": [
+          { "value": "md5", "text": "MD5" },
+          { "value": "sha1", "text": "SHA-1" },
+          { "value": "sha256", "text": "SHA-256" },
+          { "value": "sha512", "text": "SHA-512" }
+        ],
+        "default_value": "sha256"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hash_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "hashid-builtin",
+    "name": "Hashid",
+    "description": "Identify the type of a given hash.",
+    "notes": "pip install hashid",
+    "command_template": "hashid {{hash}}",
+    "input_fields": [
+      {
+        "id": "hash",
+        "label": "Hash string:",
+        "type": "text",
+        "placeholder": "5f4dcc3b5aa765d61d8327deb882cf99",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hashid_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "hashcat-builtin",
+    "name": "Hashcat",
+    "description": "Password recovery via hash cracking.",
+    "notes": "Requires hashcat and a wordlist. Use responsibly.",
+    "command_template": "hashcat -m {{hash_mode}} -a {{attack_mode}} {{hash_file}} {{wordlist}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "hash_file",
+        "label": "Hash file path:",
+        "type": "text",
+        "placeholder": "/path/to/hashes.txt",
+        "default_value": ""
+      },
+      {
+        "id": "wordlist",
+        "label": "Wordlist path:",
+        "type": "text",
+        "placeholder": "/usr/share/wordlists/rockyou.txt",
+        "default_value": ""
+      },
+      {
+        "id": "hash_mode",
+        "label": "Hash Mode (-m):",
+        "type": "select",
+        "options": [
+          { "value": "0", "text": "MD5 (0)" },
+          { "value": "100", "text": "SHA-1 (100)" },
+          { "value": "1400", "text": "SHA-256 (1400)" },
+          { "value": "1800", "text": "sha512crypt (1800)" },
+          { "value": "3200", "text": "bcrypt (3200)" },
+          { "value": "1000", "text": "NTLM (1000)" },
+          { "value": "5600", "text": "NetNTLMv2 (5600)" }
+        ],
+        "default_value": "0"
+      },
+      {
+        "id": "attack_mode",
+        "label": "Attack Mode (-a):",
+        "type": "select",
+        "options": [
+          { "value": "0", "text": "Dictionary (0)" },
+          { "value": "1", "text": "Combination (1)" },
+          { "value": "3", "text": "Brute-force/Mask (3)" },
+          { "value": "6", "text": "Hybrid wordlist+mask (6)" }
+        ],
+        "default_value": "0"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--force --show",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hashcat_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "john-builtin",
+    "name": "John the Ripper",
+    "description": "Classic password cracker.",
+    "notes": "Requires john installed. Use on files you own.",
+    "command_template": "john {{wordlist_flag}} {{wordlist}} {{format_flag}} {{hash_file}}",
+    "input_fields": [
+      {
+        "id": "hash_file",
+        "label": "Hash file:",
+        "type": "text",
+        "placeholder": "/path/to/hashes.txt",
+        "default_value": ""
+      },
+      {
+        "id": "wordlist_flag",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "--wordlist=", "text": "Wordlist mode" },
+          { "value": "--incremental", "text": "Incremental (brute)" },
+          { "value": "--single", "text": "Single crack mode" }
+        ],
+        "default_value": "--wordlist="
+      },
+      {
+        "id": "wordlist",
+        "label": "Wordlist (if wordlist mode):",
+        "type": "text",
+        "placeholder": "/usr/share/wordlists/rockyou.txt",
+        "default_value": ""
+      },
+      {
+        "id": "format_flag",
+        "label": "Format (optional):",
+        "type": "text",
+        "placeholder": "--format=NT",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "john_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "crunch-builtin",
+    "name": "Crunch Wordlist Generator",
+    "description": "Generate custom wordlists with crunch.",
+    "notes": "",
+    "command_template": "crunch {{min}} {{max}} {{charset}} {{options}}",
+    "input_fields": [
+      {
+        "id": "min",
+        "label": "Min length:",
+        "type": "text",
+        "placeholder": "4",
+        "default_value": "4"
+      },
+      {
+        "id": "max",
+        "label": "Max length:",
+        "type": "text",
+        "placeholder": "6",
+        "default_value": "6"
+      },
+      {
+        "id": "charset",
+        "label": "Charset:",
+        "type": "text",
+        "placeholder": "abcdefghijklmnopqrstuvwxyz0123456789",
+        "default_value": "abcdefghijklmnopqrstuvwxyz"
+      },
+      {
+        "id": "options",
+        "label": "Extra options (e.g. -o /tmp/list.txt):",
+        "type": "text",
+        "placeholder": "-o /tmp/wordlist.txt",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "crunch_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "cewl-builtin",
+    "name": "CeWL Wordlist Spider",
+    "description": "Spider a website and build a custom wordlist.",
+    "notes": "",
+    "command_template": "cewl {{url}} -d {{depth}} -m {{min_word_len}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "depth",
+        "label": "Spider Depth:",
+        "type": "select",
+        "options": [
+          { "value": "1", "text": "1" },
+          { "value": "2", "text": "2" },
+          { "value": "3", "text": "3" }
+        ],
+        "default_value": "2"
+      },
+      {
+        "id": "min_word_len",
+        "label": "Min Word Length:",
+        "type": "text",
+        "placeholder": "5",
+        "default_value": "5"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-w /tmp/cewl.txt --email",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "cewl_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "medusa-builtin",
+    "name": "Medusa Brute Forcer",
+    "description": "Parallel network login brute forcer.",
+    "notes": "Use only on systems you own or have written permission to test.",
+    "command_template": "medusa -h {{target}} -u {{username}} -P {{password_list}} -M {{service}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP:",
+        "type": "text",
+        "placeholder": "192.168.1.10",
+        "default_value": ""
+      },
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "admin",
+        "default_value": ""
+      },
+      {
+        "id": "password_list",
+        "label": "Password list path:",
+        "type": "text",
+        "placeholder": "/path/to/pass.txt",
+        "default_value": ""
+      },
+      {
+        "id": "service",
+        "label": "Service:",
+        "type": "select",
+        "options": [
+          { "value": "ssh", "text": "SSH" },
+          { "value": "ftp", "text": "FTP" },
+          { "value": "http", "text": "HTTP" },
+          { "value": "smb", "text": "SMB" },
+          { "value": "mysql", "text": "MySQL" },
+          { "value": "rdp", "text": "RDP" }
+        ],
+        "default_value": "ssh"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "medusa_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "wpscan-builtin",
+    "name": "WPScan",
+    "description": "WordPress vulnerability scanner.",
+    "notes": "Requires wpscan installed. API token needed for vuln data.",
+    "command_template": "wpscan --url {{url}} {{enumerate_flag}} {{api_token_flag}} {{api_token}} --no-banner",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "WordPress URL:",
+        "type": "url",
+        "placeholder": "http://target.com",
+        "default_value": ""
+      },
+      {
+        "id": "enumerate_flag",
+        "label": "Enumerate:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "None" },
+          { "value": "--enumerate u", "text": "Users (--enumerate u)" },
+          { "value": "--enumerate p", "text": "Plugins (--enumerate p)" },
+          { "value": "--enumerate t", "text": "Themes (--enumerate t)" },
+          { "value": "--enumerate vp", "text": "Vulnerable Plugins (vp)" },
+          { "value": "--enumerate ap", "text": "All Plugins (ap)" }
+        ],
+        "default_value": "--enumerate vp"
+      },
+      {
+        "id": "api_token_flag",
+        "label": "Use API token?",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "No" },
+          { "value": "--api-token", "text": "Yes (--api-token)" }
+        ],
+        "default_value": ""
+      },
+      {
+        "id": "api_token",
+        "label": "API Token:",
+        "type": "text",
+        "placeholder": "YOUR_TOKEN",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "wpscan_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "joomscan-builtin",
+    "name": "JoomScan",
+    "description": "Joomla CMS vulnerability scanner.",
+    "notes": "Requires joomscan installed (perl-based).",
+    "command_template": "joomscan --url {{url}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Joomla URL:",
+        "type": "url",
+        "placeholder": "http://target.com",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--enumerate-components",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "joomscan_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "cmseek-builtin",
+    "name": "CMSeeK",
+    "description": "CMS detection and exploitation suite.",
+    "notes": "Requires CMSeeK cloned.",
+    "command_template": "python3 cmseek.py --url {{url}} {{deep_scan}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://target.com",
+        "default_value": ""
+      },
+      {
+        "id": "deep_scan",
+        "label": "Deep Scan:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "No" },
+          { "value": "--deep-scan", "text": "Yes (--deep-scan)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/Tuhinshubhra/CMSeeK.git",
+    "clone_dir": "tools/CMSeeK",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/CMSeeK",
+    "output_filename_pattern": "cmseek_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "wafw00f-builtin",
+    "name": "WAF Detection (wafw00f)",
+    "description": "Detect and fingerprint Web Application Firewalls.",
+    "notes": "pip install wafw00f",
+    "command_template": "wafw00f {{url}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default detect" },
+          { "value": "-a", "text": "Test all WAFs (-a)" },
+          { "value": "-v", "text": "Verbose (-v)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "wafw00f_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "arjun-builtin",
+    "name": "Arjun Parameter Finder",
+    "description": "Discover hidden HTTP GET/POST parameters.",
+    "notes": "pip install arjun",
+    "command_template": "arjun -u {{url}} -m {{method}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com/page",
+        "default_value": ""
+      },
+      {
+        "id": "method",
+        "label": "Method:",
+        "type": "select",
+        "options": [
+          { "value": "GET", "text": "GET" },
+          { "value": "POST", "text": "POST" },
+          { "value": "JSON", "text": "JSON" }
+        ],
+        "default_value": "GET"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--stable",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "arjun_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "dalfox-builtin",
+    "name": "Dalfox XSS Scanner",
+    "description": "Fast XSS scanner and parameter analysis.",
+    "notes": "Requires dalfox installed (Go binary).",
+    "command_template": "dalfox url {{url}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com/search?q=test",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default scan" },
+          { "value": "--only-discovery", "text": "Discovery only" },
+          { "value": "--deep-domxss", "text": "Deep DOM XSS" },
+          { "value": "--skip-bav", "text": "Skip BAV analysis" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "dalfox_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "commix-builtin",
+    "name": "Commix Command Injection",
+    "description": "Automated command injection exploitation.",
+    "notes": "Requires commix. Use only on authorized targets.",
+    "command_template": "commix --url '{{url}}' {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com/vuln?cmd=test",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--batch --level=2",
+        "default_value": "--batch"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "commix_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "xsstrike-cloned",
+    "name": "XSStrike XSS Suite",
+    "description": "Advanced XSS detection and exploitation framework.",
+    "notes": "",
+    "command_template": "python3 xsstrike.py -u {{url}} {{mode_flag}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com/search?q=test",
+        "default_value": ""
+      },
+      {
+        "id": "mode_flag",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "--crawl", "text": "Crawl site (--crawl)" },
+          { "value": "--blind", "text": "Blind XSS (--blind)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/s0md3v/XSStrike.git",
+    "clone_dir": "tools/XSStrike",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/XSStrike",
+    "output_filename_pattern": "xsstrike_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "gitdumper-cloned",
+    "name": "Git Dumper",
+    "description": "Dump an exposed .git repository from a web server.",
+    "notes": "",
+    "command_template": "python3 git_dumper.py {{url}}/.git {{output_dir}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "output_dir",
+        "label": "Output directory:",
+        "type": "text",
+        "placeholder": "/tmp/git_dump",
+        "default_value": "/tmp/git_dump"
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/arthaud/git-dumper.git",
+    "clone_dir": "tools/git-dumper",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/git-dumper",
+    "output_filename_pattern": "gitdumper_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "gitleaks-builtin",
+    "name": "Gitleaks Secret Scanner",
+    "description": "Scan git repos for secrets, API keys, passwords.",
+    "notes": "Requires gitleaks binary installed.",
+    "command_template": "gitleaks detect --source {{repo_path}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "repo_path",
+        "label": "Repo path or URL:",
+        "type": "text",
+        "placeholder": "/path/to/repo or https://github.com/user/repo",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "--verbose", "text": "Verbose" },
+          { "value": "--no-git", "text": "No-git mode (scan dir)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "gitleaks_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "trufflehog-builtin",
+    "name": "TruffleHog Secret Scanner",
+    "description": "Find secrets and credentials in git history.",
+    "notes": "pip install trufflehog or use Go binary.",
+    "command_template": "trufflehog git {{repo_url}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "repo_url",
+        "label": "Repo URL or local path:",
+        "type": "text",
+        "placeholder": "https://github.com/user/repo",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "--only-verified", "text": "Only verified secrets" },
+          { "value": "--json", "text": "JSON output (--json)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "trufflehog_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "cloud-enum-cloned",
+    "name": "Cloud Enum (AWS/GCP/Azure)",
+    "description": "Enumerate public cloud resources for a keyword.",
+    "notes": "",
+    "command_template": "python3 cloud_enum.py -k {{keyword}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "keyword",
+        "label": "Keyword:",
+        "type": "text",
+        "placeholder": "targetcompany",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Cloud targets:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "All clouds" },
+          { "value": "--aws", "text": "AWS only" },
+          { "value": "--gcp", "text": "GCP only" },
+          { "value": "--azure", "text": "Azure only" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/initstring/cloud_enum.git",
+    "clone_dir": "tools/cloud_enum",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/cloud_enum",
+    "output_filename_pattern": "cloud_enum_{{INPUT__keyword}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "awscli-s3-builtin",
+    "name": "AWS CLI - S3 Bucket Check",
+    "description": "Check if an S3 bucket is public or list its contents.",
+    "notes": "Requires awscli. --no-sign-request tests anonymous access.",
+    "command_template": "aws s3 ls s3://{{bucket}} {{no_sign}} {{endpoint_flag}}",
+    "input_fields": [
+      {
+        "id": "bucket",
+        "label": "Bucket name:",
+        "type": "text",
+        "placeholder": "my-bucket-name",
+        "default_value": ""
+      },
+      {
+        "id": "no_sign",
+        "label": "Anonymous access?",
+        "type": "select",
+        "options": [
+          { "value": "--no-sign-request", "text": "Yes (unauthenticated)" },
+          { "value": "", "text": "No (use configured creds)" }
+        ],
+        "default_value": "--no-sign-request"
+      },
+      {
+        "id": "endpoint_flag",
+        "label": "Endpoint (optional):",
+        "type": "text",
+        "placeholder": "--endpoint-url https://...",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "awss3_{{INPUT__bucket}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "feroxbuster-builtin",
+    "name": "Feroxbuster",
+    "description": "Fast, recursive content discovery tool written in Rust.",
+    "notes": "Requires feroxbuster binary installed.",
+    "command_template": "feroxbuster --url {{url}} --wordlist {{wordlist}} {{depth_flag}} {{extensions_flag}} --no-recursion {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "wordlist",
+        "label": "Wordlist:",
+        "type": "text",
+        "placeholder": "/usr/share/seclists/Discovery/Web-Content/common.txt",
+        "default_value": ""
+      },
+      {
+        "id": "depth_flag",
+        "label": "Recursion depth:",
+        "type": "select",
+        "options": [
+          { "value": "--depth 1", "text": "1" },
+          { "value": "--depth 2", "text": "2" },
+          { "value": "--depth 3", "text": "3" }
+        ],
+        "default_value": "--depth 2"
+      },
+      {
+        "id": "extensions_flag",
+        "label": "Extensions:",
+        "type": "text",
+        "placeholder": "-x php,html,js",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--silent",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "feroxbuster_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "amass-builtin",
+    "name": "Amass Subdomain Enum",
+    "description": "In-depth DNS enumeration and network mapping.",
+    "notes": "Requires amass installed. Enum mode is most useful.",
+    "command_template": "amass {{mode}} -d {{domain}} {{extra_flags}}",
     "input_fields": [
       {
         "id": "domain",
-        "label": "Target Domain (e.g., example.com):",
+        "label": "Domain:",
         "type": "text",
-        "placeholder": "example.com"
+        "placeholder": "example.com",
+        "default_value": ""
       },
       {
-        "id": "filenames",
-        "label": "Filenames to search (one per line):",
-        "type": "textarea",
-        "placeholder": "robots.txt\nadmin.php\nbackup.zip\n.env"
+        "id": "mode",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "enum", "text": "Enum (passive + active)" },
+          { "value": "intel", "text": "Intel (org/ASN lookup)" },
+          { "value": "viz", "text": "Viz (output graph data)" }
+        ],
+        "default_value": "enum"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-passive -o /tmp/out.txt",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "amass_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "dnsdumpster-cloned",
+    "name": "DNSdumpster API lookup",
+    "description": "Passive DNS reconnaissance using the DNSdumpster API.",
+    "notes": "",
+    "command_template": "python3 dnsdumpster.py {{domain}}",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/PaulSec/API-dnsdumpster.com.git",
+    "clone_dir": "tools/dnsdumpster",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/dnsdumpster",
+    "output_filename_pattern": "dnsdumpster_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "fierce-builtin",
+    "name": "Fierce DNS Recon",
+    "description": "DNS reconnaissance and subdomain brute force.",
+    "notes": "pip install fierce",
+    "command_template": "fierce --domain {{domain}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--subdomain-file /path/to/list.txt",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "fierce_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "whois-rdap",
+    "name": "RDAP Lookup (curl)",
+    "description": "Modern WHOIS replacement — fetch RDAP data for a domain.",
+    "notes": "",
+    "command_template": "curl -s https://rdap.org/domain/{{domain}}",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "rdap_{{INPUT__domain}}_{{TIMESTAMP}}.json"
+  },
+
+  {
+    "id": "photon-cloned",
+    "name": "Photon Web Crawler",
+    "description": "Fast web crawler for OSINT — extracts URLs, emails, files, keys.",
+    "notes": "",
+    "command_template": "python3 photon.py -u {{url}} -l {{level}} -t {{threads}} {{clone_flag}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "level",
+        "label": "Depth level:",
+        "type": "select",
+        "options": [
+          { "value": "1", "text": "1" },
+          { "value": "2", "text": "2" },
+          { "value": "3", "text": "3" }
+        ],
+        "default_value": "2"
+      },
+      {
+        "id": "threads",
+        "label": "Threads:",
+        "type": "select",
+        "options": [
+          { "value": "2", "text": "2" },
+          { "value": "5", "text": "5" },
+          { "value": "10", "text": "10" }
+        ],
+        "default_value": "5"
+      },
+      {
+        "id": "clone_flag",
+        "label": "Clone site?",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "No" },
+          { "value": "--clone", "text": "Yes (--clone)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/s0md3v/Photon.git",
+    "clone_dir": "tools/Photon",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/Photon",
+    "output_filename_pattern": "photon_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "socialscan-builtin",
+    "name": "Socialscan Username/Email Check",
+    "description": "Check username/email availability across social platforms.",
+    "notes": "pip install socialscan",
+    "command_template": "socialscan {{query}} {{json_flag}}",
+    "input_fields": [
+      {
+        "id": "query",
+        "label": "Username or email:",
+        "type": "text",
+        "placeholder": "targetusername",
+        "default_value": ""
+      },
+      {
+        "id": "json_flag",
+        "label": "JSON output?",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "No" },
+          { "value": "--json", "text": "Yes (--json)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "socialscan_{{INPUT__query}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "maigret-cloned",
+    "name": "Maigret Username OSINT",
+    "description": "Collect a dossier on a person from username across 2500+ sites.",
+    "notes": "",
+    "command_template": "python3 -m maigret {{username}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "targetusername",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--html --timeout 5",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": true,
+    "clone_url": "https://github.com/soxoj/maigret.git",
+    "clone_dir": "tools/maigret",
+    "requirements_file": "requirements.txt",
+    "run_in_directory": "tools/maigret",
+    "output_filename_pattern": "maigret_{{INPUT__username}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "emailrep-builtin",
+    "name": "EmailRep Reputation Check",
+    "description": "Query emailrep.io for email reputation data.",
+    "notes": "",
+    "command_template": "curl -s https://emailrep.io/{{email}}",
+    "input_fields": [
+      {
+        "id": "email",
+        "label": "Email:",
+        "type": "email",
+        "placeholder": "target@example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "emailrep_{{INPUT__email}}_{{TIMESTAMP}}.json"
+  },
+
+  {
+    "id": "ipinfo-builtin",
+    "name": "IPinfo Lookup",
+    "description": "Get geolocation, ASN, and org info for an IP via ipinfo.io.",
+    "notes": "",
+    "command_template": "curl -s https://ipinfo.io/{{ip}}/json",
+    "input_fields": [
+      {
+        "id": "ip",
+        "label": "IP Address:",
+        "type": "text",
+        "placeholder": "8.8.8.8",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "ipinfo_{{INPUT__ip}}_{{TIMESTAMP}}.json"
+  },
+
+  {
+    "id": "abuseipdb-builtin",
+    "name": "AbuseIPDB Check",
+    "description": "Check an IP against the AbuseIPDB threat database.",
+    "notes": "Requires a free AbuseIPDB API key.",
+    "command_template": "curl -s -G https://api.abuseipdb.com/api/v2/check --data-urlencode 'ipAddress={{ip}}' -d maxAgeInDays=90 -H 'Key: {{api_key}}' -H 'Accept: application/json'",
+    "input_fields": [
+      {
+        "id": "ip",
+        "label": "IP Address:",
+        "type": "text",
+        "placeholder": "1.2.3.4",
+        "default_value": ""
+      },
+      {
+        "id": "api_key",
+        "label": "AbuseIPDB API Key:",
+        "type": "text",
+        "placeholder": "YOUR_API_KEY",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "abuseipdb_{{INPUT__ip}}_{{TIMESTAMP}}.json"
+  },
+
+  {
+    "id": "waybackurls-builtin",
+    "name": "Waybackurls",
+    "description": "Fetch all URLs the Wayback Machine knows about a domain.",
+    "notes": "Requires waybackurls Go binary installed.",
+    "command_template": "echo {{domain}} | waybackurls",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "waybackurls_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "crt-sh-builtin",
+    "name": "crt.sh Cert Transparency",
+    "description": "Query crt.sh certificate transparency for subdomains.",
+    "notes": "",
+    "command_template": "curl -s 'https://crt.sh/?q=%25.{{domain}}&output=json' | jq -r '.[].name_value' | sort -u",
+    "input_fields": [
+      {
+        "id": "domain",
+        "label": "Domain:",
+        "type": "text",
+        "placeholder": "example.com",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "crtsh_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "wfuzz-builtin",
+    "name": "WFuzz Web Fuzzer",
+    "description": "Web application brute forcer and fuzzer.",
+    "notes": "pip install wfuzz",
+    "command_template": "wfuzz -w {{wordlist}} -u {{url}} {{filter_flag}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Target URL (use FUZZ keyword):",
+        "type": "text",
+        "placeholder": "http://example.com/FUZZ",
+        "default_value": ""
+      },
+      {
+        "id": "wordlist",
+        "label": "Wordlist path:",
+        "type": "text",
+        "placeholder": "/usr/share/seclists/Discovery/Web-Content/common.txt",
+        "default_value": ""
+      },
+      {
+        "id": "filter_flag",
+        "label": "Hide responses:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Show all" },
+          { "value": "--hc 404", "text": "Hide 404s (--hc 404)" },
+          { "value": "--hc 404,403", "text": "Hide 404 & 403" },
+          { "value": "--sc 200", "text": "Show only 200s" }
+        ],
+        "default_value": "--hc 404"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-t 50",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "wfuzz_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "ncrack-builtin",
+    "name": "Ncrack Network Auth Cracker",
+    "description": "Nmap-based network authentication cracking tool.",
+    "notes": "",
+    "command_template": "ncrack -U {{user_list}} -P {{pass_list}} {{protocol}}://{{target}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP:",
+        "type": "text",
+        "placeholder": "192.168.1.10",
+        "default_value": ""
       },
       {
         "id": "protocol",
         "label": "Protocol:",
         "type": "select",
         "options": [
-          {
-            "value": "https",
-            "text": "HTTPS"
-          },
-          {
-            "value": "http",
-            "text": "HTTP"
-          }
+          { "value": "ssh", "text": "SSH" },
+          { "value": "ftp", "text": "FTP" },
+          { "value": "rdp", "text": "RDP" },
+          { "value": "telnet", "text": "Telnet" }
         ],
-        "default_value": "https"
-      }
-    ],
-    "requires_clone": false,
-    "clone_url": "",
-    "clone_dir": "",
-    "requirements_file": "",
-    "run_in_directory": null,
-    "output_filename_pattern": "ffuf_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": true
-  },
-  {
-    "id": "dnsrecon-builtin",
-    "name": "Dnsrecon",
-    "description": "DNS Enumeration Script. Assumes 'dnsrecon' installed.",
-    "notes": "",
-    "command_template": "dnsrecon -d {{domain}} -t {{type}}",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
-        "type": "text",
-        "placeholder": "example.com"
+        "default_value": "ssh"
       },
       {
-        "id": "type",
-        "label": "Enumeration Type:",
-        "type": "select",
-        "options": [
-          {
-            "value": "std",
-            "text": "Standard"
-          },
-          {
-            "value": "brt",
-            "text": "Brute-force"
-          },
-          {
-            "value": "axfr",
-            "text": "Zone Transfer"
-          }
-        ],
-        "default_value": "std"
+        "id": "user_list",
+        "label": "User list path:",
+        "type": "text",
+        "placeholder": "/path/to/users.txt",
+        "default_value": ""
+      },
+      {
+        "id": "pass_list",
+        "label": "Password list path:",
+        "type": "text",
+        "placeholder": "/path/to/pass.txt",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-T5",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "dnsrecon_{{INPUT__domain}}_{{INPUT__type}}_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "ncrack_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "dnsenum-builtin",
-    "name": "Dnsenum",
-    "description": "Modular DNS enumeration with selectable options (fast or full).",
-    "notes": "Split flags into single tokens so runner won't auto-quote multi-token values.",
-    "command_template": "dnsenum {{domain}} {{mode_flag}} {{noreverse_flag}} {{dnsserver_flag}} {{dnsserver_value}} {{threads_flag}} {{threads_value}} {{wordlist_flag}} {{wordlist_value}} {{custom_flags}} -o dnsenum_{{domain}}.txt",
+    "id": "sslyze-builtin",
+    "name": "SSLyze TLS Scanner",
+    "description": "Analyse the TLS/SSL configuration of a server.",
+    "notes": "pip install sslyze",
+    "command_template": "python3 -m sslyze {{host}}:{{port}} {{scan_flags}}",
     "input_fields": [
       {
-        "id": "domain",
-        "label": "Domain:",
+        "id": "host",
+        "label": "Hostname:",
         "type": "text",
         "placeholder": "example.com",
         "default_value": ""
       },
       {
-        "id": "mode_flag",
-        "label": "Scan Mode:",
+        "id": "port",
+        "label": "Port:",
         "type": "select",
-        "placeholder": "",
-        "default_value": "--enum",
         "options": [
-          {
-            "text": "None (manual options)",
-            "value": ""
-          },
-          {
-            "text": "Full Enum (--enum)",
-            "value": "--enum"
-          },
-          {
-            "text": "Brute only (--only-brute)",
-            "value": "--only-brute"
-          }
-        ]
+          { "value": "443", "text": "443 (HTTPS)" },
+          { "value": "465", "text": "465 (SMTPS)" },
+          { "value": "8443", "text": "8443" }
+        ],
+        "default_value": "443"
       },
       {
-        "id": "noreverse_flag",
-        "label": "Disable reverse lookups?",
+        "id": "scan_flags",
+        "label": "Checks:",
         "type": "select",
-        "placeholder": "",
-        "default_value": "--noreverse",
         "options": [
-          {
-            "text": "No (allow reverse lookups)",
-            "value": ""
-          },
-          {
-            "text": "Yes (--noreverse)",
-            "value": "--noreverse"
-          }
-        ]
-      },
-      {
-        "id": "dnsserver_flag",
-        "label": "Use custom DNS server?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No (use system resolver)",
-            "value": ""
-          },
-          {
-            "text": "Yes (--dnsserver)",
-            "value": "--dnsserver"
-          }
-        ]
-      },
-      {
-        "id": "dnsserver_value",
-        "label": "DNS Server (if enabled):",
-        "type": "text",
-        "placeholder": "8.8.8.8",
-        "default_value": ""
-      },
-      {
-        "id": "threads_flag",
-        "label": "Set threads?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No (default threads)",
-            "value": ""
-          },
-          {
-            "text": "Set threads (--threads)",
-            "value": "--threads"
-          }
-        ]
-      },
-      {
-        "id": "threads_value",
-        "label": "Threads (if enabled):",
-        "type": "text",
-        "placeholder": "5",
-        "default_value": ""
-      },
-      {
-        "id": "wordlist_flag",
-        "label": "Use a wordlist?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "None",
-            "value": ""
-          },
-          {
-            "text": "Choose wordlist (--wordlist)",
-            "value": "--wordlist"
-          }
-        ]
-      },
-      {
-        "id": "wordlist_value",
-        "label": "Wordlist path (if enabled):",
-        "type": "text",
-        "placeholder": "/path/to/wordlist.txt",
-        "default_value": ""
-      },
-      {
-        "id": "custom_flags",
-        "label": "Custom flags (optional)",
-        "type": "text",
-        "placeholder": "extra flags here, e.g. --whois",
-        "default_value": ""
+          { "value": "--regular", "text": "Regular scan (--regular)" },
+          { "value": "--heartbleed", "text": "Heartbleed only" },
+          { "value": "--robot", "text": "ROBOT only" },
+          { "value": "--early_data", "text": "Early data / 0-RTT" }
+        ],
+        "default_value": "--regular"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "dnsenum_{{domain}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "sslyze_{{INPUT__host}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "host-builtin",
-    "name": "Host Lookup",
-    "description": "DNS queries using host command.",
-    "notes": "",
-    "command_template": "host {{target}}",
+    "id": "testssl-builtin",
+    "name": "testssl.sh TLS Checker",
+    "description": "Comprehensive TLS/SSL testing from command line.",
+    "notes": "Clone testssl.sh or install system-wide.",
+    "command_template": "testssl.sh {{extra_flags}} {{host}}:{{port}}",
     "input_fields": [
       {
-        "id": "target",
-        "label": "Domain/IP:",
-        "type": "text",
-        "placeholder": "example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "host_{{INPUT__target}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "subfinder-builtin",
-    "name": "Subfinder",
-    "description": "Passive subdomain discovery.",
-    "notes": "",
-    "command_template": "subfinder -d {{domain}}",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
+        "id": "host",
+        "label": "Host:",
         "type": "text",
         "placeholder": "example.com",
         "default_value": ""
+      },
+      {
+        "id": "port",
+        "label": "Port:",
+        "type": "text",
+        "placeholder": "443",
+        "default_value": "443"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Full scan" },
+          { "value": "--protocols", "text": "Protocols only" },
+          { "value": "--cipher-per-proto", "text": "Ciphers per protocol" },
+          { "value": "--heartbleed", "text": "Heartbleed check" }
+        ],
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "subfinder_{{domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "testssl_{{INPUT__host}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "assetfinder-builtin",
-    "name": "Assetfinder",
-    "description": "Find related domains using assetfinder.",
-    "notes": "",
-    "command_template": "assetfinder --subs-only {{domain}}",
+    "id": "sslscan-builtin",
+    "name": "SSLScan",
+    "description": "Enumerate SSL/TLS cipher suites and protocols.",
+    "notes": "apt install sslscan",
+    "command_template": "sslscan {{extra_flags}} {{host}}:{{port}}",
     "input_fields": [
       {
-        "id": "domain",
-        "label": "Domain:",
+        "id": "host",
+        "label": "Host:",
         "type": "text",
         "placeholder": "example.com",
         "default_value": ""
+      },
+      {
+        "id": "port",
+        "label": "Port:",
+        "type": "text",
+        "placeholder": "443",
+        "default_value": "443"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "--no-colour", "text": "No colour" },
+          { "value": "--show-certificate", "text": "Show cert details" }
+        ],
+        "default_value": "--no-colour"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "assetfinder_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "sslscan_{{INPUT__host}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "dnsx-builtin",
-    "name": "Dnsx",
-    "description": "Fast DNS probing by ProjectDiscovery.",
-    "notes": "",
-    "command_template": "dnsx -l {{input_list}} -a -resp",
+    "id": "stegseek-builtin",
+    "name": "Stegseek Steganography Cracker",
+    "description": "Crack steghide-encrypted steganography in images.",
+    "notes": "Requires stegseek and a wordlist.",
+    "command_template": "stegseek {{image}} {{wordlist}}",
     "input_fields": [
       {
-        "id": "input_list",
-        "label": "Hosts file:",
+        "id": "image",
+        "label": "Image file path:",
         "type": "text",
-        "placeholder": "/path/to/hosts.txt",
+        "placeholder": "/path/to/image.jpg",
         "default_value": ""
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "dnsx_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
-  },
-  {
-    "id": "ctfr-builtin",
-    "name": "CTFR",
-    "description": "Subdomain discovery using cert transparency logs.",
-    "notes": "",
-    "command_template": "python3 ./ctfr.py -d {{domain}}",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
-        "type": "text",
-        "placeholder": "example.com",
-        "default_value": ""
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "ctfr_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
-  },
-  {
-    "id": "gobuster-single",
-    "name": "Gobuster",
-    "description": "Single Gobuster tool. Choose mode from dropdown; enter Target and Wordlist. Bucket prefix is a dropdown (or Custom).",
-    "command_template": "/usr/local/bin/gobuster-wrapper {{mode}} {{target}} -w {{wordlist}} {{threads_flag}} {{threads_value}} {{timeout_flag}} {{timeout_value}} {{delay_flag}} {{delay_value}} {{extensions_flag}} {{extensions_value}} {{status_flag}} {{status_value}} {{no_tls}} {{proxy_flag}} {{proxy_value}} {{resolvers_flag}} {{resolvers_value}} {{bucket_flag}} {{bucket_value}} {{custom_bucket}} -o gobuster_{{TIMESTAMP}}.txt",
-    "input_fields": [
-      {
-        "id": "mode",
-        "label": "Mode",
-        "type": "select",
-        "options": [
-          {
-            "value": "dir",
-            "text": "dir (directories/files)"
-          },
-          {
-            "value": "dns",
-            "text": "dns (subdomain brute)"
-          },
-          {
-            "value": "vhost",
-            "text": "vhost (virtual hosts)"
-          },
-          {
-            "value": "s3",
-            "text": "s3 (Amazon S3 buckets)"
-          },
-          {
-            "value": "gcs",
-            "text": "gcs (Google Cloud Storage buckets)"
-          },
-          {
-            "value": "fuzz",
-            "text": "fuzz (FUZZ token)"
-          }
-        ],
-        "default_value": "dir"
-      },
-      {
-        "id": "target",
-        "label": "Target (URL, domain, or bucket prefix):",
-        "type": "text",
-        "placeholder": "http://example.com  OR  example.com  OR  myprefix (for buckets)",
-        "default_value": ""
-      },
-      {
-        "id": "wordlist",
-        "label": "Wordlist (path):",
-        "type": "text",
-        "placeholder": "/path/to/wordlist.txt",
-        "default_value": ""
-      },
-      {
-        "id": "threads_flag",
-        "label": "Set threads?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "Default"
-          },
-          {
-            "value": "-t",
-            "text": "Set threads (-t)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "threads_value",
-        "label": "Threads value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "Auto"
-          },
-          {
-            "value": "50",
-            "text": "50"
-          },
-          {
-            "value": "25",
-            "text": "25"
-          },
-          {
-            "value": "10",
-            "text": "10"
-          },
-          {
-            "value": "5",
-            "text": "5"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "timeout_flag",
-        "label": "Timeout flag?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "--timeout",
-            "text": "--timeout"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "timeout_value",
-        "label": "Timeout value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "Auto"
-          },
-          {
-            "value": "10s",
-            "text": "10s"
-          },
-          {
-            "value": "15s",
-            "text": "15s"
-          },
-          {
-            "value": "30s",
-            "text": "30s"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "delay_flag",
-        "label": "Delay flag?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "--delay",
-            "text": "--delay"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "delay_value",
-        "label": "Delay value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "50ms",
-            "text": "50ms"
-          },
-          {
-            "value": "100ms",
-            "text": "100ms"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "extensions_flag",
-        "label": "Extensions flag?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "-x",
-            "text": "-x (extensions)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "extensions_value",
-        "label": "Extensions value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "php,html,asp,aspx",
-            "text": "php,html,asp,aspx"
-          },
-          {
-            "value": "php,html",
-            "text": "php,html"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "status_flag",
-        "label": "Status flag?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "-s",
-            "text": "-s (status codes)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "status_value",
-        "label": "Status value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "All"
-          },
-          {
-            "value": "200,301,302",
-            "text": "200,301,302"
-          },
-          {
-            "value": "200,204",
-            "text": "200,204"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "no_tls",
-        "label": "Skip TLS verify?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "No"
-          },
-          {
-            "value": "-k",
-            "text": "Yes (-k)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "proxy_flag",
-        "label": "Proxy flag?",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "--proxy",
-            "text": "--proxy"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "proxy_value",
-        "label": "Proxy value",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "http://127.0.0.1:8080",
-            "text": "Burp (127.0.0.1:8080)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "resolvers_flag",
-        "label": "Resolvers method (dns mode)",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "System"
-          },
-          {
-            "value": "-r",
-            "text": "Inline (-r ip,ip)"
-          },
-          {
-            "value": "-rf",
-            "text": "File (-rf /path)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "resolvers_value",
-        "label": "Resolvers value (if -r/-rf)",
-        "type": "text",
-        "placeholder": "8.8.8.8,1.1.1.1  OR  /path/resolvers.txt",
-        "default_value": ""
-      },
-      {
-        "id": "bucket_flag",
-        "label": "Bucket flag (s3/gcs)",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "-b",
-            "text": "-b (bucket prefix)"
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "bucket_value",
-        "label": "Bucket prefix (dropdown)",
-        "type": "select",
-        "options": [
-          {
-            "value": "",
-            "text": "None"
-          },
-          {
-            "value": "www",
-            "text": "www"
-          },
-          {
-            "value": "dev",
-            "text": "dev"
-          },
-          {
-            "value": "test",
-            "text": "test"
-          },
-          {
-            "value": "staging",
-            "text": "staging"
-          },
-          {
-            "value": "prod",
-            "text": "prod"
-          },
-          {
-            "value": "__USE_CUSTOM_BUCKET__",
-            "text": "Custom..."
-          }
-        ],
-        "default_value": ""
-      },
-      {
-        "id": "custom_bucket",
-        "label": "Custom bucket prefix (if Custom selected)",
-        "type": "text",
-        "placeholder": "mybucketprefix",
-        "default_value": ""
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "gobuster_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "dirb-builtin",
-    "name": "Dirb",
-    "description": "Directory brute forcing with dirb.",
-    "notes": "",
-    "command_template": "dirb {{url}} {{wordlist}} -o {{output_file}}",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "Target URL:",
-        "type": "url",
-        "placeholder": "http://example.com"
       },
       {
         "id": "wordlist",
         "label": "Wordlist:",
         "type": "text",
-        "placeholder": "/path/to/wordlist.txt"
+        "placeholder": "/usr/share/wordlists/rockyou.txt",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "dirb_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "stegseek_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "gau-builtin",
-    "name": "Gau - Get All Urls",
-    "description": "Get all known URLs for a domain (gau) \u2014 domain is free text; other options via dropdowns.",
-    "notes": "Dropdown-only options avoid multi-token quoting issues. Use Custom Flags for anything not covered.",
-    "command_template": "gau {{domain}} {{providers_flag}} {{providers_value}} {{subs_flag}} {{threads_flag}} {{threads_value}} {{timeout_flag}} {{timeout_value}} {{from_flag}} {{from_value}} {{to_flag}} {{to_value}} {{blacklist_flag}} {{blacklist_value}} {{fc_flag}} {{fc_value}} {{mc_flag}} {{mc_value}} {{mt_flag}} {{mt_value}} {{fp_flag}} {{proxy_flag}} {{proxy_value}} {{json_flag}} {{output_flag}}  {{custom_flags}}",
+    "id": "steghide-builtin",
+    "name": "Steghide",
+    "description": "Embed or extract hidden data from image/audio files.",
+    "notes": "apt install steghide",
+    "command_template": "steghide {{action}} -sf {{file}} {{passphrase_flag}} {{passphrase}}",
     "input_fields": [
+      {
+        "id": "action",
+        "label": "Action:",
+        "type": "select",
+        "options": [
+          { "value": "extract", "text": "Extract hidden data" },
+          { "value": "info", "text": "File info" }
+        ],
+        "default_value": "extract"
+      },
+      {
+        "id": "file",
+        "label": "Image/Audio file:",
+        "type": "text",
+        "placeholder": "/path/to/file.jpg",
+        "default_value": ""
+      },
+      {
+        "id": "passphrase_flag",
+        "label": "Passphrase flag:",
+        "type": "select",
+        "options": [
+          { "value": "-p", "text": "With passphrase (-p)" },
+          { "value": "", "text": "No passphrase" }
+        ],
+        "default_value": ""
+      },
+      {
+        "id": "passphrase",
+        "label": "Passphrase:",
+        "type": "text",
+        "placeholder": "secret",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "steghide_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "binwalk-builtin",
+    "name": "Binwalk Binary Analysis",
+    "description": "Scan a binary for embedded files and executable code.",
+    "notes": "pip install binwalk or apt install binwalk",
+    "command_template": "binwalk {{mode_flags}} {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "File path:",
+        "type": "text",
+        "placeholder": "/path/to/firmware.bin",
+        "default_value": ""
+      },
+      {
+        "id": "mode_flags",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Scan (default)" },
+          { "value": "-e", "text": "Extract (-e)" },
+          { "value": "-Me", "text": "Recursive extract (-Me)" },
+          { "value": "-A", "text": "Architecture scan (-A)" },
+          { "value": "--entropy", "text": "Entropy analysis" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "binwalk_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "foremost-builtin",
+    "name": "Foremost File Carving",
+    "description": "Recover files by file header/footer signatures (forensics).",
+    "notes": "apt install foremost",
+    "command_template": "foremost -i {{input}} -o {{output_dir}} {{type_flag}}",
+    "input_fields": [
+      {
+        "id": "input",
+        "label": "Input file/image:",
+        "type": "text",
+        "placeholder": "/path/to/image.dd",
+        "default_value": ""
+      },
+      {
+        "id": "output_dir",
+        "label": "Output dir:",
+        "type": "text",
+        "placeholder": "/tmp/foremost_out",
+        "default_value": "/tmp/foremost_out"
+      },
+      {
+        "id": "type_flag",
+        "label": "File types:",
+        "type": "text",
+        "placeholder": "-t jpg,pdf,zip",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "foremost_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "volatility-builtin",
+    "name": "Volatility Memory Forensics",
+    "description": "Analyse memory dump files for forensic artefacts.",
+    "notes": "Requires volatility3 installed. vol.py for legacy v2.",
+    "command_template": "python3 vol.py -f {{memory_image}} {{plugin}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "memory_image",
+        "label": "Memory image path:",
+        "type": "text",
+        "placeholder": "/path/to/mem.dump",
+        "default_value": ""
+      },
+      {
+        "id": "plugin",
+        "label": "Plugin:",
+        "type": "select",
+        "options": [
+          { "value": "windows.pslist", "text": "Process list (pslist)" },
+          { "value": "windows.netscan", "text": "Network scan (netscan)" },
+          { "value": "windows.cmdline", "text": "Command lines (cmdline)" },
+          { "value": "windows.filescan", "text": "File scan (filescan)" },
+          { "value": "windows.dlllist", "text": "DLL list (dlllist)" },
+          { "value": "linux.bash", "text": "Bash history (linux)" }
+        ],
+        "default_value": "windows.pslist"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--pid 1234",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "volatility_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "aircrack-ng-builtin",
+    "name": "Aircrack-ng WPA Cracker",
+    "description": "Crack WPA/WPA2 handshake files.",
+    "notes": "Use only on networks you own or have written permission to test.",
+    "command_template": "aircrack-ng {{handshake_file}} -w {{wordlist}} {{bssid_flag}} {{bssid}}",
+    "input_fields": [
+      {
+        "id": "handshake_file",
+        "label": "Capture (.cap) file:",
+        "type": "text",
+        "placeholder": "/path/to/handshake.cap",
+        "default_value": ""
+      },
+      {
+        "id": "wordlist",
+        "label": "Wordlist:",
+        "type": "text",
+        "placeholder": "/usr/share/wordlists/rockyou.txt",
+        "default_value": ""
+      },
+      {
+        "id": "bssid_flag",
+        "label": "Specify BSSID?",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "No" },
+          { "value": "-b", "text": "Yes (-b)" }
+        ],
+        "default_value": ""
+      },
+      {
+        "id": "bssid",
+        "label": "BSSID (if specified):",
+        "type": "text",
+        "placeholder": "AA:BB:CC:DD:EE:FF",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "aircrack_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "airodump-ng-builtin",
+    "name": "Airodump-ng Packet Capture",
+    "description": "Capture 802.11 frames for WPA handshake collection.",
+    "notes": "Interface must be in monitor mode. Use only on your own networks.",
+    "command_template": "airodump-ng --bssid {{bssid}} --channel {{channel}} --write {{output}} {{interface}}",
+    "input_fields": [
+      {
+        "id": "interface",
+        "label": "Interface (monitor mode):",
+        "type": "text",
+        "placeholder": "wlan0mon",
+        "default_value": "wlan0mon"
+      },
+      {
+        "id": "bssid",
+        "label": "Target BSSID:",
+        "type": "text",
+        "placeholder": "AA:BB:CC:DD:EE:FF",
+        "default_value": ""
+      },
+      {
+        "id": "channel",
+        "label": "Channel:",
+        "type": "text",
+        "placeholder": "6",
+        "default_value": "6"
+      },
+      {
+        "id": "output",
+        "label": "Output filename prefix:",
+        "type": "text",
+        "placeholder": "/tmp/capture",
+        "default_value": "/tmp/capture"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "airodump_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "fping-builtin",
+    "name": "Fping Host Sweep",
+    "description": "Ping multiple hosts simultaneously for alive detection.",
+    "notes": "apt install fping",
+    "command_template": "fping {{mode_flag}} {{target}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target (IP, range, or CIDR):",
+        "type": "text",
+        "placeholder": "192.168.1.0/24",
+        "default_value": ""
+      },
+      {
+        "id": "mode_flag",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "-a -g", "text": "Alive hosts in range (-a -g)" },
+          { "value": "-u -g", "text": "Unreachable hosts (-u -g)" },
+          { "value": "-s", "text": "Statistics (-s)" }
+        ],
+        "default_value": "-a -g"
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-q -r1",
+        "default_value": "-q"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "fping_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "hping3-builtin",
+    "name": "Hping3 Packet Crafter",
+    "description": "Send custom TCP/UDP/ICMP/raw-IP packets.",
+    "notes": "Requires root. Use on authorized targets only.",
+    "command_template": "hping3 {{flags}} -c {{count}} {{target}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target:",
+        "type": "text",
+        "placeholder": "192.168.1.1",
+        "default_value": ""
+      },
+      {
+        "id": "flags",
+        "label": "Probe type:",
+        "type": "select",
+        "options": [
+          { "value": "-S -p 80", "text": "SYN to port 80" },
+          { "value": "-A -p 80", "text": "ACK to port 80" },
+          { "value": "--icmp", "text": "ICMP" },
+          { "value": "--udp -p 53", "text": "UDP to port 53" },
+          { "value": "-S --scan 1-1000", "text": "SYN scan 1-1000" }
+        ],
+        "default_value": "-S -p 80"
+      },
+      {
+        "id": "count",
+        "label": "Packet count:",
+        "type": "select",
+        "options": [
+          { "value": "5", "text": "5" },
+          { "value": "10", "text": "10" },
+          { "value": "20", "text": "20" }
+        ],
+        "default_value": "5"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "hping3_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "snmpwalk-builtin",
+    "name": "SNMPwalk",
+    "description": "Walk SNMP MIB tree on a target device.",
+    "notes": "apt install snmp",
+    "command_template": "snmpwalk -v {{version}} -c {{community}} {{target}} {{oid}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP:",
+        "type": "text",
+        "placeholder": "192.168.1.1",
+        "default_value": ""
+      },
+      {
+        "id": "version",
+        "label": "SNMP Version:",
+        "type": "select",
+        "options": [
+          { "value": "1", "text": "v1" },
+          { "value": "2c", "text": "v2c" }
+        ],
+        "default_value": "2c"
+      },
+      {
+        "id": "community",
+        "label": "Community string:",
+        "type": "text",
+        "placeholder": "public",
+        "default_value": "public"
+      },
+      {
+        "id": "oid",
+        "label": "OID (leave blank for full walk):",
+        "type": "text",
+        "placeholder": "1.3.6.1.2.1",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "snmpwalk_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "impacket-secretsdump",
+    "name": "Impacket secretsdump",
+    "description": "Remotely dump Windows credentials (SAM/NTDS/LSA).",
+    "notes": "pip install impacket. Use on authorized systems only.",
+    "command_template": "impacket-secretsdump {{domain}}/{{username}}:{{password}}@{{target}}",
+    "input_fields": [
+      {
+        "id": "target",
+        "label": "Target IP:",
+        "type": "text",
+        "placeholder": "192.168.1.10",
+        "default_value": ""
+      },
       {
         "id": "domain",
         "label": "Domain:",
         "type": "text",
-        "placeholder": "example.com",
+        "placeholder": "WORKGROUP",
+        "default_value": "WORKGROUP"
+      },
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "Administrator",
         "default_value": ""
       },
       {
-        "id": "providers_flag",
-        "label": "Use providers?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "System/default",
-            "value": ""
-          },
-          {
-            "text": "Use providers (--providers)",
-            "value": "--providers"
-          }
-        ]
-      },
-      {
-        "id": "providers_value",
-        "label": "Providers (comma list if enabled)",
-        "type": "text",
-        "placeholder": "wayback,commoncrawl,urlscan,otx",
-        "default_value": ""
-      },
-      {
-        "id": "subs_flag",
-        "label": "Include subdomains?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Yes (--subs)",
-            "value": "--subs"
-          }
-        ]
-      },
-      {
-        "id": "threads_flag",
-        "label": "Set threads?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "Default",
-            "value": ""
-          },
-          {
-            "text": "Set threads (--threads)",
-            "value": "--threads"
-          }
-        ]
-      },
-      {
-        "id": "threads_value",
-        "label": "Threads value",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "Auto",
-            "value": ""
-          },
-          {
-            "text": "50",
-            "value": "50"
-          },
-          {
-            "text": "25",
-            "value": "25"
-          },
-          {
-            "text": "10",
-            "value": "10"
-          },
-          {
-            "text": "5",
-            "value": "5"
-          }
-        ]
-      },
-      {
-        "id": "timeout_flag",
-        "label": "Set timeout?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Timeout (--timeout)",
-            "value": "--timeout"
-          }
-        ]
-      },
-      {
-        "id": "timeout_value",
-        "label": "Timeout (seconds)",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "Auto",
-            "value": ""
-          },
-          {
-            "text": "30",
-            "value": "30"
-          },
-          {
-            "text": "60",
-            "value": "60"
-          },
-          {
-            "text": "120",
-            "value": "120"
-          }
-        ]
-      },
-      {
-        "id": "from_flag",
-        "label": "From date?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "From (--from YYYYMM)",
-            "value": "--from"
-          }
-        ]
-      },
-      {
-        "id": "from_value",
-        "label": "From (YYYYMM)",
-        "type": "text",
-        "placeholder": "202101",
-        "default_value": ""
-      },
-      {
-        "id": "to_flag",
-        "label": "To date?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "To (--to YYYYMM)",
-            "value": "--to"
-          }
-        ]
-      },
-      {
-        "id": "to_value",
-        "label": "To (YYYYMM)",
-        "type": "text",
-        "placeholder": "202112",
-        "default_value": ""
-      },
-      {
-        "id": "blacklist_flag",
-        "label": "Blacklist extensions?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Blacklist (--blacklist)",
-            "value": "--blacklist"
-          }
-        ]
-      },
-      {
-        "id": "blacklist_value",
-        "label": "Blacklist value (comma list)",
-        "type": "text",
-        "placeholder": "png,jpg,gif,woff",
-        "default_value": ""
-      },
-      {
-        "id": "fc_flag",
-        "label": "Filter status codes (--fc)?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Filter codes (--fc)",
-            "value": "--fc"
-          }
-        ]
-      },
-      {
-        "id": "fc_value",
-        "label": "Filter codes (comma list)",
-        "type": "text",
-        "placeholder": "404,302",
-        "default_value": ""
-      },
-      {
-        "id": "mc_flag",
-        "label": "Match status codes (--mc)?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Match codes (--mc)",
-            "value": "--mc"
-          }
-        ]
-      },
-      {
-        "id": "mc_value",
-        "label": "Match codes (comma list)",
-        "type": "text",
-        "placeholder": "200,301",
-        "default_value": ""
-      },
-      {
-        "id": "mt_flag",
-        "label": "Filter MIME types (--mt)?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "MIME types (--mt)",
-            "value": "--mt"
-          }
-        ]
-      },
-      {
-        "id": "mt_value",
-        "label": "MIME types (comma list)",
-        "type": "text",
-        "placeholder": "text/html,application/json",
-        "default_value": ""
-      },
-      {
-        "id": "fp_flag",
-        "label": "Remove param variants (--fp)?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Yes (--fp)",
-            "value": "--fp"
-          }
-        ]
-      },
-      {
-        "id": "proxy_flag",
-        "label": "Use proxy?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No",
-            "value": ""
-          },
-          {
-            "text": "Proxy (--proxy)",
-            "value": "--proxy"
-          }
-        ]
-      },
-      {
-        "id": "proxy_value",
-        "label": "Proxy (if enabled)",
-        "type": "text",
-        "placeholder": "http://127.0.0.1:8080 or socks5://127.0.0.1:9050",
-        "default_value": ""
-      },
-      {
-        "id": "json_flag",
-        "label": "Output JSON?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No (plain)",
-            "value": ""
-          },
-          {
-            "text": "Yes (--json)",
-            "value": "--json"
-          }
-        ]
-      },
-      {
-        "id": "output_flag",
-        "label": "Write to file flag?",
-        "type": "select",
-        "placeholder": "",
-        "default_value": "",
-        "options": [
-          {
-            "text": "No (-o used by default filename)",
-            "value": ""
-          },
-          {
-            "text": "Yes (--o filename)",
-            "value": "--o"
-          }
-        ]
-      },
-      {
-        "id": "custom_flags",
-        "label": "Custom flags (optional)",
-        "type": "text",
-        "placeholder": "extra flags, e.g. --retries 10",
+        "id": "password",
+        "label": "Password:",
+        "type": "password",
+        "placeholder": "Password123",
         "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "gau_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "secretsdump_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "gauplus-builtin",
-    "name": "Gauplus",
-    "description": "Enhanced URL aggregation (gauplus).",
-    "notes": "",
-    "command_template": "gauplus {{domain}}",
+    "id": "crackmapexec-builtin",
+    "name": "CrackMapExec (CME)",
+    "description": "Post-exploitation / AD assessment swiss-army knife.",
+    "notes": "pip install crackmapexec. Use on authorized systems only.",
+    "command_template": "crackmapexec {{protocol}} {{target}} -u {{username}} -p {{password}} {{extra_flags}}",
     "input_fields": [
       {
-        "id": "domain",
-        "label": "Domain:",
+        "id": "target",
+        "label": "Target (IP/CIDR):",
         "type": "text",
-        "placeholder": "example.com",
+        "placeholder": "192.168.1.0/24",
+        "default_value": ""
+      },
+      {
+        "id": "protocol",
+        "label": "Protocol:",
+        "type": "select",
+        "options": [
+          { "value": "smb", "text": "SMB" },
+          { "value": "ssh", "text": "SSH" },
+          { "value": "winrm", "text": "WinRM" },
+          { "value": "mssql", "text": "MSSQL" },
+          { "value": "ldap", "text": "LDAP" }
+        ],
+        "default_value": "smb"
+      },
+      {
+        "id": "username",
+        "label": "Username:",
+        "type": "text",
+        "placeholder": "Administrator",
+        "default_value": ""
+      },
+      {
+        "id": "password",
+        "label": "Password:",
+        "type": "password",
+        "placeholder": "Password123",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "--shares --sam",
         "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "gauplus_{{domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "cme_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "httprobe-builtin",
-    "name": "Httprobe",
-    "description": "Probe alive HTTP/S endpoints.",
-    "notes": "",
-    "command_template": "cat {{input_list}} | httprobe > {{output_file}}",
+    "id": "responder-builtin",
+    "name": "Responder LLMNR/NBT-NS Poisoner",
+    "description": "Capture NTLM hashes via LLMNR/NBT-NS poisoning on the local network.",
+    "notes": "Requires root. Use only on authorized networks.",
+    "command_template": "responder -I {{interface}} {{mode_flags}}",
     "input_fields": [
       {
-        "id": "input_list",
+        "id": "interface",
+        "label": "Interface:",
+        "type": "text",
+        "placeholder": "eth0",
+        "default_value": "eth0"
+      },
+      {
+        "id": "mode_flags",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "-A", "text": "Analyse mode only (-A)" },
+          { "value": "", "text": "Active poisoning (default)" },
+          { "value": "-wF", "text": "WPAD + force NTLM (-wF)" }
+        ],
+        "default_value": "-A"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "responder_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "objdump-builtin",
+    "name": "Objdump Binary Disassembler",
+    "description": "Disassemble and inspect binary/ELF files.",
+    "notes": "",
+    "command_template": "objdump {{flags}} {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "Binary file path:",
+        "type": "text",
+        "placeholder": "/path/to/binary",
+        "default_value": ""
+      },
+      {
+        "id": "flags",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "-d", "text": "Disassemble code sections (-d)" },
+          { "value": "-D", "text": "Disassemble all sections (-D)" },
+          { "value": "-f", "text": "File header info (-f)" },
+          { "value": "-h", "text": "Section headers (-h)" },
+          { "value": "-x", "text": "All headers (-x)" },
+          { "value": "-t", "text": "Symbol table (-t)" }
+        ],
+        "default_value": "-d"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "objdump_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "readelf-builtin",
+    "name": "Readelf ELF Inspector",
+    "description": "Display detailed information about ELF binaries.",
+    "notes": "",
+    "command_template": "readelf {{flags}} {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "ELF file path:",
+        "type": "text",
+        "placeholder": "/path/to/binary",
+        "default_value": ""
+      },
+      {
+        "id": "flags",
+        "label": "Output:",
+        "type": "select",
+        "options": [
+          { "value": "-a", "text": "All info (-a)" },
+          { "value": "-h", "text": "ELF header (-h)" },
+          { "value": "-S", "text": "Section headers (-S)" },
+          { "value": "-l", "text": "Program headers (-l)" },
+          { "value": "-s", "text": "Symbol table (-s)" },
+          { "value": "-d", "text": "Dynamic section (-d)" }
+        ],
+        "default_value": "-h"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "readelf_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "ltrace-builtin",
+    "name": "Ltrace Library Call Tracer",
+    "description": "Trace library calls made by a program at runtime.",
+    "notes": "apt install ltrace",
+    "command_template": "ltrace {{extra_flags}} {{binary}} {{args}}",
+    "input_fields": [
+      {
+        "id": "binary",
+        "label": "Binary path:",
+        "type": "text",
+        "placeholder": "/path/to/binary",
+        "default_value": ""
+      },
+      {
+        "id": "args",
+        "label": "Program arguments:",
+        "type": "text",
+        "placeholder": "arg1 arg2",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Flags:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "-C", "text": "Demangle C++ names (-C)" },
+          { "value": "-e malloc+free", "text": "Track malloc/free" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "ltrace_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "strace-builtin",
+    "name": "Strace Syscall Tracer",
+    "description": "Trace system calls and signals made by a process.",
+    "notes": "",
+    "command_template": "strace {{extra_flags}} {{binary}} {{args}}",
+    "input_fields": [
+      {
+        "id": "binary",
+        "label": "Binary path:",
+        "type": "text",
+        "placeholder": "/path/to/binary",
+        "default_value": ""
+      },
+      {
+        "id": "args",
+        "label": "Program arguments:",
+        "type": "text",
+        "placeholder": "arg1 arg2",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Flags:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "-e trace=network", "text": "Network calls only" },
+          { "value": "-e trace=file", "text": "File calls only" },
+          { "value": "-f", "text": "Follow forks (-f)" },
+          { "value": "-p", "text": "Attach to PID (-p)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "strace_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "lsof-builtin",
+    "name": "Lsof (Open Files / Network)",
+    "description": "List open files, sockets, and processes on the system.",
+    "notes": "",
+    "command_template": "lsof {{flags}}",
+    "input_fields": [
+      {
+        "id": "flags",
+        "label": "Query type:",
+        "type": "select",
+        "options": [
+          { "value": "-i", "text": "All network connections (-i)" },
+          { "value": "-i :80", "text": "Port 80 (-i :80)" },
+          { "value": "-i :443", "text": "Port 443 (-i :443)" },
+          { "value": "-u root", "text": "Files by root user (-u root)" },
+          { "value": "-p 1234", "text": "Files by PID (-p PID)" },
+          { "value": "+D /tmp", "text": "Files under /tmp (+D /tmp)" }
+        ],
+        "default_value": "-i"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "lsof_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "ps-builtin",
+    "name": "Process List (ps)",
+    "description": "Snapshot of current running processes.",
+    "notes": "",
+    "command_template": "ps {{flags}}",
+    "input_fields": [
+      {
+        "id": "flags",
+        "label": "Format:",
+        "type": "select",
+        "options": [
+          { "value": "aux", "text": "All processes BSD style (aux)" },
+          { "value": "-ef", "text": "Full format (-ef)" },
+          { "value": "auxf", "text": "Tree view (auxf)" },
+          { "value": "-eo pid,user,cmd", "text": "PID / user / cmd only" }
+        ],
+        "default_value": "aux"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "ps_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "find-builtin",
+    "name": "Find Files",
+    "description": "Search for files and directories matching criteria.",
+    "notes": "",
+    "command_template": "find {{path}} {{type_flag}} {{name_flag}} {{perm_flag}} {{size_flag}} {{extra_flags}}",
+    "input_fields": [
+      {
+        "id": "path",
+        "label": "Search path:",
+        "type": "text",
+        "placeholder": "/var/www",
+        "default_value": "/"
+      },
+      {
+        "id": "type_flag",
+        "label": "Type:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Any" },
+          { "value": "-type f", "text": "Files only (-type f)" },
+          { "value": "-type d", "text": "Directories only (-type d)" },
+          { "value": "-type l", "text": "Symlinks only (-type l)" }
+        ],
+        "default_value": "-type f"
+      },
+      {
+        "id": "name_flag",
+        "label": "Name pattern (optional):",
+        "type": "text",
+        "placeholder": "-name '*.php'",
+        "default_value": ""
+      },
+      {
+        "id": "perm_flag",
+        "label": "SUID/SGID?",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "None" },
+          { "value": "-perm -4000", "text": "SUID files" },
+          { "value": "-perm -2000", "text": "SGID files" },
+          { "value": "-perm -u=w,o=w", "text": "World-writable" }
+        ],
+        "default_value": ""
+      },
+      {
+        "id": "size_flag",
+        "label": "Size filter (optional):",
+        "type": "text",
+        "placeholder": "-size +10M",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra (e.g. -mtime -7):",
+        "type": "text",
+        "placeholder": "-mtime -7",
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "find_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "grep-builtin",
+    "name": "Grep Text Search",
+    "description": "Search files for patterns with grep.",
+    "notes": "",
+    "command_template": "grep {{flags}} '{{pattern}}' {{path}}",
+    "input_fields": [
+      {
+        "id": "pattern",
+        "label": "Search pattern:",
+        "type": "text",
+        "placeholder": "password",
+        "default_value": ""
+      },
+      {
+        "id": "path",
+        "label": "File or directory:",
+        "type": "text",
+        "placeholder": "/var/www",
+        "default_value": ""
+      },
+      {
+        "id": "flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "-rn", "text": "Recursive + line numbers (-rn)" },
+          { "value": "-rni", "text": "Case-insensitive recursive (-rni)" },
+          { "value": "-rl", "text": "List matching files only (-rl)" },
+          { "value": "-rn --include='*.php'", "text": "PHP files only" },
+          { "value": "-rn --include='*.py'", "text": "Python files only" }
+        ],
+        "default_value": "-rn"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "grep_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "base64-builtin",
+    "name": "Base64 Encode / Decode",
+    "description": "Encode or decode Base64 data.",
+    "notes": "",
+    "command_template": "echo '{{input}}' | base64 {{decode_flag}}",
+    "input_fields": [
+      {
+        "id": "input",
+        "label": "Input string:",
+        "type": "text",
+        "placeholder": "Hello World",
+        "default_value": ""
+      },
+      {
+        "id": "decode_flag",
+        "label": "Action:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Encode" },
+          { "value": "--decode", "text": "Decode (--decode)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "base64_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "xxd-builtin",
+    "name": "xxd Hex Dump",
+    "description": "Create a hex dump or reverse it to binary.",
+    "notes": "",
+    "command_template": "xxd {{reverse_flag}} {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "File path:",
+        "type": "text",
+        "placeholder": "/path/to/file",
+        "default_value": ""
+      },
+      {
+        "id": "reverse_flag",
+        "label": "Mode:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Hex dump (default)" },
+          { "value": "-r", "text": "Reverse hex to binary (-r)" },
+          { "value": "-b", "text": "Binary dump (-b)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "xxd_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "tr-builtin",
+    "name": "Tr / ROT13 Transform",
+    "description": "Translate or transform characters — useful for simple cipher CTF challenges.",
+    "notes": "",
+    "command_template": "echo '{{input}}' | tr '{{from_set}}' '{{to_set}}'",
+    "input_fields": [
+      {
+        "id": "input",
+        "label": "Input string:",
+        "type": "text",
+        "placeholder": "Hello World",
+        "default_value": ""
+      },
+      {
+        "id": "from_set",
+        "label": "From charset:",
+        "type": "text",
+        "placeholder": "A-Za-z",
+        "default_value": "A-Za-z"
+      },
+      {
+        "id": "to_set",
+        "label": "To charset (ROT13 = N-ZA-Mn-za-m):",
+        "type": "text",
+        "placeholder": "N-ZA-Mn-za-m",
+        "default_value": "N-ZA-Mn-za-m"
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "tr_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "awk-builtin",
+    "name": "Awk Column Extractor",
+    "description": "Extract and process columns from text files.",
+    "notes": "",
+    "command_template": "awk '{{program}}' {{file}}",
+    "input_fields": [
+      {
+        "id": "file",
         "label": "Input file:",
         "type": "text",
-        "placeholder": "/path/to/list.txt"
+        "placeholder": "/path/to/file.txt",
+        "default_value": ""
+      },
+      {
+        "id": "program",
+        "label": "Awk program:",
+        "type": "text",
+        "placeholder": "{print $1, $3}",
+        "default_value": "{print $1}"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "httprobe_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "awk_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "httpx-builtin",
-    "name": "Httpx",
-    "description": "HTTP probing with ProjectDiscovery httpx.",
+    "id": "sed-builtin",
+    "name": "Sed Stream Editor",
+    "description": "Find and replace text in files using sed.",
     "notes": "",
-    "command_template": "httpx -l {{input_list}} -o {{output_file}}",
+    "command_template": "sed '{{expression}}' {{file}}",
     "input_fields": [
       {
-        "id": "input_list",
-        "label": "Input list:",
+        "id": "file",
+        "label": "File path:",
         "type": "text",
-        "placeholder": "/path/to/urls.txt"
+        "placeholder": "/path/to/file.txt",
+        "default_value": ""
+      },
+      {
+        "id": "expression",
+        "label": "Sed expression:",
+        "type": "text",
+        "placeholder": "s/old/new/g",
+        "default_value": "s/old/new/g"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "httpx_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "sed_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "curl-builtin",
-    "name": "Curl",
-    "description": "Fetch a URL with curl.",
+    "id": "sort-uniq-builtin",
+    "name": "Sort & Deduplicate",
+    "description": "Sort lines in a file and remove duplicates.",
     "notes": "",
-    "command_template": "curl {{url}}",
+    "command_template": "sort {{extra_flags}} {{file}} | uniq {{uniq_flags}}",
+    "input_fields": [
+      {
+        "id": "file",
+        "label": "File:",
+        "type": "text",
+        "placeholder": "/path/to/file.txt",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Sort options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Alphabetical (default)" },
+          { "value": "-n", "text": "Numeric sort (-n)" },
+          { "value": "-r", "text": "Reverse (-r)" },
+          { "value": "-rn", "text": "Numeric reverse (-rn)" }
+        ],
+        "default_value": ""
+      },
+      {
+        "id": "uniq_flags",
+        "label": "Uniq mode:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Remove duplicates (default)" },
+          { "value": "-c", "text": "Count occurrences (-c)" },
+          { "value": "-d", "text": "Show duplicates only (-d)" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "sort_uniq_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "curl-headers-builtin",
+    "name": "Curl HTTP Headers Inspector",
+    "description": "Fetch only the HTTP response headers from a URL.",
+    "notes": "",
+    "command_template": "curl -sI {{url}} {{extra_flags}}",
     "input_fields": [
       {
         "id": "url",
-        "label": "URL:",
+        "label": "Target URL:",
+        "type": "url",
+        "placeholder": "http://example.com",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Options:",
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "-L", "text": "Follow redirects (-L)" },
+          { "value": "-k", "text": "Skip TLS verify (-k)" },
+          { "value": "-A 'Googlebot'", "text": "Googlebot User-Agent" }
+        ],
+        "default_value": ""
+      }
+    ],
+    "requires_clone": false,
+    "output_filename_pattern": "curl_headers_{{TIMESTAMP}}.txt"
+  },
+
+  {
+    "id": "robotstxt-builtin",
+    "name": "Robots.txt Fetcher",
+    "description": "Retrieve and display the robots.txt file of a domain.",
+    "notes": "",
+    "command_template": "curl -sL {{url}}/robots.txt",
+    "input_fields": [
+      {
+        "id": "url",
+        "label": "Base URL:",
         "type": "url",
         "placeholder": "http://example.com",
         "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "curl_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "robots_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "wget-builtin",
-    "name": "Wget",
-    "description": "Download with wget.",
-    "notes": "",
-    "command_template": "wget -qO {{output_file}} {{url}}",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "URL:",
-        "type": "url",
-        "placeholder": "http://example.com/file.zip"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "wget_{{TIMESTAMP}}.bin"
-  },
-  {
-    "id": "masscan-builtin",
-    "name": "Masscan",
-    "description": "Fast port scanner.",
-    "notes": "",
-    "command_template": "masscan {{target}} -p{{ports}} --rate {{rate}}",
+    "id": "nmap-vuln-script",
+    "name": "Nmap Vuln Script Scan",
+    "description": "Run Nmap with vulnerability detection NSE scripts.",
+    "notes": "Requires nmap with script engine. Can be slow — limit port range.",
+    "command_template": "nmap -sV --script vuln {{port_flag}} {{target}}",
     "input_fields": [
       {
         "id": "target",
-        "label": "Target:",
+        "label": "Target (IP/Hostname):",
         "type": "text",
-        "placeholder": "192.168.1.0/24",
+        "placeholder": "192.168.1.1",
         "default_value": ""
       },
       {
-        "id": "ports",
-        "label": "Ports:",
-        "type": "text",
-        "placeholder": "1-1000",
-        "default_value": "1-1000"
-      },
-      {
-        "id": "rate",
-        "label": "Rate:",
-        "type": "text",
-        "placeholder": "1000",
-        "default_value": "1000"
+        "id": "port_flag",
+        "label": "Port range:",
+        "type": "select",
+        "options": [
+          { "value": "-p 80,443,8080", "text": "Common web ports" },
+          { "value": "-p 1-1000", "text": "Top 1000" },
+          { "value": "-p-", "text": "All ports (slow)" },
+          { "value": "--top-ports 100", "text": "Top 100" }
+        ],
+        "default_value": "--top-ports 100"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "masscan_{{INPUT__target}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false,
-    "clone_url": "",
-    "requirements_file": "",
-    "run_in_directory": null
+    "output_filename_pattern": "nmap_vuln_{{INPUT__target}}_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "nikto-builtin",
-    "name": "Nikto",
-    "description": "Webserver vulnerability scanner.",
-    "notes": "",
-    "command_template": "nikto -h {{url}}",
+    "id": "ghidra-headless",
+    "name": "Ghidra Headless Analysis",
+    "description": "Run Ghidra in headless mode to auto-analyse a binary.",
+    "notes": "Requires Ghidra installed and GHIDRA_HOME set. Slow on first run.",
+    "command_template": "${GHIDRA_HOME}/support/analyzeHeadless {{project_dir}} {{project_name}} -import {{binary}} -postScript {{script}} {{extra_flags}}",
     "input_fields": [
       {
-        "id": "url",
-        "label": "Target URL:",
-        "type": "url",
-        "placeholder": "http://example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "nikto_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "sqlmap-builtin",
-    "name": "Sqlmap",
-    "description": "Automated SQL injection tool.",
-    "notes": "",
-    "command_template": "sqlmap -u '{{url}}' --batch -o",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "Target URL:",
-        "type": "url",
-        "placeholder": "http://example.com/vuln?id=1"
-      },
-      {
-        "id": "output_dir",
-        "label": "Output Directory:",
+        "id": "binary",
+        "label": "Binary to analyse:",
         "type": "text",
-        "placeholder": "/tmp/sqlmap"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "sqlmap_{{TIMESTAMP}}"
-  },
-  {
-    "id": "nuclei-builtin",
-    "name": "Nuclei",
-    "description": "Templated vulnerability scanner.",
-    "notes": "",
-    "command_template": "nuclei -l {{input_list}} -t {{templates}}",
-    "input_fields": [
-      {
-        "id": "input_list",
-        "label": "Targets file:",
-        "type": "text",
-        "placeholder": "/path/to/urls.txt"
-      },
-      {
-        "id": "templates",
-        "label": "Templates path:",
-        "type": "text",
-        "placeholder": "/path/to/nuclei-templates/"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "nuclei_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "subjack-builtin",
-    "name": "Subjack",
-    "description": "Subdomain takeover tool.",
-    "notes": "",
-    "command_template": "subjack -w {{wordlist}} -t 100 -timeout 30 -ssl",
-    "input_fields": [
-      {
-        "id": "wordlist",
-        "label": "Subdomains list:",
-        "type": "text",
-        "placeholder": "/path/to/subs.txt"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "subjack_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "theharvester-builtin",
-    "name": "TheHarvester",
-    "description": "Gather emails, names, subdomains, IPs from search engines.",
-    "notes": "",
-    "command_template": "theHarvester -d {{domain}} -b all -f",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
-        "type": "text",
-        "placeholder": "example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "theharvester_{{INPUT__domain}}_{{TIMESTAMP}}.html"
-  },
-  {
-    "id": "reconng-builtin",
-    "name": "Recon-ng",
-    "description": "Web recon framework (CLI).",
-    "notes": "",
-    "command_template": "recon-ng --no-check -m recon/domains-hosts/bing_domain_web -o SOURCE={{domain}}",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
-        "type": "text",
-        "placeholder": "example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "reconng_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "spiderfoot-builtin",
-    "name": "Spiderfoot CLI",
-    "description": "OSINT automation via Spiderfoot CLI.",
-    "notes": "",
-    "command_template": "spiderfoot-cli -s {{target}}",
-    "input_fields": [
-      {
-        "id": "target",
-        "label": "Target (domain/IP):",
-        "type": "text",
-        "placeholder": "example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "spiderfoot_{{INPUT__target}}_{{TIMESTAMP}}.txt"
-  },
-   {
-    "id": "sherlock-cloned",
-    "name": "Sherlock Username Search",
-    "description": "Hunt for social media accounts by username. This configuration expects Sherlock to be cloned.",
-    "notes": "Ensure the clone URL is correct and the server can access it. Clone and pip install will be attempted if added via UI.",
-    "command_template": "python3 sherlock/sherlock.py {{username}} --no-color --timeout 10 --print-found",
-    "input_fields": [
-      {
-        "id": "username",
-        "label": "Username:",
-        "type": "text",
-        "placeholder": "Enter username",
-        "default_value": ""
-      }
-    ],
-    "requires_clone": true,
-    "clone_url": "https://github.com/sherlock-project/sherlock.git",
-    "clone_dir": "tools/sherlock_username_search_cloned",
-    "requirements_file": "requirements.txt",
-    "run_in_directory": "tools/sherlock_username_search",
-    "output_filename_pattern": "sherlock_{{INPUT__username}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false
-  },
-  {
-    "id": "shodan-builtin",
-    "name": "Shodan CLI",
-    "description": "Search devices on Shodan.",
-    "notes": "",
-    "command_template": "shodan host {{ip}}",
-    "input_fields": [
-      {
-        "id": "ip",
-        "label": "IP:",
-        "type": "text",
-        "placeholder": "8.8.8.8"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "shodan_{{INPUT__ip}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "censys-builtin",
-    "name": "Censys CLI",
-    "description": "Search Censys with CLI.",
-    "notes": "",
-    "command_template": "censys search {{query}}",
-    "input_fields": [
-      {
-        "id": "query",
-        "label": "Search query:",
-        "type": "text",
-        "placeholder": "service.service_name: HTTP"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "censys_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "vt-builtin",
-    "name": "VirusTotal CLI",
-    "description": "Scan URLs or files with VirusTotal CLI.",
-    "notes": "",
-    "command_template": "vt url scan {{url}}",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "URL:",
-        "type": "url",
-        "placeholder": "http://example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "vt_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "urlscan-builtin",
-    "name": "Urlscan CLI",
-    "description": "Submit and fetch results from urlscan.io.",
-    "notes": "",
-    "command_template": "urlscan submit {{url}}",
-    "input_fields": [
-      {
-        "id": "url",
-        "label": "URL:",
-        "type": "url",
-        "placeholder": "http://example.com"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "urlscan_{{TIMESTAMP}}.txt"
-  },
-    {
-    "id": "sublist3r-cloned",
-    "name": "Sublist3r Subdomain Enum",
-    "description": "Fast subdomains enumeration tool. This expects Sublist3r to be cloned.",
-    "notes": "Cloning and pip install will be attempted if added via UI.",
-    "command_template": "python3 sublist3r.py -d {{domain}} -n",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Domain:",
-        "type": "text",
-        "placeholder": "example.com",
-        "default_value": ""
-      }
-    ],
-    "requires_clone": true,
-    "clone_url": "https://github.com/aboul3la/Sublist3r.git",
-    "clone_dir": "tools/sublist3r_subdomain_enum_cloned",
-    "requirements_file": "requirements.txt",
-    "run_in_directory": "tools/sublist3r_subdomain_enum",
-    "output_filename_pattern": "sublist3r_{{INPUT__domain}}_{{TIMESTAMP}}.txt",
-    "custom_handling": false
-  },
-   {
-    "id": "metagoofil-cloned",
-    "name": "Metagoofil Metadata Extraction",
-    "description": "Extracts metadata from public documents. Expects Metagoofil to be cloned.",
-    "notes": "Output directory will be created inside the cloned tool's directory. Relies on system's exiftool.",
-    "command_template": "python2 metagoofil/metagoofil.py -d {{domain}} -t {{filetypes}} -l {{search_limit}} -n {{download_limit}} -o results_output -f metagoofil_report.html",
-    "input_fields": [
-      {
-        "id": "domain",
-        "label": "Target Domain:",
-        "type": "text",
-        "placeholder": "example.com",
+        "placeholder": "/path/to/binary",
         "default_value": ""
       },
       {
-        "id": "filetypes",
-        "label": "File Types (comma-sep):",
+        "id": "project_dir",
+        "label": "Project directory:",
         "type": "text",
-        "placeholder": "pdf,doc,xls",
-        "default_value": "pdf,doc,xls"
+        "placeholder": "/tmp/ghidra_projects",
+        "default_value": "/tmp/ghidra_projects"
       },
       {
-        "id": "search_limit",
-        "label": "Search Results Limit:",
+        "id": "project_name",
+        "label": "Project name:",
         "type": "text",
-        "placeholder": "100",
-        "default_value": "100"
+        "placeholder": "MyProject",
+        "default_value": "MyProject"
       },
       {
-        "id": "download_limit",
-        "label": "Files to Download Limit:",
+        "id": "script",
+        "label": "Post-analysis script:",
         "type": "text",
-        "placeholder": "50",
-        "default_value": "50"
+        "placeholder": "ExportFunctions.java",
+        "default_value": ""
+      },
+      {
+        "id": "extra_flags",
+        "label": "Extra flags:",
+        "type": "text",
+        "placeholder": "-overwrite",
+        "default_value": "-overwrite"
       }
     ],
-    "requires_clone": true,
-    "clone_url": "https://github.com/laramies/metagoofil.git",
-    "clone_dir": "tools/metagoofil_metadata_extr_cloned",
-    "requirements_file": "",
-    "run_in_directory": "tools/metagoofil_metadata_extraction",
-    "output_filename_pattern": "metagoofil_{{INPUT__domain}}_{{TIMESTAMP}}.info",
-    "custom_handling": false
+    "requires_clone": false,
+    "output_filename_pattern": "ghidra_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "exiftool-builtin",
-    "name": "Exiftool",
-    "description": "Extract metadata from files.",
+    "id": "file-builtin",
+    "name": "File Type Identifier",
+    "description": "Identify file type using magic bytes.",
     "notes": "",
-    "command_template": "exiftool {{file}}",
+    "command_template": "file {{extra_flags}} {{path}}",
     "input_fields": [
       {
-        "id": "file",
+        "id": "path",
         "label": "File path:",
         "type": "text",
-        "placeholder": "/path/to/file.jpg"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "exiftool_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "pdfinfo-builtin",
-    "name": "Pdfinfo",
-    "description": "Extract PDF metadata with pdfinfo.",
-    "notes": "",
-    "command_template": "pdfinfo {{file}}",
-    "input_fields": [
-      {
-        "id": "file",
-        "label": "PDF File path:",
-        "type": "text",
-        "placeholder": "/path/to/file.pdf"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "pdfinfo_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "strings-builtin",
-    "name": "Strings",
-    "description": "Extract strings from binary/text files.",
-    "notes": "",
-    "command_template": "strings {{file}}",
-    "input_fields": [
-      {
-        "id": "file",
-        "label": "File path:",
-        "type": "text",
-        "placeholder": "/path/to/file.bin"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "strings_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "jq-builtin",
-    "name": "jq",
-    "description": "Process JSON using jq.",
-    "notes": "",
-    "command_template": "jq '{{filter}}' {{file}}",
-    "input_fields": [
-      {
-        "id": "file",
-        "label": "JSON File path:",
-        "type": "text",
-        "placeholder": "/path/to/file.json"
+        "placeholder": "/path/to/unknownfile",
+        "default_value": ""
       },
       {
-        "id": "filter",
-        "label": "jq Filter:",
-        "type": "text",
-        "placeholder": ".data"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "jq_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "rg-builtin",
-    "name": "Ripgrep",
-    "description": "Search text using ripgrep (rg).",
-    "notes": "",
-    "command_template": "rg '{{pattern}}' {{file}}",
-    "input_fields": [
-      {
-        "id": "pattern",
-        "label": "Search Pattern:",
-        "type": "text",
-        "placeholder": "password"
-      },
-      {
-        "id": "file",
-        "label": "File or Directory:",
-        "type": "text",
-        "placeholder": "/path/to/files"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "rg_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "nc-builtin",
-    "name": "Netcat",
-    "description": "Networking swiss-army knife.",
-    "notes": "",
-    "command_template": "nc {{target}} {{port}}",
-    "input_fields": [
-      {
-        "id": "target",
-        "label": "Target:",
-        "type": "text",
-        "placeholder": "example.com"
-      },
-      {
-        "id": "port",
-        "label": "Port:",
-        "type": "text",
-        "placeholder": "80"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "nc_{{INPUT__target}}_{{INPUT__port}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "socat-builtin",
-    "name": "Socat",
-    "description": "Advanced relay for bidirectional data transfer.",
-    "notes": "",
-    "command_template": "socat {{options}}",
-    "input_fields": [
-      {
-        "id": "options",
+        "id": "extra_flags",
         "label": "Options:",
-        "type": "text",
-        "placeholder": "TCP4-LISTEN:4444,reuseaddr,fork TCP4:target:80"
+        "type": "select",
+        "options": [
+          { "value": "", "text": "Default" },
+          { "value": "-b", "text": "Brief (no filename) (-b)" },
+          { "value": "-z", "text": "Look inside compressed (-z)" },
+          { "value": "-i", "text": "MIME type (-i)" }
+        ],
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "socat_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "file_id_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "traceroute-builtin",
-    "name": "Traceroute",
-    "description": "Network route tracing.",
-    "notes": "",
-    "command_template": "traceroute {{target}}",
+    "id": "checksec-builtin",
+    "name": "Checksec Binary Protections",
+    "description": "Check security properties of ELF binaries (NX, ASLR, PIE, etc.).",
+    "notes": "pip install checksec or apt install checksec",
+    "command_template": "checksec --file={{binary}}",
     "input_fields": [
       {
-        "id": "target",
-        "label": "Target:",
+        "id": "binary",
+        "label": "Binary path:",
         "type": "text",
-        "placeholder": "example.com"
+        "placeholder": "/path/to/binary",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "traceroute_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "checksec_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "mtr-builtin",
-    "name": "MTR",
-    "description": "Network diagnostic combining ping & traceroute.",
+    "id": "urlparse-python",
+    "name": "URL Parser",
+    "description": "Parse a URL into its components (scheme, host, path, query, fragment).",
     "notes": "",
-    "command_template": "mtr -r {{target}}",
+    "command_template": "python3 -c \"from urllib.parse import urlparse; u = urlparse('{{url}}'); print(f'Scheme: {u.scheme}\\nHost: {u.netloc}\\nPath: {u.path}\\nQuery: {u.query}\\nFragment: {u.fragment}')\"",
     "input_fields": [
       {
-        "id": "target",
-        "label": "Target:",
+        "id": "url",
+        "label": "URL to parse:",
         "type": "text",
-        "placeholder": "example.com"
+        "placeholder": "https://example.com/path?foo=bar#anchor",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "mtr_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "urlparse_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "enum4linux-builtin",
-    "name": "Enum4linux",
-    "description": "Windows/Samba enumeration tool.",
+    "id": "cyberchef-decode",
+    "name": "Python Decode Helper",
+    "description": "Decode common encodings: URL, HTML, unicode escapes using Python one-liners.",
     "notes": "",
-    "command_template": "enum4linux -a {{target}}",
+    "command_template": "python3 -c \"import {{module}}; print({{decode_call}})\"",
     "input_fields": [
       {
-        "id": "target",
-        "label": "Target:",
+        "id": "module",
+        "label": "Module:",
+        "type": "select",
+        "options": [
+          { "value": "urllib.parse", "text": "urllib.parse (URL decode)" },
+          { "value": "html", "text": "html (HTML entities)" },
+          { "value": "base64", "text": "base64 (Base64 decode)" },
+          { "value": "binascii", "text": "binascii (hex/bytes)" }
+        ],
+        "default_value": "urllib.parse"
+      },
+      {
+        "id": "decode_call",
+        "label": "Python expression:",
         "type": "text",
-        "placeholder": "192.168.1.100"
+        "placeholder": "urllib.parse.unquote('Hello%20World')",
+        "default_value": ""
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "enum4linux_{{INPUT__target}}_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "decode_{{TIMESTAMP}}.txt"
   },
+
   {
-    "id": "smbclient-builtin",
-    "name": "Smbclient",
-    "description": "Access SMB shares.",
+    "id": "whatismyip-builtin",
+    "name": "Public IP Lookup",
+    "description": "Get your current public IP address and geo info.",
     "notes": "",
-    "command_template": "smbclient \\\\{{target}}\\{{share}} -U {{username}}%{{password}}",
+    "command_template": "curl -s https://ipinfo.io/json",
+    "input_fields": [],
+    "requires_clone": false,
+    "output_filename_pattern": "myip_{{TIMESTAMP}}.json"
+  },
+
+  {
+    "id": "dnstwist-builtin",
+    "name": "DNSTwist Typosquat Finder",
+    "description": "Generate and resolve typosquatting/phishing variations of a domain.",
+    "notes": "pip install dnstwist[full]",
+    "command_template": "dnstwist {{domain}} {{format_flag}} {{extra_flags}}",
     "input_fields": [
       {
-        "id": "target",
-        "label": "Target IP:",
+        "id": "domain",
+        "label": "Domain:",
         "type": "text",
-        "placeholder": "192.168.1.100"
+        "placeholder": "example.com",
+        "default_value": ""
       },
       {
-        "id": "share",
-        "label": "Share name:",
-        "type": "text",
-        "placeholder": "C$"
+        "id": "format_flag",
+        "label": "Output format:",
+        "type": "select",
+        "options": [
+          { "value": "--format cli", "text": "CLI table" },
+          { "value": "--format csv", "text": "CSV" },
+          { "value": "--format json", "text": "JSON" }
+        ],
+        "default_value": "--format cli"
       },
       {
-        "id": "username",
-        "label": "Username:",
+        "id": "extra_flags",
+        "label": "Extra flags:",
         "type": "text",
-        "placeholder": "user"
-      },
-      {
-        "id": "password",
-        "label": "Password:",
-        "type": "password",
-        "placeholder": "pass"
+        "placeholder": "--registered --mxcheck",
+        "default_value": "--registered"
       }
     ],
     "requires_clone": false,
-    "output_filename_pattern": "smbclient_{{INPUT__target}}_{{INPUT__share}}_{{TIMESTAMP}}.txt"
-  },
-  {
-    "id": "hydra-builtin",
-    "name": "Hydra",
-    "description": "Brute force login services with hydra.",
-    "notes": "",
-    "command_template": "hydra -l {{username}} -P {{password_list}} {{target}} {{service}}",
-    "input_fields": [
-      {
-        "id": "username",
-        "label": "Username:",
-        "type": "text",
-        "placeholder": "admin"
-      },
-      {
-        "id": "password_list",
-        "label": "Password list path:",
-        "type": "text",
-        "placeholder": "/path/to/pass.txt"
-      },
-      {
-        "id": "target",
-        "label": "Target:",
-        "type": "text",
-        "placeholder": "192.168.1.10"
-      },
-      {
-        "id": "service",
-        "label": "Service:",
-        "type": "text",
-        "placeholder": "ssh"
-      }
-    ],
-    "requires_clone": false,
-    "output_filename_pattern": "hydra_{{INPUT__target}}_{{INPUT__service}}_{{TIMESTAMP}}.txt"
+    "output_filename_pattern": "dnstwist_{{INPUT__domain}}_{{TIMESTAMP}}.txt"
   }
 ]
