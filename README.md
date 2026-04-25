@@ -158,7 +158,14 @@ cd ..
 pip install -r tools/sherlock/sherlock/requirements.txt
 pip install -r tools/Sublist3r/requirements.txt
 ```
+## Uninstall
 
+```bash
+chmod +x uninstall.sh
+./uninstall.sh          # removes project files + Go binaries
+./uninstall.sh --full   # also removes apt packages
+./uninstall.sh --purge  # apt purge + autoremove
+```
 ---
 
 ## ctfr.py — Certificate Transparency Recon (v1.3)
